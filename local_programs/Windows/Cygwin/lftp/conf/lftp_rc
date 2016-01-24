@@ -1,0 +1,13 @@
+set sftp:auto-confirm yes
+set color:use-color auto
+set bmk:save-password true
+set cmd:default-protocol sftp
+set mirror:parallel-transfer-count 1
+set mirror:use-pget-n 20
+set pget:default-n 20
+set cmd:prompt "lftp \[\e[01;32m\]\h\[\e[00m\]:\[\e[01;34m\]\w\[\e[00m\] % "
+
+# Here you can create your own aliases. The examples below make use of the settings above when used
+
+alias pg pget -c
+alias m mirror -c

@@ -1,0 +1,1 @@
+start bin\notepad\notepad++.exe %cd%\scripts\connect.bysh.lftp
