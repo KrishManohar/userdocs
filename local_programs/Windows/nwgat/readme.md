@@ -36,7 +36,7 @@ Usage
 
 **1:** Download the zip file.
 
-[lftp-4.6.5.win64.zip](https://git.io/vznas)
+[lftp-4.6.5.win64.zip](https://git.io/vzoiB)
 
 ![](1.png)
 
