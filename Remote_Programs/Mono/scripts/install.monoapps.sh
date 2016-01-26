@@ -10,7 +10,7 @@
 #
 # Bash Command for easy reference:
 #
-# wget -qO ~/somescript http://git.io/vfN2U && bash ~/somescript
+# wget -qO ~/install.monoapps https://git.io/vzyZ4 && bash ~/install.monoapps
 #
 # The GPLv3 License (GNU)
 #
@@ -61,7 +61,7 @@ then
     #echo 'v0.0.5 - My changes go here'
     #echo 'v0.0.4 - My changes go here'
     #echo 'v0.0.3 - My changes go here'
-    #echo 'v0.0.2 - My changes go here'
+    echo 'v0.0.2 - beta release'
     echo 'v0.0.1 - Updated templated'
     #
     echo
@@ -80,7 +80,7 @@ fi
 scriptversion="0.0.2"
 #
 # Script name goes here. Please prefix with install.
-scriptname="install.somescript"
+scriptname="install.monoapps"
 #
 # Author name goes here.
 scriptauthor="userdocs"
@@ -89,13 +89,13 @@ scriptauthor="userdocs"
 contributors="None credited"
 #
 # Set the http://git.io/ shortened URL for the raw github URL here:
-gitiourl=""
+gitiourl="https://git.io/vzyZ4"
 #
 # Don't edit: This is the bash command shown when using the info option.
 gitiocommand="wget -qO ~/$scriptname $gitiourl && bash ~/$scriptname"
 #
 # This is the raw github url of the script to use with the built in updater.
-scripturl="https://raw.githubusercontent.com/userdocs/userdocs/"
+scripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Mono/scripts/install.monoapps.sh"
 #
 # This will generate a 20 character random passsword for use with your applications.
 apppass="$(< /dev/urandom tr -dc '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' | head -c20; echo;)"
