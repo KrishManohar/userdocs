@@ -625,7 +625,7 @@ do
                 #
                 echo "http:/$(whoami).$(hostname -f):$embyappporthttp"; echo
                 #
-                echo -n "$embyv" > ~/.userdocs/versions/emby.version"
+                echo -n "$embyv" > ~/.userdocs/versions/emby.version
                 #
                 screen -dmS emby ~/bin/mono ~/.emby/MediaBrowser.Server.Mono.exe
             else
