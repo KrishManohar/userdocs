@@ -1,3 +1,3 @@
 # userdocs
 
-A repo for user documentation.
+A documentation and end user experience framework.
