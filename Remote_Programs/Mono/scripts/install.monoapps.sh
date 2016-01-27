@@ -139,8 +139,8 @@ monovshort="$(curl -s http://download.mono-project.com/sources/mono/ | egrep -o 
 sonarrurl="http://update.sonarr.tv/v2/master/mono/NzbDrone.master.tar.gz"
 sonarrv="$(curl -s https://github.com/Sonarr/Sonarr/releases | grep -o '/Sonarr/Sonarr/archive/.*\.zip' | sort -V | tail -1 | sed -rn 's|/Sonarr/Sonarr/archive/v(.*).zip|\1|p')"
 #
-sonarrproxyapache="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Sonarr/proxypass/apache/sonarr.conf"
-sonarrproxynginx="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Sonarr/proxypass/nginx/sonarr.conf"
+genericproxyapache="https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/proxypass/apache/generic.conf"
+genericproxynginx="https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/proxypass/nginx/generic.conf"
 #
 embyurl="$(curl -sL https://api.github.com/repos/MediaBrowser/Emby/releases/latest | grep -P 'browser(.*)Emby.Mono.zip' | cut -d\" -f4)"
 embyv="$(curl -sL https://api.github.com/repos/MediaBrowser/Emby/releases/latest | sed -rn 's/(.*)"tag_name": "(.*)",/\2/p')"
@@ -152,8 +152,8 @@ while [[ "$(netstat -ln | grep ':'"$embyappporthttps"'' | grep -c 'LISTEN')" -ge
 #
 embyconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Emby/configs/system.xml"
 #
-#jacketturl="$(curl -sL https://api.github.com/repos/Jackett/Jackett/releases/latest | grep -P 'browser(.*)Jackett.Binaries.Mono.tar.gz' | cut -d\" -f4)"
-#jackettv="$(curl -sL https://api.github.com/repos/Jackett/Jackett/releases/latest | sed -rn 's/(.*)"tag_name": "v(.*)",/\2/p')"
+jacketturl="$(curl -sL https://api.github.com/repos/Jackett/Jackett/releases/latest | grep -P 'browser(.*)Jackett.Binaries.Mono.tar.gz' | cut -d\" -f4)"
+jackettv="$(curl -sL https://api.github.com/repos/Jackett/Jackett/releases/latest | sed -rn 's/(.*)"tag_name": "v(.*)",/\2/p')"
 #
 ############################
 ### Custom Variables End ###
@@ -174,8 +174,9 @@ showMenu () {
     #
     echo "1) Install or update mono"
     echo "2) Install or update Sonarr"
-    echo "3) Install or update Emby"
-    echo "4) Exit"
+    echo "3) Install or update Jackett"
+    echo "4) Install or update Emby"
+    echo "5) Exit"
     #
     echo
 }
@@ -266,18 +267,20 @@ sqlite3setup () {
     fi
 }
 #
-proxypasssonarr () {
+proxypassgeneric () {
     if [[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]]
     then
         if [[ -f ~/.config/NzbDrone/config.xml ]]
         then
-            wget -qO ~/.apache2/conf.d/sonarr.conf "$sonarrproxyapache"
-            sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' ~/.config/NzbDrone/config.xml)"'|g' ~/.apache2/conf.d/sonarr.conf
+            wget -qO ~/.apache2/conf.d/"$appname".conf "$genericproxyapache"
+            sed -i 's|generic|'"$appname"'|g' ~/.apache2/conf.d/"$appname".conf
+            sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' ~/.config/NzbDrone/config.xml)"'|g' ~/.apache2/conf.d/"$appname".conf
             /usr/sbin/apache2ctl -k graceful > /dev/null 2>&1
             echo "The Apache proxypass was updated"; echo
         else
-            wget -qO ~/.apache2/conf.d/sonarr.conf "$sonarrproxyapache"
-            sed -i 's|PORT|'"$appport"'|g' ~/.apache2/conf.d/sonarr.conf
+            wget -qO ~/.apache2/conf.d/"$appname".conf "$genericproxyapache"
+            sed -i 's|generic|'"$appname"'|g' ~/.apache2/conf.d/"$appname".conf
+            sed -i 's|PORT|'"$appport"'|g' ~/.apache2/conf.d/"$appname".conf
             /usr/sbin/apache2ctl -k graceful > /dev/null 2>&1
             echo "The Apache proxypass was installed"; echo
         fi
@@ -286,14 +289,18 @@ proxypasssonarr () {
         then
             if [[ -f ~/.config/NzbDrone/config.xml ]]
             then
-                wget -qO ~/.nginx/conf.d/000-default-server.d/sonarr.conf $sonarrproxynginx
-                sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' ~/.config/NzbDrone/config.xml)"'|g' ~/.nginx/conf.d/000-default-server.d/sonarr.conf
+                wget -qO ~/.nginx/conf.d/000-default-server.d/"$appname".conf $genericproxynginx
+                sed -i 's|generic|'"$appname"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
+                sed -i 's|username|'"$(whoami)"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
+                sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' ~/.config/NzbDrone/config.xml)"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
                 /usr/sbin/nginx -s reload -c ~/.nginx/nginx.conf > /dev/null 2>&1
                 echo "The nginx proxypass was updated"; echo
             else
-                wget -qO ~/.nginx/conf.d/000-default-server.d/sonarr.conf $sonarrproxynginx
-                sed -i 's|username|'"$(whoami)"'|g' ~/.nginx/conf.d/000-default-server.d/sonarr.conf
-                sed -i 's|PORT|'"$appport"'|g' ~/.nginx/conf.d/000-default-server.d/sonarr.conf
+                wget -qO ~/.nginx/conf.d/000-default-server.d/"$appname".conf $genericproxynginx
+                sed -i 's|generic|'"$appname"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
+                sed -i 's|username|'"$(whoami)"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
+                sed -i 's|username|'"$(whoami)"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
+                sed -i 's|PORT|'"$appport"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
                 /usr/sbin/nginx -s reload -c ~/.nginx/nginx.conf > /dev/null 2>&1
                 echo "The nginx proxypass was installed"; echo
             fi
@@ -558,6 +565,8 @@ do
         "2")
             prerequisites
             #
+            appname="sonarr"
+            #
             [[ -f ~/.sonarr/NzbDrone.exe ]] && sonarrcheck1="ON" || sonarrcheck1="NO"
             [[ -f ~/.userdocs/versions/sonarr.version ]] && sonarrcheck2="ON" || sonarrcheck2="NO"
             [[ "$(cat ~/.userdocs/versions/sonarr.version 2> /dev/null)" = "$sonarrv" ]] && sonarrcheck3="ON" || sonarrcheck3="NO"
@@ -600,7 +609,14 @@ do
         "3")
             prerequisites
             #
+            appname="jackett"
+            ;;
+        "4")
+            prerequisites
+            #
             sqlite3setup
+            #
+            appname="emby"
             #
             [[ -f ~/.emby/MediaBrowser.Server.Mono.exe ]] && embycheck1="ON" || embycheck1="NO"
             [[ -f ~/.userdocs/versions/emby.version ]] && embycheck2="ON" || embycheck2="NO"
