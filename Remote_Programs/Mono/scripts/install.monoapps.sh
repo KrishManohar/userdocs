@@ -378,6 +378,9 @@ genericremove () {
             rm -rf ~/.userdocs/cronjobs/"$appname".cronjob
             rm -rf ~/.userdocs/logins/"$appname".login
             rm -rf ~/.userdocs/pids/"$appname".pids
+            #
+            rm -rf ~/.apache2/conf.d/"$appname".conf
+            rm -rf ~/.nginx/conf.d/000-default-server.d/"$appname".conf
         fi
         if [[ "$appname" = "jackett" ]]
         then
@@ -387,6 +390,9 @@ genericremove () {
             rm -rf ~/.userdocs/cronjobs/"$appname".cronjob
             rm -rf ~/.userdocs/logins/"$appname".login
             rm -rf ~/.userdocs/pids/"$appname".pids
+            #
+            rm -rf ~/.apache2/conf.d/"$appname".conf
+            rm -rf ~/.nginx/conf.d/000-default-server.d/"$appname".conf
         fi
         if [[ "$appname" = "emby" ]]
         then
@@ -400,6 +406,9 @@ genericremove () {
             sed -i '/^export PATH=~\/bin:$PATH$/d' ~/.bashrc
             sed -i '/^export LD_LIBRARY_PATH=~\/lib:$LD_LIBRARY_PATH$/d' ~/.bashrc
             sed -i '/^export PKG_CONFIG_PATH=~\/lib\/pkgconfig:$PKG_CONFIG_PATH$/d' ~/.bashrc
+            #
+            rm -rf ~/.apache2/conf.d/"$appname".conf
+            rm -rf ~/.nginx/conf.d/000-default-server.d/"$appname".conf
         fi
         #
         cronjobremove
