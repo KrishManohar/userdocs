@@ -77,7 +77,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="0.0.5"
+scriptversion="0.0.6"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
@@ -313,7 +313,7 @@ generichosturl () {
         [[ "$appname" = "emby" && -f ~/.emby/ProgramData-Server/config/system.xml ]] && echo -e "https://$(hostname -f)/$(whoami)/emby/"
     else
         [[ "$appname" = "sonarr" && -f ~/.config/NzbDrone/config.xml ]] && echo -e "http://$(hostname -f):$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' ~/.config/NzbDrone/config.xml)/$(whoami)/sonarr/settings/general"
-        [[ "$appname" = "jackett" && -f ~/.config/Jackett/ServerConfig.json ]] && echo -e "http://$(hostname -f):$(sed -rn 's|(.*)"Port": (.*),|\2|p' ~/.config/Jackett/ServerConfig.json)/$(whoami)/jackett/Admin/Dashboard"
+        [[ "$appname" = "jackett" && -f ~/.config/Jackett/ServerConfig.json ]] && echo -e "http://$(hostname -f):$(sed -rn 's|(.*)"Port": (.*),|\2|p' ~/.config/Jackett/ServerConfig.json)/$(whoami)/jackett/admin/adashboard"
         [[ "$appname" = "emby" && -f ~/.emby/ProgramData-Server/config/system.xml ]] && echo -e "http://$(hostname -f):$(sed -rn 's|(.*)<PublicPort>(.*)</PublicPort>|\2|p' ~/.emby/ProgramData-Server/config/system.xml)/$(whoami)/emby/"
     fi    
 }
