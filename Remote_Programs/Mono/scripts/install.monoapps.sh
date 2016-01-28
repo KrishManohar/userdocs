@@ -77,7 +77,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="0.0.7"
+scriptversion="0.0.8"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
@@ -595,6 +595,10 @@ do
                     sed -i 's|<UrlBase></UrlBase>|<UrlBase>/'"$(whoami)"'/sonarr</UrlBase>|g' ~/.config/NzbDrone/config.xml
                 fi
                 #
+                cronjobadd
+                #
+                cronscript
+                #
                 genericproxypass
                 #
                 genericrestart
@@ -604,6 +608,11 @@ do
                 echo
                 echo -n "$sonarrv" > ~/.userdocs/versions/sonarr.version
             else
+                #
+                cronjobadd
+                #
+                cronscript
+                #
                 [[ -f ~/.config/NzbDrone/config.xml ]] && genericproxypass
                 #
                 genericrestart
@@ -697,6 +706,10 @@ do
                     sed -i 's|<HttpsPortNumber>8920</HttpsPortNumber>|<HttpsPortNumber>'"$embyappporthttps"'</HttpsPortNumber>|g' ~/.emby/ProgramData-Server/config/system.xml
                 fi
                 #
+                cronjobadd
+                #
+                cronscript
+                #
                 embyexportenv
                 #
                 genericproxypass
@@ -708,6 +721,11 @@ do
                 echo -n "$embyv" > ~/.userdocs/versions/emby.version
                 #
             else
+                #
+                cronjobadd
+                #
+                cronscript
+                #
                 embyexportenv
                 #
                 genericproxypass
