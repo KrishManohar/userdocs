@@ -215,13 +215,16 @@ cronjobremove () {
 }
 #
 cronscript () {
-    if [[ -z "$(screen -ls $appname | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p')" ]]
-    then
-        [[ "$appname" = "sonarr" ]] && job='screen -dmS $appname ~/bin/mono --debug ~/.sonarr/NzbDrone.exe'
-        [[ "$appname" = "jackett" ]] && job='screen -dmS $appname ~/bin/mono --debug ~/.jackett/JackettConsole.exe'
-        [[ "$appname" = "emby" ]] && job='screen -dmS $appname ~/bin/mono --debug ~/.emby/MediaBrowser.Server.Mono.exe'
-        echo "$appname was restarted"; echo
-    fi
+    wget -qO ~/.userdocs/cronjobs/"$appname".cronjob "https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/Bash_Scripts/cronscript.sh"
+    #
+    [[ "$appname" = "sonarr" ]] && sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/"$appname".cronjob
+    [[ "$appname" = "jackett"  ]] && sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/"$appname".cronjob
+    [[ "$appname" = "emby" ]] && sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/"$appname".cronjob
+    #
+    [[ "$appname" = "sonarr" ]] && sed -i 's|PATH|~/.sonarr/NzbDrone.exe|g' ~/.userdocs/cronjobs/"$appname".cronjob
+    [[ "$appname" = "jackett"  ]] && sed -i 's|PATH|~/.jackett/JackettConsole.exe|g' ~/.userdocs/cronjobs/"$appname".cronjob
+    [[ "$appname" = "emby" ]] && sed -i 's|PATH|~/.emby/MediaBrowser.Server.Mono.exe|g' ~/.userdocs/cronjobs/"$appname".cronjob
+    #
 }
 prerequisites () {
     mkdir -p ~/bin
@@ -640,6 +643,8 @@ do
                 #
                 cronjobadd
                 #
+                cronscript
+                #
                 genericproxypass
                 #
                 genericrestart
@@ -648,6 +653,11 @@ do
                 echo
                 echo -n "$jackettv" > ~/.userdocs/versions/jackett.version
             else
+                #
+                cronjobadd
+                #
+                cronscript
+                #
                 genericproxypass
                 #
                 genericrestart
