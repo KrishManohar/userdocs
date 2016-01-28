@@ -143,6 +143,7 @@ genericproxynginx="https://raw.githubusercontent.com/userdocs/userdocs/master/0_
 #
 sonarrurl="http://update.sonarr.tv/v2/master/mono/NzbDrone.master.tar.gz"
 sonarrv="$(curl -s https://github.com/Sonarr/Sonarr/releases | grep -o '/Sonarr/Sonarr/archive/.*\.zip' | sort -V | tail -1 | sed -rn 's|/Sonarr/Sonarr/archive/v(.*).zip|\1|p')"
+sonarrconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Sonarr/configs/config.xml"
 #
 jacketturl="$(curl -sL https://api.github.com/repos/Jackett/Jackett/releases/latest | grep -P 'browser(.*)Jackett.Binaries.Mono.tar.gz' | cut -d\" -f4)"
 jackettv="$(curl -sL https://api.github.com/repos/Jackett/Jackett/releases/latest | sed -rn 's/(.*)"tag_name": "v(.*)",/\2/p')"
@@ -669,7 +670,7 @@ do
                 if [[ ! -f ~/.config/NzbDrone/config.xml ]]
                 then
                     mkdir -p ~/.config/NzbDrone >> ~/.userdocs/logs/sonarr.log 2>&1
-                    wget -qO ~/.config/NzbDrone/config.xml http://git.io/vcCvh
+                    wget -qO ~/.config/NzbDrone/config.xml "$sonarrconfig"
                     sed -i 's|<Port>8989</Port>|<Port>'"$appport"'</Port>|g' ~/.config/NzbDrone/config.xml
                     sed -i 's|<UrlBase></UrlBase>|<UrlBase>/'"$(whoami)"'/sonarr</UrlBase>|g' ~/.config/NzbDrone/config.xml
                 fi
