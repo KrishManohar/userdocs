@@ -205,8 +205,8 @@ cronjobremove () {
     if [[ "$(crontab -l 2> /dev/null | grep -oc '^\* \* \* \* \* bash -l ~/.userdocs/cronjobs/'"$appname"'.cronjob >> ~/.userdocs/cronjobs/logs/'"$appname"'.log$')" == "1" ]]
     then
         crontab -l 2> /dev/null > "$tmpcron"
-        sed -i '/^\* \* \* \* \* bash -l ~\/.cronjobs\/'"$appname"'.cronjob >> ~\/.userdocs\/cronjobs\/logs\/'"$appname"'.log$/d' "$tmpcron"
-        sed -i '/^$/d' "$tmpcron"
+        sed -ni '/^\* \* \* \* \* bash -l ~\/.cronjobs\/'"$appname"'.cronjob >> ~\/.userdocs\/cronjobs\/logs\/'"$appname"'.log$/d' "$tmpcron"
+        sed -ni '/^$/d' "$tmpcron"
         crontab "$tmpcron"
         rm "$tmpcron"
     else
