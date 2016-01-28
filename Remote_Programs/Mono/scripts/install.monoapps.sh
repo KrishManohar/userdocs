@@ -103,7 +103,7 @@ apppass="$(< /dev/urandom tr -dc '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij
 appport="$(shuf -i 10001-32001 -n 1)"
 #
 # This wil take the previously generated port and test it to make sure it is not in use, generating it again until it has selected an open port.
-while [[ "$(netstat -ln | grep ':'"$appport"'' | grep -c 'LISTEN')" -ge "1" ]]; do appport="$(shuf -i 10001-32001 -n 1)"; done
+[[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(netstat -ln | grep ':'"$appport"'' | grep -c 'LISTEN')" -ge "1" ]]; do appport="$(shuf -i 10001-32001 -n 1)"; done
 #
 # Script user's http www URL in the format http://username.server.feralhosting.com/
 # http="http://$(hostname -f)/$(whoami)/"
@@ -146,15 +146,15 @@ jacketturl="$(curl -sL https://api.github.com/repos/Jackett/Jackett/releases/lat
 jackettv="$(curl -sL https://api.github.com/repos/Jackett/Jackett/releases/latest | sed -rn 's/(.*)"tag_name": "v(.*)",/\2/p')"
 jacketconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Jackett/configs/ServerConfig.json"
 jackettappport="$(shuf -i 10001-32001 -n 1)"
-while [[ "$(netstat -ln | grep ':'"$jackettappport"'' | grep -c 'LISTEN')" -ge "1" ]]; do jackettappport="$(shuf -i 10001-32001 -n 1)"; done
+[[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(netstat -ln | grep ':'"$jackettappport"'' | grep -c 'LISTEN')" -ge "1" ]]; do jackettappport="$(shuf -i 10001-32001 -n 1)"; done
 #
 embyurl="$(curl -sL https://api.github.com/repos/MediaBrowser/Emby/releases/latest | grep -P 'browser(.*)Emby.Mono.zip' | cut -d\" -f4)"
 embyv="$(curl -sL https://api.github.com/repos/MediaBrowser/Emby/releases/latest | sed -rn 's/(.*)"tag_name": "(.*)",/\2/p')"
 embyconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Emby/configs/system.xml"
 embyappporthttp="$(shuf -i 10001-32001 -n 1)"
-while [[ "$(netstat -ln | grep ':'"$embyappporthttp"'' | grep -c 'LISTEN')" -ge "1" ]]; do embyappporthttp="$(shuf -i 10001-32001 -n 1)"; done
+[[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(netstat -ln | grep ':'"$embyappporthttp"'' | grep -c 'LISTEN')" -ge "1" ]]; do embyappporthttp="$(shuf -i 10001-32001 -n 1)"; done
 embyappporthttps="$(shuf -i 10001-32001 -n 1)"
-while [[ "$(netstat -ln | grep ':'"$embyappporthttps"'' | grep -c 'LISTEN')" -ge "1" ]]; do embyappporthttps="$(shuf -i 10001-32001 -n 1)"; done
+[[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(netstat -ln | grep ':'"$embyappporthttps"'' | grep -c 'LISTEN')" -ge "1" ]]; do embyappporthttps="$(shuf -i 10001-32001 -n 1)"; done
 #
 ############################
 ### Custom Variables End ###
