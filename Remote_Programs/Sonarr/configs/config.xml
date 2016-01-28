@@ -1,7 +1,7 @@
 <Config>
   <Port>8989</Port>
   <UrlBase></UrlBase>
-  <BindAddress>0.0.0.0</BindAddress>
+  <BindAddress>*</BindAddress>
   <SslPort>9898</SslPort>
   <EnableSsl>False</EnableSsl>
   <ApiKey></ApiKey>
