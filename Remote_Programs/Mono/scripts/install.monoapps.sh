@@ -77,7 +77,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.0.0"
+scriptversion="1.0.1"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
@@ -317,7 +317,7 @@ genericproxypass () {
         then
             wget -qO ~/.nginx/conf.d/000-default-server.d/"$appname".conf "$genericproxynginx"
             #
-            [[ "$appname" = "sonarr" ]] sed -i 's|rewrite /generic/(.*) /$1 break;|rewrite /(.*) /username/$1 break;|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
+            [[ "$appname" = "sonarr" ]] && sed -i 's|rewrite /generic/(.*) /$1 break;|rewrite /(.*) /username/$1 break;|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
             #
             sed -i 's|generic|'"$appname"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
             sed -i 's|username|'"$(whoami)"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
