@@ -316,6 +316,9 @@ genericproxypass () {
         if [[ -d ~/.nginx ]]
         then
             wget -qO ~/.nginx/conf.d/000-default-server.d/"$appname".conf "$genericproxynginx"
+            #
+            [[ "$appname" = "sonarr" ]] sed -i 's|rewrite /generic/(.*) /$1 break;|rewrite /(.*) /username/$1 break;|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
+            #
             sed -i 's|generic|'"$appname"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
             sed -i 's|username|'"$(whoami)"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
             #
