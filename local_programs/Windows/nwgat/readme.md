@@ -4,7 +4,7 @@ lftp guide
 
 ### lftp in a portable set-up on Windows using ConEmu
 
-This project is based on the work and release from this page - [https://nwgat.ninja/lftp-for-windows/](https://nwgat.ninja/lftp-for-windows/)
+This project is based on the solution documented here - [https://nwgat.ninja/lftp-for-windows/](https://nwgat.ninja/lftp-for-windows/)
 
 What is this?
 ---
@@ -13,30 +13,16 @@ This is magic!
 
 This project has taken a portable version of lftp on Windows, made from a Cygwin installation, and created a self contained and truly portable lftp solution on Windows that effectively only requires the end user to double click a preconfigured bat file. If there is no preconfigured template in place then it has been made as easy as possible for the end user to edit and use the existing templates.
 
-**1:** Taken the `x64` portable release of `lftp` by [Nwgat](https://nwgat.ninja/) -  https://lftp.nwgat.ninja/lftp-4.6.5/lftp-4.6.5.win64-openssl.zip
-
-**2:** Taken the `x64` portable version of [ConEmu](https://conemu.github.io/) - http://www.fosshub.com/ConEmu.html/ConEmuPack.150813f.7z
-
-**3:** Added some extra Cygwin binaries like `rm ps mkdir bash` and more so that the standard `lftpsync.sh` script works seamlessly with this set-up.
-
-**4:** Customised `ConEmu` to load relative to the Script directory and download and log locally to the portable folder. Start `ConEmu` and do `ls` to see this. This means you are always in the script folder to use your custom scripts.
-
-**5:** Configured lots script templates, aliases and bat files to make running or editing files as simple as double clicking a bat file or using an alias in ConEmu.
-
-**6:** Merged it all together with some tweaks to make it all just work.
-
 The result: A truly portable and configurable `lftp` solution on Windows that can also run the well known `lftpsync.sh` script without actually needing to install Cygwin or any other program.
 
-The potential is that a seed box company could provide a self contained lftp solution to the end user that they download, extract and double click. It really can be that easy and simple to use lfpt on Windows.
+The potential is that a seed box company could provide a self contained lftp solution to the end user that they download, extract and double click. It really can be that easy and simple to use lftp on Windows.
 
 Usage
 ---
 
 > **Important note:** Use the provided `edit` or `notepad` bat files to edit the provided scripts. It will use a preconfigured text editor to make sure the files are properly edited.
 
-**1:** Download the zip file.
-
-[lftp-4.6.5.win64.zip](https://git.io/vzoiB)
+**1:** Download the zip file - [lftp 4.7.3 zip download](https://github.com/userdocs/userdocs/raw/master/local_programs/Windows/nwgat/lftp-4.7.3.win64.zip)
 
 ![](1.png)
 
