@@ -4,8 +4,8 @@
 #
 # Credits: A heavily modified version of this idea and script http://www.torrent-invites.com/showthread.php?t=132965
 # Authors: Lordhades - Adamaze - userdocs
-# Script URL: https://git.io/vzZ51
-# wget -qO ~/lftpsync.sh https://git.io/vzZ5X
+# Script URL: https://git.io/v6Mza
+# wget -qO ~/lftpsync.sh https://git.io/v6Mza
 #
 ### Editing options 1 - 4 is required. Editing options 5 - 10 is optional.
 #
