@@ -2,16 +2,18 @@
 #
 # v1.0.0 nwgat
 #
-# Credits: A heavily modified version of this idea and script http://www.torrent-invites.com/showthread.php?t=132965
+# Credits: A heavily modified version of this idea and script http://www.torrent-invites.com/showthread.php?t=132965 towards a simplified end user experience.
 # Authors: Lordhades - Adamaze - userdocs
 # Script URL: https://git.io/v6Mza
 # wget -qO ~/lftpsync.sh https://git.io/v6Mza
 #
-### Editing options 1 - 4 is required. Editing options 5 - 10 is optional.
+### Editing options 1 - 4 is required. Editing options 5 - 10 is optional. Option 0 is only required if you have set have a private key you wish to use.
 #
+# 0: Set your private keyfile name here to match a keyfile placed in keys/ so that you can logon using a private keyfile. Otherwise leave it blank. Set up guides for private key auth on your host will vary.
+keyname=""
 # 1: Your sftp/ftp username
 username="username"
-# 2: Your sftp/ftp password
+# 2: Your sftp/ftp password. If you have set up a private key file then you can ignore this variable.
 password="password"
 # 3: Your seedbox server URL/hostname
 hostname="servername.com"
@@ -35,6 +37,9 @@ args="-c -e"
 base_name="$(basename "$0")"
 lock_file="/tmp/$base_name.lock"
 trap "rm -f $lock_file" SIGINT SIGTERM
+#
+[[ -z $(ps -p $(sed -rn 's/\[(.*)\](.*)/\1/p;1q' ../tmp/PID 2> /dev/null) 2> /dev/null) ]] && rm -f "$lock_file"
+#
 if [[ -e "$lock_file" ]]
 #
 then
@@ -42,7 +47,7 @@ then
 	exit
 else
 	touch "$lock_file"
-	lftp -p "$port" -u "$username,$password" "sftp://$hostname" <<-EOF
+	lftp -e "debug -Tpo ../tmp/PID 0;set sftp:connect-program ssh -a -x -i ../keys/$keyname" -p "$port" -u "$username,$password" "sftp://$hostname" <<-EOF
 	set sftp:auto-confirm yes
 	set mirror:parallel-transfer-count "$parallel"
 	set pget:default-n $default_pget
