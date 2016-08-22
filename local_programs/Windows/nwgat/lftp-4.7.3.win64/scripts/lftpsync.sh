@@ -41,7 +41,7 @@ args="-c -e"
 base_name="$(basename "$0")"
 lock_file="$tmpdir/$base_name.lock"
 #
-[[ -z $(ps -p $(sed -rn 's/\[(.*)\](.*)/\1/p;1q' $tmpdir/PID 2> /dev/null) 2> /dev/null) ]] && echo "removing lock file"; rm -f "$lock_file"
+[[ -z $(ps -p $(sed -rn 's/\[(.*)\](.*)/\1/p;1q' $tmpdir/PID 2> /dev/null) 2> /dev/null) ]] && echo; rm -f "$lock_file"
 #
 trap "rm -f $lock_file" SIGINT SIGTERM
 #
