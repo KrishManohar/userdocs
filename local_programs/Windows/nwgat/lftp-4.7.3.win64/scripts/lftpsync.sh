@@ -41,7 +41,7 @@ args="-c -e"
 base_name="$(basename "$0")"
 lock_file="$tmpdir/$base_name.lock"
 #
-[[ -z $(ps -p $(sed -rn 's/\[(.*)\](.*)/\1/p;1q' $tmpdir/PID 2> /dev/null) 2> /dev/null | gawk 'FNR==2{print $1}') ]] && rm -f "$tmpdir/PID" "$lock_file" "$tmpdir/$base_name.log"
+[[ -z $(ps -p $(sed -rn 's/\[(.*)\](.*)/\1/p;1q' $tmpdir/PID 2> /dev/null) 2> /dev/null | awk 'FNR==2{print $1}') ]] && rm -f "$tmpdir/PID" "$lock_file" "$tmpdir/$base_name.log"
 #
 trap "rm -f $lock_file" SIGINT SIGTERM
 #
