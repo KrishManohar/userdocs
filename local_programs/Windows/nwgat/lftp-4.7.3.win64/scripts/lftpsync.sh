@@ -9,15 +9,15 @@
 #
 ### Editing options 2 - 5 is required. Editing options 5 - 10 is optional. Option 0 is only required if you have set have a private key you wish to use
 #
-# 0: Optional - Change this if you are on linux to just /tmp as the current setup is for the windows solution
+# 0: Optional - This variable specifies the location of the tmp folder to use for the lock, PID and log file. This default should be workign on both linux and windows at the same time. On Linux by using the /tmp folder and Windows by using the included tmp folder in the lftp directory. You should not need to change this.
 tmpdir="/tmp"
-# 1: Optional - Set your private keyfile name here to match a keyfile placed in keys/ so that you can logon using a private keyfile. Otherwise leave it blank. Set up guides for private key auth on your host will vary.
-keyname=""
-# Change this if you are on a unix OS to a directory of your choosing.
+# 1: Optional - This variable will specify the path to the key folder where the script will look for your ssh private keyfiles. You will probably need to change this on linux if you are using private keys.
 keydirectory="/keys"
-# 2: Your sftp/ftp username
+# If you place a private key in the key folder you can give the script the name of this file here.
+keyname=""
+# 2: Your sftp/ftp username goes here replacing username inside the doubel quotes.
 username="username"
-# 3: Your sftp/ftp password. If you have set up a private key file then you can ignore this variable.
+# 3: Your sftp/ftp password. If you have set up a private key file then you can ignore this variable and leave it as it is.
 password="password"
 # 4: Your seedbox server URL/hostname
 hostname="servername.com"
@@ -34,10 +34,9 @@ default_pget="20"
 # 10: Optional - Set the number of connections per file lftp can open
 pget_mirror="20"
 # 11: Optional - Add custom arguments or flags here.
-args="-c -e"
-# This is so we can pass remote directory path to the script when calling the script. Use single quotes on the path.
-[[ ! -z "$1" ]] && remote_dir="$1"
+args="-c -e --only-newer --ignore-time"
 #
+[[ ! -z "$1" ]] && remote_dir="$1"
 base_name="$(basename "$0")"
 lock_file="$tmpdir/$base_name.lock"
 #
