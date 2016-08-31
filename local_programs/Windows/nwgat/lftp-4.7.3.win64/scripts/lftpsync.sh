@@ -1,21 +1,24 @@
 #!/bin/bash
 #
-# v1.0.2 nwgat
+# v1.0.3 nwgat
 #
 # Credits: A heavily modified version of this idea and script http://www.torrent-invites.com/showthread.php?t=132965 towards a simplified end user experience.
 # Authors: Lordhades - Adamaze - userdocs
 # Script URL: https://git.io/v6Mza
 # wget -qO ~/lftpsync.sh https://git.io/v6Mza
 #
-### Editing options 2 - 5 is required. Editing options 5 - 10 is optional. Option 0 is only required if you have set have a private key you wish to use
+### Editing options 0 is only required if you need to specify the tmp directory
+### Editing options 1 is only required if you have set have a private key you wish to use
+### Editing options 2 - 5 is required. 
+### Editing options 6 - 10 is optional.
 #
-# 0: Optional - This variable specifies the location of the tmp folder to use for the lock, PID and log file. This default should be workign on both linux and windows at the same time. On Linux by using the /tmp folder and Windows by using the included tmp folder in the lftp directory. You should not need to change this.
+# 0: Optional - This variable specifies the location of the tmp folder to use for the lock, PID and log file. This default should be working on both linux and windows at the same time. On Linux by using the /tmp folder and Windows by using the included tmp folder in the lftp directory. You should not need to change this unless you want to specify the tmp directory for debugging.
 tmpdir="/tmp"
-# 1: Optional - This variable will specify the path to the key folder where the script will look for your ssh private keyfiles. You will probably need to change this on linux if you are using private keys.
+# 1: Optional - This variable will specify the path to the key folder where the script will look for your ssh private keyfiles. You will probably need to change this on linux if you are using private keys to something relative like ~/.ssh
 keydirectory="/keys"
-# If you place a private key in the key folder you can give the script the name of this file here.
+# If you place a private key in the key folder you can give the script the exact name of this file here including the file extension if applicable.
 keyname=""
-# 2: Your sftp/ftp username goes here replacing username inside the doubel quotes.
+# 2: Your sftp/ftp username goes here replacing username inside the double quotes.
 username="username"
 # 3: Your sftp/ftp password. If you have set up a private key file then you can ignore this variable and leave it as it is.
 password="password"
