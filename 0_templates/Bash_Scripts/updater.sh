@@ -169,6 +169,7 @@ cronjobremove () {
 cronscript () {
      # You can echo the script here or fetch it from a gist or file.
      # save it to ~/.cronjobs/myjobname.cronjob
+     :
 }
 #
 ############################
