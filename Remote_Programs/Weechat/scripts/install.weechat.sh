@@ -74,7 +74,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.1.9"
+scriptversion="1.2.0"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.weechat"
