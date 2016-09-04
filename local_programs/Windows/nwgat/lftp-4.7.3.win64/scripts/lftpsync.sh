@@ -7,10 +7,10 @@
 # Script URL: https://git.io/v6Mza
 # wget -qO ~/lftpsync.sh https://git.io/v6Mza
 #
-### Editing options 0 is only required if you need to specify the tmp directory
+#### Editing option 0 is only required if you need to specify the tmp directory. This is the location the lock file, PID file and log file are created and checked by this script.
 ### Editing options 1 is only required if you have set have a private key you wish to use
-### Editing options 2 - 5 is required. 
-### Editing options 6 - 10 is optional.
+## Editing options 2 - 5 is required. 
+# Editing options 6 - 10 is optional.
 #
 # 0: Optional - This variable specifies the location of the tmp folder to use for the lock, PID and log file. This default should be working on both linux and windows at the same time. On Linux by using the /tmp folder and Windows by using the included tmp folder in the lftp directory. You should not need to change this unless you want to specify the tmp directory for debugging.
 tmpdir="/tmp"
@@ -43,6 +43,7 @@ args="-c -e --only-newer --ignore-time"
 base_name="$(basename "$0")"
 lock_file="$tmpdir/$base_name.lock"
 #
+# This checks to see if LFTP is actually running and if the lock file exists. It LFTP is not running and there is a lock file it will be automatically cleared allowing the script to run.
 [[ -z $(ps -p $(sed -rn 's/\[(.*)\](.*)/\1/p;1q' $tmpdir/PID 2> /dev/null) 2> /dev/null | awk 'FNR==2{print $1}') ]] && rm -f "$tmpdir/PID" "$lock_file" "$tmpdir/$base_name.log"
 #
 trap "rm -f $lock_file" SIGINT SIGTERM

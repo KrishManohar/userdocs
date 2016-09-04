@@ -56,7 +56,9 @@ if [[ ! -z "$1" && "$1" = 'changelog' ]]
 then
     echo
     #
-    echo 'v1.1.9 - wecchat and template updated'
+    echo 'v1.2.0 - cmake updated and script template tweaks.'
+    echo 'v1.1.9 - weechat and template updated'
+    echo 'v1.1.9 - wechat and template updated'
     echo 'v1.1.8 - jessie curl whereis location'
     echo 'v1.1.6 - fixed script url'
     echo 'v1.1.5 - Template updated'
