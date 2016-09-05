@@ -44,7 +44,7 @@ base_name="$(basename "$0")"
 lock_file="$tmpdir/$base_name.lock"
 #
 # This checks to see if LFTP is actually running and if the lock file exists. It LFTP is not running and there is a lock file it will be automatically cleared allowing the script to run.
-[[ -z $(ps -p $(sed -rn 's/\[(.*)\](.*)/\1/p;1q' $tmpdir/PID 2> /dev/null) 2> /dev/null | awk 'FNR==2{print $1}') ]] && rm -f "$tmpdir/PID" "$lock_file" "$tmpdir/$base_name.log"
+[[ -z $(ps -p $(sed -rn 's/\[(.*)\](.*)/\1/p;1q' $tmpdir/$base_name.PID 2> /dev/null) 2> /dev/null | awk 'FNR==2{print $1}') ]] && rm -f "$tmpdir/$base_name.PID" "$lock_file" "$tmpdir/$base_name.log"
 #
 trap "rm -f $lock_file" SIGINT SIGTERM
 #
@@ -55,7 +55,7 @@ then
 	exit
 else
 	touch "$lock_file"
-	lftp -e "debug -Tpo $tmpdir/PID 0;set sftp:connect-program ssh -a -x -i $keydirectory/$keyname" -p "$port" -u "$username,$password" "sftp://$hostname" <<-EOF
+	lftp -e "debug -Tpo $tmpdir/$base_name.PID 0;set sftp:connect-program ssh -a -x -i $keydirectory/$keyname" -p "$port" -u "$username,$password" "sftp://$hostname" <<-EOF
 	set sftp:auto-confirm yes
 	set mirror:parallel-transfer-count "$parallel"
 	set pget:default-n $default_pget
@@ -64,7 +64,7 @@ else
 	quit
 	EOF
 	#
-	rm -f "$tmpdir/PID" "$lock_file" "$tmpdir/$base_name.log"
+	rm -f "$tmpdir/$base_name.PID" "$lock_file" "$tmpdir/$base_name.log"
     #
 	trap - SIGINT SIGTERM
 	exit
