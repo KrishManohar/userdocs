@@ -1,1 +1,0 @@
-start bin\ConEmu64.exe -LoadCfgFile bin\ConEmu.xml -cur_console:n

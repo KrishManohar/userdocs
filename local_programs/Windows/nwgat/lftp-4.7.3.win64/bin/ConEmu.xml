@@ -626,7 +626,7 @@
 					<value name="Flags" type="dword" data="00000000"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
 					<value name="GuiArgs" type="string" data="-dir ../scripts"/>
-					<value name="Cmd1" type="string" data="set CHERE_INVOKING=1 &amp; bash.exe --login -i"/>
+					<value name="Cmd1" type="string" data="set CHERE_INVOKING=1 &amp; bash.exe --login -i -new_console:p1"/>
 					<value name="Active" type="dword" data="00000000"/>
 					<value name="Count" type="dword" data="00000001"/>
 				</key>

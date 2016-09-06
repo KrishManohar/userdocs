@@ -40,6 +40,7 @@ pget_mirror="20"
 args="-c -e --only-newer --ignore-time"
 #
 [[ ! -z "$1" ]] && remote_dir="$1"
+#
 base_name="$(basename "$0")"
 lock_file="$tmpdir/$base_name.lock"
 #
@@ -48,7 +49,7 @@ lock_file="$tmpdir/$base_name.lock"
 #
 trap "rm -f $lock_file" SIGINT SIGTERM
 #
-if [[ -e "$lock_file" ]]
+if [[ -f "$lock_file" ]]
 #
 then
 	echo "$base_name is running already."
