@@ -1,6 +1,8 @@
 
 # Troubleshooting:
 
+ownership and deletion issues: double click on the ownership.bat and accept with Y. Then delete.
+
 There is no conf/rc file with this set-up. You need to use an lftp script  with your required options and call that in ConEmu. It pretty much works out the same anyway.
 
 If you keep seeing that the lftp script is already running but you know it isn't, check the /tmp folder for and delete the lock file then try again.
