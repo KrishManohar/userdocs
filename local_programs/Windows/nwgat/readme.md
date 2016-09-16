@@ -9,16 +9,27 @@ This project is based on the solution documented here - [https://nwgat.ninja/lft
 What is this?
 ---
 
-This is magic!
-
 This project has taken a portable version of lftp on Windows, made from a Cygwin installation, and created a self contained and truly portable lftp solution on Windows that effectively only requires the end user to double click a preconfigured bat file. If there is no preconfigured template in place then it has been made as easy as possible for the end user to edit and use the existing templates.
 
-The result: A truly portable and configurable `lftp` solution on Windows that can also run the well known `lftpsync.sh` script without actually needing to install Cygwin or any other program.
+The results: 
 
-The potential is that a seed box company could provide a self contained lftp solution to the end user that they download, extract and double click. It really can be that easy and simple to use lftp on Windows.
+A portable and configurable `lftp` solution on Windows that can also run the well known `lftpsync.sh` script without actually needing to install Cygwin or any other program.
+
+No need to understand linux or set up complex environments. Just follow simple configuration instructions.
+
+The potential for a seed box company to provide a self contained lftp solution via templates to the end user that they download, extract and double click. It really can be that easy and simple to use lftp on Windows.
+
+Critical features:
+---
+
+This package does not clash with any local installations such as cygwin or the linux subshell in windows.
+
+If you have ownership issues when moving or deleting the package please run the `ownership.bat` and select `Y` in the console. Then try again.
 
 Usage
 ---
+
+Read the `readme.txt` file for an a breakdown of the packages and it's features.
 
 > **Important note:** Use the provided `edit` or `notepad` bat files to edit the provided scripts. It will use a preconfigured text editor to make sure the files are properly edited.
 
