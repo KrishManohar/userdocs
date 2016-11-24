@@ -1,28 +1,16 @@
 
-lftp guide
+lftp portable
 ---
 
-### lftp in a portable set-up on Windows using ConEmu
-
-This project is based on the solution documented here - [https://nwgat.ninja/lftp-for-windows/](https://nwgat.ninja/lftp-for-windows/)
-
-What is this?
----
-
-This project has taken a portable version of lftp on Windows, made from a Cygwin installation, and created a self contained and truly portable lftp solution on Windows that effectively only requires the end user to double click a preconfigured bat file. If there is no preconfigured template in place then it has been made as easy as possible for the end user to edit and use the existing templates.
-
-The results: 
+### Features:
 
 A portable and configurable `lftp` solution on Windows that can also run the well known `lftpsync.sh` script without actually needing to install Cygwin or any other program.
 
-No need to understand linux or set up complex environments. Just follow simple configuration instructions.
+No need to understand Linux or set up complex environments. Just follow simple configuration instructions.
 
 The potential for a seed box company to provide a self contained lftp solution via templates to the end user that they download, extract and double click. It really can be that easy and simple to use lftp on Windows.
 
-Critical features:
----
-
-This package does not clash with any local installations such as cygwin or the linux subshell in windows.
+This package does not clash with any local installations such as Cygwin or the Linux sub shell in windows.
 
 If you have ownership issues when moving or deleting the package please run the `ownership.bat` and select `Y` in the console. Then try again.
 

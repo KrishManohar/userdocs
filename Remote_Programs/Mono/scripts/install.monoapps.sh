@@ -57,7 +57,7 @@ then
     #echo 'v0.0.9 - My changes go here'
     #echo 'v0.0.8 - My changes go here'
     #echo 'v0.0.7 - My changes go here'
-    #echo 'v0.0.6 - My changes go here'
+    echo 'v1.0.1 - i think i fixed something'
     echo 'v1.0.0 - a functional install/updater/removal script for mono/sonarr/jackett/emby on feral and whatbox with proxypass where applicable'
     echo 'v0.0.7 - beta 2 feature complete release and functional on both feral and whatbox'
     echo 'v0.0.5 - beta release'
@@ -127,6 +127,8 @@ gitissue="https://github.com/userdocs/userdocs/issues/new"
 ############################
 ## Custom Variables Start ##
 ############################
+#
+cmakeurl="https://cmake.org/files/v3.7/cmake-3.7.0-Linux-x86_64.tar.gz"
 #
 sqlite3url="https://www.sqlite.org/$(date +"%Y")/$(curl -s https://www.sqlite.org/download.html | egrep -om 1 'sqlite-autoconf-(.*).tar.gz')"
 sqlite3v="$(curl -s https://www.sqlite.org/download.html | egrep -om 1 'sqlite-autoconf-(.*).tar.gz' | sed -rn 's/sqlite-autoconf-(.*).tar.gz/\1/p')"
@@ -640,12 +642,16 @@ do
             then
                 echo "Installing mono. This will take a long time. Put the kettle on."; echo
                 #
-                wget -qO ~/.userdocs/tmp/mono.tar.bz2 "$monourl"
+                wget -qO ~/.userdocs/tmp/cmake.tar.gz "$cmakeurl" ~/.userdocs/logs/cmake.download.log 2>&1
+                tar xf ~/.userdocs/tmp/cmake.tar.gz --strip-components=1 -C ~/
+                rm -rf ~/.userdocs/tmp/cmake.tar.gz
+                #
+                wget -qO ~/.userdocs/tmp/mono.tar.bz2 "$monourl" ~/.userdocs/logs/mono.download.log 2>&1
                 tar xf ~/.userdocs/tmp/mono.tar.bz2 -C ~/.userdocs/tmp && cd ~/.userdocs/tmp/mono-"$monovshort"
                 ./autogen.sh --prefix="$HOME" > ~/.userdocs/logs/mono.install.log 2>&1
                 make get-monolite-latest >> ~/.userdocs/logs/mono.install.log 2>&1
                 make >> ~/.userdocs/logs/mono.log 2>&1 && make install >> ~/.userdocs/logs/mono.install.log 2>&1
-                rm -rf ~/.userdocs/tmp/mono{,.tar.bz2}
+                rm -rf ~/.userdocs/tmp/mono{-*,.tar.bz2}
                 #
                 echo -n "$monovfull" > ~/.userdocs/versions/mono.version
             else

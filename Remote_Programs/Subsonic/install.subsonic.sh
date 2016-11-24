@@ -31,7 +31,7 @@
 #### Script Notes Start ####
 ############################
 #
-## See readme.md
+##
 #
 ############################
 ##### Script Notes End #####
@@ -83,7 +83,7 @@ scriptauthor="userdocs"
 contributors="None credited"
 #
 # Set the http://git.io/ shortened URL for the raw github URL here:
-gitiourl=""
+gitiourl="http://git.io/11111"
 #
 # Don't edit: This is the bash command shown when using the info option.
 gitiocommand="wget -qO ~/$scriptname $gitiourl && bash ~/$scriptname"
@@ -184,7 +184,7 @@ cronscript () {
     if [[ -z "$(ps -p $(cat ~/private/subsonic/subsonic.sh.PID) --no-headers)" && -d ~/private/subsonic ]]
     then
         bash ~/private/subsonic/subsonic.sh
-        echo "$(date +"%H:%M on the %d.%m.%y")" >> ~/.userdocs/cronjobs/logs/subsonic.log
+        echo "Restarted @ $(date +"%H:%M on the %d.%m.%y")" >> ~/.userdocs/cronjobs/logs/subsonic.log
     else
         exit
     fi' > ~/.userdocs/cronjobs/subsonic.cronjob
@@ -379,25 +379,6 @@ fi
 ## Positional Param Start ##
 ############################
 #
-if [[ ! -z "$1" && "$1" = "example" ]]
-then
-    echo
-    #
-    # Edit below this line
-    #
-    echo "Add your custom positional parameters in this section."
-    #
-    if [[ -n "$2" ]]
-    then
-        echo "You used $scriptname $1 $2 when calling this example"
-    fi
-    #
-    # Edit above this line
-    #
-    echo
-    exit
-fi
-#
 ############################
 ### Positional Param End ###
 ############################
@@ -412,6 +393,14 @@ then
 else
     echo -e "Hello $(whoami), you have the latest version of the" "\033[36m""$scriptname""\e[0m" "script. This script version is:" "\033[31m""$scriptversion""\e[0m"
     echo
+    echo -e "The version of the" "\033[33m""Subsonic""\e[0m" "server being used in this script is:" "\033[31m""$subsonicversion""\e[0m"
+    echo -e "The version of the" "\033[33m""Java""\e[0m" "being used in this script is:" "\033[31m""$javaversion""\e[0m"
+    echo
+    if [[ -f "$HOME/private/subsonic/.version" ]]
+    then
+        echo -e "Your currently installed version is:" "\033[32m""$(sed -n '1p' $HOME/private/subsonic/.version)""\e[0m"
+        echo
+    fi
     read -ep "The script has been updated, enter [y] to continue or [q] to exit: " -i "y" updatestatus
     echo
 fi
@@ -579,6 +568,7 @@ then
             rm -rf ~/private/subsonic
             echo -e "\033[31m" "Done""\e[0m"
             echo "Removing scripts."
+            cronjobremove
             rm -f ~/bin/subsonic.4.8
             rm -f ~/subsonic.4.8.sh
             rm -f ~/subsonicstart.sh
@@ -588,7 +578,6 @@ then
             rm -f ~/bin/subsonicrsk
             rm -f ~/bin/subsonicron
             rm -f ~/.cronjobs/subsonic.cronjob
-            cronjobremove
             rm -f ~/.nginx/conf.d/000-default-server.d/subsonic.conf
             rm -f ~/.apache2/conf.d/subsonic.conf
             /usr/sbin/apache2ctl -k graceful > /dev/null 2>&1
