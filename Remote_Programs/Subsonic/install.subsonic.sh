@@ -8,18 +8,22 @@
 #
 # Script Contributors: 
 #
-# Bash Command for easy reference: wget -qO ~/install.subsonic http://git.io/bGZT && bash ~/install.subsonic
+# Bash Command for easy reference: wget -qO ~/install.subsonic https://git.io/v1J6i && bash ~/install.subsonic
 #
-# This program is free software: you can redistribute it and/or modify
+# The GPLv3 License (GNU)
+#
+# Copyright (c) 2016 userdocs
+#
+# This script is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
@@ -82,8 +86,8 @@ scriptauthor="userdocs"
 # Contributor's names go here.
 contributors="None credited"
 #
+gitiourl="https://git.io/v1J6i"
 # Set the http://git.io/ shortened URL for the raw github URL here:
-gitiourl="http://git.io/11111"
 #
 # Don't edit: This is the bash command shown when using the info option.
 gitiocommand="wget -qO ~/$scriptname $gitiourl && bash ~/$scriptname"
