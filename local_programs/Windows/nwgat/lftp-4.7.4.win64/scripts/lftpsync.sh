@@ -1,11 +1,11 @@
 #!/bin/bash
 #
-# v1.0.3 nwgat
+# v1.0.4 nwgat
 #
 # Credits: A heavily modified version of this idea and script http://www.torrent-invites.com/showthread.php?t=132965 towards a simplified end user experience.
 # Authors: Lordhades - Adamaze - userdocs
 # Script URL: https://git.io/v6Mza
-# wget -qO ~/lftpsync.sh https://git.io/v6Mza
+# wget -qO ~/lftpsync.sh https://git.io/v1skN
 #
 #### Editing option 0 is only required if you need to specify the tmp directory. This is the location the lock file, PID file and log file are created and checked by this script.
 ### Editing options 1 is only required if you have set have a private key you wish to use
@@ -41,7 +41,7 @@ args="-c -e --only-newer --ignore-time"
 #
 [[ ! -z "$1" ]] && remote_dir="$1"
 #
-# on cygwin awk is a symlink to gawk. Testing for whih to use.
+# on cygwin awk is a symlink to gawk. Testing for which to use.
 [[ -z $(whereis gawk | cut -d ':' -f 2) ]] && awkpath="awk" || awkpath="gawk"
 base_name="$(basename "$0")"
 lock_file="$tmpdir/$base_name.lock"
