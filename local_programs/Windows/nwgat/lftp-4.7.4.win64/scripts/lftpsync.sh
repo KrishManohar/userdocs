@@ -41,11 +41,13 @@ args="-c -e --only-newer --ignore-time"
 #
 [[ ! -z "$1" ]] && remote_dir="$1"
 #
+# on cygwin awk is a symlink to gawk. Testing for whih to use.
+[[ -z $(whereis gawk | cut -d ':' -f 2) ]] && awkpath="awk" || awkpath="gawk"
 base_name="$(basename "$0")"
 lock_file="$tmpdir/$base_name.lock"
 #
 # This checks to see if LFTP is actually running and if the lock file exists. It LFTP is not running and there is a lock file it will be automatically cleared allowing the script to run.
-[[ -z $(ps -p $(sed -rn 's/\[(.*)\](.*)/\1/p;1q' $tmpdir/$base_name.PID 2> /dev/null) 2> /dev/null | awk 'FNR==2{print $1}') ]] && rm -f "$tmpdir/$base_name.PID" "$lock_file" "$tmpdir/$base_name.log"
+[[ -z $(ps -p $(sed -rn 's/\[(.*)\](.*)/\1/p;1q' $tmpdir/$base_name.PID 2> /dev/null) 2> /dev/null | $awkpath 'FNR==2{print $1}') ]] && rm -f "$tmpdir/$base_name.PID" "$lock_file" "$tmpdir/$base_name.log"
 #
 trap "rm -f $lock_file" SIGINT SIGTERM
 #
