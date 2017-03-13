@@ -4,15 +4,30 @@
 ##### Basic Info Start #####
 ############################
 #
-# Script Author: randomessence
+# Script Author: userdocs
 #
 # Script Contributors: 
 #
-# License: This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License. https://creativecommons.org/licenses/by-sa/4.0/
-#
 # Bash Command for easy reference:
 #
-# wget -qO ~/install.proftpd http://git.io/nQJBxw && bash ~/install.proftpd
+# wget -qO ~/install.proftpd https://git.io/vyPfn && bash ~/install.proftpd
+#
+# The GPLv3 License (GNU)
+#
+# Copyright (c) 2016 userdocs
+#
+# This script is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ############################
 ###### Basic Info End ######
@@ -35,23 +50,7 @@
 if [[ ! -z "$1" && "$1" = 'changelog' ]]
 then
     echo
-    #
-    # put your version changes in the single quotes and then uncomment the line.
-    #
-    #echo 'v0.1.0 - My changes go here'
-    #echo 'v0.0.9 - My changes go here'
-    #echo 'v0.0.8 - My changes go here'
-    echo 'v1.3.3 - proftpd-1.3.5a'
-    echo 'v1.3.2 - deleteuser option added'
-    echo 'v1.3.1 - adduser custom filezilla profiles'
-    echo 'v1.3.0 - even easier filezilla template.'
-    echo 'v1.2.9 - filezilla importable templates generated during installation.'
-    echo 'v1.2.7 - fixed broken if in adduser section.'
-    echo 'v1.2.6 - merged adduser script into main script as a script option and tweaked script.'
-    echo 'v1.2.5 - Automatic password generation. USer experience simplified. More useful information is shown.'
-    echo 'v1.2.4 - Template updated'
-    #
-    echo
+    wget -O- -q https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/proftpd/changelog
     exit
 fi
 #
@@ -64,25 +63,25 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.3.3"
+scriptversion="1.3.4"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.proftpd"
 #
 # Author name goes here.
-scriptauthor="randomessence"
+scriptauthor="userdocs"
 #
 # Contributor's names go here.
 contributors="None credited"
 #
 # Set the http://git.io/ shortened URL for the raw github URL here:
-gitiourl="http://git.io/nQJBxw"
+gitiourl="https://git.io/vyPfn"
 #
 # Don't edit: This is the bash command shown when using the info option.
 gitiocommand="wget -qO ~/$scriptname $gitiourl && bash ~/$scriptname"
 #
 # This is the raw github url of the script to use with the built in updater.
-scripturl="https://raw.githubusercontent.com/feralhosting/feralfilehosting/master/Feral%20Wiki/Software/proftpd%20-%20Installing%20an%20FTP%20daemon%20for%20extra%20accounts/scripts/install.proftpd.sh"
+scripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/proftpd/scripts/install.proftpd.sh"
 #
 # This will generate a 20 character random passsword for use with your applications.
 apppass="$(< /dev/urandom tr -dc '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' | head -c20; echo;)"
@@ -92,28 +91,9 @@ appport="$(shuf -i 10001-32001 -n 1)"
 # This wil take the previously generated port and test it to make sure it is not in use, generating it again until it has selected an open port.
 while [[ "$(netstat -ln | grep ':'"$appport"'' | grep -c 'LISTEN')" -eq "1" ]]; do appport="$(shuf -i 10001-32001 -n 1)"; done
 #
-# Script user's http www URL in the format http://username.server.feralhosting.com/
-host1http="http://$(whoami).$(hostname -f)/"
-# Script user's https www URL in the format https://username.server.feralhosting.com/
-host1https="https://$(whoami).$(hostname -f)/"
-# Script user's http www url in the format https://server.feralhosting.com/username/
-host2http="http://$(hostname -f)/$(whoami)/"
-# Script user's https www url in the format https://server.feralhosting.com/username/
-host2https="https://$(hostname -f)/$(whoami)/"
 #
-# feralwww - sets the full path to the default public_html directory if it exists.
-[[ -d ~/www/"$(whoami)"."$(hostname -f)"/public_html ]] && feralwww="$HOME/www/$(whoami).$(hostname -f)/public_html/"
-# rtorrentdata - sets the full path to the rtorrent data directory if it exists.
-[[ -d ~/private/rtorrent/data ]] && rtorrentdata="$HOME/private/rtorrent/data"
-# deluge - sets the full path to the deluge data directory if it exists.
-[[ -d ~/private/deluge/data ]] && delugedata="$HOME/private/deluge/data"
-# transmission - sets the full path to the transmission data directory if it exists.
-[[ -d ~/private/transmission/data ]] && transmissiondata="$HOME/private/transmission/data"
-#
-# Bug reporting varaibles.
-makeissue=".makeissue $scriptname A description of the issue"
-ticketurl="https://www.feralhosting.com/manager/tickets/new"
-gitissue="https://github.com/feralhosting/feralfilehosting/issues/new"
+# Bug reporting variables.
+gitissue="https://github.com/userdocs/userdocs/issues/new"
 #
 ############################
 ## Custom Variables Start ##
@@ -121,18 +101,18 @@ gitissue="https://github.com/feralhosting/feralfilehosting/issues/new"
 #
 filezilla="http://git.io/vfAZ9"
 #
-proftpdversion="proftpd-1.3.5a"
+proftpdversion="proftpd-1.3.5d"
 installedproftpdversion="$(cat $HOME/proftpd/.proftpdversion 2> /dev/null)"
 #
-proftpdconf="https://raw.githubusercontent.com/feralhosting/feralfilehosting/master/Feral%20Wiki/Software/proftpd%20-%20Installing%20an%20FTP%20daemon%20for%20extra%20accounts/conf/proftpd.conf"
+proftpdconf="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/proftpd/conf/proftpd.conf"
 proftpdconfsize="3796"
-sftpconf="https://raw.githubusercontent.com/feralhosting/feralfilehosting/master/Feral%20Wiki/Software/proftpd%20-%20Installing%20an%20FTP%20daemon%20for%20extra%20accounts/conf/sftp.conf"
+sftpconf="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/proftpd/conf/sftp.conf"
 sftpconfsize="832"
-ftpsconf="https://raw.githubusercontent.com/feralhosting/feralfilehosting/master/Feral%20Wiki/Software/proftpd%20-%20Installing%20an%20FTP%20daemon%20for%20extra%20accounts/conf/ftps.conf"
+ftpsconf="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/proftpd/conf/ftps.conf"
 ftpsconfsize="940"
-scripturl="https://raw.githubusercontent.com/feralhosting/feralfilehosting/master/Feral%20Wiki/Software/proftpd%20-%20Installing%20an%20FTP%20daemon%20for%20extra%20accounts/scripts/install.proftpd.sh"
+scripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/proftpd/scripts/install.proftpd.sh"
 #
-proftpdurl="ftp://ftp.proftpd.org/distrib/source/proftpd-1.3.5a.tar.gz"
+proftpdurl="ftp://ftp.proftpd.org/distrib/source/proftpd-1.3.5d.tar.gz"
 #
 sftpport="$(shuf -i 10001-32001 -n 1)"
 #
@@ -322,11 +302,11 @@ then
     echo
     echo -e "\033[32m""Script Details:""\e[0m"
     echo
-    echo "Script version: $scriptversion"
+    echo -e "Script version: $scriptversion"
     echo
-    echo "Script Author: $scriptauthor"
+    echo -e "Script Author: $scriptauthor"
     echo
-    echo "Script Contributors: $contributors"
+    echo -e "Script Contributors: $contributors"
     echo
     echo -e "\033[32m""Script options:""\e[0m"
     echo
@@ -364,17 +344,7 @@ then
     echo
     echo -e "\033[32m""Bug Reporting:""\e[0m"
     echo
-    echo -e "These are the recommended ways to report bugs for scripts in the FAQs:"
-    echo
-    echo -e "1: In IRC you can use wikibot to create a github issue by using this command format:"
-    echo
-    echo -e "\033[36m""$makeissue""\e[0m"
-    echo
-    echo -e "2: You could open a ticket describing the problem with details of which script and what the problem is."
-    echo
-    echo -e "\033[36m""$ticketurl""\e[0m"
-    echo
-    echo -e "3: You can create an issue directly on github using your github account."
+    echo -e "You should create an issue directly on github using your github account."
     echo
     echo -e "\033[36m""$gitissue""\e[0m"
     echo
@@ -396,51 +366,32 @@ fi
 [[ ! -z "$1" && "$1" != 'qr' ]] || [[ ! -z "$2" && "$2" != 'qr' ]] && echo -en "$1\n$2" > ~/.passparams
 # Quick Run option part 1: If qr is used it will create this file. Then if the script also updates, which would reset the option, it will then find this file and set it back.
 [[ ! -z "$1" && "$1" = 'qr' ]] || [[ ! -z "$2" && "$2" = 'qr' ]] && echo -n '' > ~/.quickrun
-#
 # No Update option: This disables the updater features if the script option "nu" was used when running the script.
-if [[ ! -z "$1" && "$1" = 'nu' ]] || [[ ! -z "$2" && "$2" = 'nu' ]]
-then
-    echo
-    echo "The Updater has been temporarily disabled"
-    echo
+if [[ ! -z "$1" && "$1" = 'nu' ]] || [[ ! -z "$2" && "$2" = 'nu' ]]; then
     scriptversion="$scriptversion-nu"
+    echo -e "\nThe Updater has been temporarily disabled\n"
 else
-    #
     # Check to see if the variable "updaterenabled" is set to 1. If it is set to 0 the script will bypass the built in updater regardless of the options used.
-    if [[ "$updaterenabled" -eq "1" ]]
-    then
+    if [[ "$updaterenabled" -eq "1" ]]; then
         [[ ! -d ~/bin ]] && mkdir -p ~/bin
         [[ ! -f ~/bin/"$scriptname" ]] && wget -qO ~/bin/"$scriptname" "$scripturl"
-        #
         wget -qO ~/.000"$scriptname" "$scripturl"
-        #
-        if [[ "$(sha256sum ~/.000"$scriptname" | awk '{print $1}')" != "$(sha256sum ~/bin/"$scriptname" | awk '{print $1}')" ]]
-        then
-            echo -e "#!/bin/bash\nwget -qO ~/bin/$scriptname $scripturl\ncd && rm -f $scriptname{.sh,}\nbash ~/bin/$scriptname\nexit" > ~/.111"$scriptname"
-            bash ~/.111"$scriptname"
-            exit
+        if [[ "$(sha256sum ~/.000"$scriptname" | awk '{print $1}')" != "$(sha256sum ~/bin/"$scriptname" | awk '{print $1}')" ]]; then
+            echo -e "#!/bin/bash\nwget -qO ~/bin/$scriptname $scripturl\ncd && rm -f $scriptname{.sh,}\nbash ~/bin/$scriptname\nexit" > ~/.111"$scriptname" && bash ~/.111"$scriptname"; exit
         else
-            if [[ -z "$(pgrep -fu "$(whoami)" "bash $HOME/bin/$scriptname")" && "$(pgrep -fu "$(whoami)" "bash $HOME/bin/$scriptname")" -ne "$$" ]]
-            then
-                echo -e "#!/bin/bash\ncd && rm -f $scriptname{.sh,}\nbash ~/bin/$scriptname\nexit" > ~/.222"$scriptname"
-                bash ~/.222"$scriptname"
-                exit
+            if [[ -z "$(pgrep -fu "$(whoami)" "bash $HOME/bin/$scriptname")" && "$(pgrep -fu "$(whoami)" "bash $HOME/bin/$scriptname")" -ne "$$" ]]; then
+                echo -e "#!/bin/bash\ncd && rm -f $scriptname{.sh,}\nbash ~/bin/$scriptname\nexit" > ~/.222"$scriptname" && bash ~/.222"$scriptname"; exit
             fi
         fi
-        cd && rm -f .{000,111,222}"$scriptname"
-        chmod -f 700 ~/bin/"$scriptname"
+        cd && rm -f .{000,111,222}"$scriptname" && chmod -f 700 ~/bin/"$scriptname"
         echo
     else
-        echo
-        echo "The Updater has been disabled"
-        echo
         scriptversion="$scriptversion-DEV"
+        echo -e "\nThe Updater has been disabled\n"
     fi
 fi
-#
 # Quick Run option part 2: If quick run was set and the updater section completes this will enable quick run again then remove the file.
 [[ -f ~/.quickrun ]] && updatestatus="y"; rm -f ~/.quickrun
-#
 # resets the positional parameters $1 and $2 post update.
 [[ -f ~/.passparams ]] && set "$1" "$(sed -n '1p' ~/.passparams)" && set "$2" "$(sed -n '2p' ~/.passparams)"; rm -f ~/.passparams
 #
