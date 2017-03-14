@@ -1,1 +1,0 @@
-takeown /f "%cd%" /r

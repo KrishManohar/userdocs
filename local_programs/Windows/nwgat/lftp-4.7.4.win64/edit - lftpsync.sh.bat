@@ -1,1 +1,0 @@
-start bin\notepad\notepad++.exe %cd%\scripts\lftpsync.sh
