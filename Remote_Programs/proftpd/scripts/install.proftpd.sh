@@ -50,7 +50,7 @@
 if [[ ! -z "$1" && "$1" = 'changelog' ]]
 then
     echo
-    wget -O- -q https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/proftpd/changelog
+    curl -s https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/proftpd/changelog
     exit
 fi
 #
