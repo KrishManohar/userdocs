@@ -101,7 +101,7 @@ gitissue="https://github.com/userdocs/userdocs/issues/new"
 #
 filezilla="http://git.io/vfAZ9"
 #
-proftpdversion="proftpd-1.3.5d"
+proftpdversion="proftpd-1.3.6"
 installedproftpdversion="$(cat $HOME/proftpd/.proftpdversion 2> /dev/null)"
 #
 proftpdconf="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/proftpd/conf/proftpd.conf"
@@ -112,7 +112,7 @@ ftpsconf="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Prog
 ftpsconfsize="940"
 scripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/proftpd/scripts/install.proftpd.sh"
 #
-proftpdurl="ftp://ftp.proftpd.org/distrib/source/proftpd-1.3.5d.tar.gz"
+proftpdurl="ftp://ftp.proftpd.org/distrib/source/proftpd-1.3.6.tar.gz"
 #
 sftpport="$(shuf -i 10001-32001 -n 1)"
 #
@@ -129,7 +129,7 @@ while [[ "$(netstat -ln | grep ':'"$ftpsport"'' | grep -c 'LISTEN')" -eq "1" ]];
 ############################
 #
 # Disables the built in script updater permanently by setting this variable to 0.
-updaterenabled="1"
+updaterenabled="0"
 #
 ############################
 ####### Variable End #######
@@ -551,9 +551,9 @@ then
         then
             killall -9 -u "$(whoami)" proftpd >/dev/null 2>&1
             mkdir -p "$HOME"/proftpd/install_logs
-            rm -rf ~/"$proftpdversion"{,.tar.gz}
-            wget -qO ~/proftpd-1.3.5.tar.gz "$proftpdurl"
-            tar xf ~/proftpd-1.3.5.tar.gz
+            rm -rf "$HOME/$proftpdversion"{,.tar.gz}
+            wget -qO "$HOME/$proftpdversion.tar.gz" "$proftpdurl"
+            tar xf "$HOME/$proftpdversion.tar.gz"
             #
             [[ -z "$(grep -o '^ProcessTitles terse$' $HOME/proftpd/etc/proftpd.conf)" ]] && sed -i '/###### Options/a ProcessTitles terse' "$HOME"/proftpd/etc/proftpd.conf || :
             [[ -z "$(grep -o '^IdentLookups off$' $HOME/proftpd/etc/proftpd.conf)" ]] && sed -i '/###### Options/a IdentLookups off' "$HOME"/proftpd/etc/proftpd.conf || :
@@ -603,8 +603,8 @@ then
     mkdir -p "$HOME"/proftpd/etc/sftp/authorized_keys
     mkdir -p "$HOME"/proftpd/etc/keys
     mkdir -p "$HOME"/proftpd/{ssl,install_logs}
-    wget -qO ~/proftpd-1.3.5.tar.gz "$proftpdurl"
-    tar xf ~/proftpd-1.3.5.tar.gz
+    wget -qO "$HOME/$proftpdversion.tar.gz" "$proftpdurl"
+    tar xf "$HOME/$proftpdversion.tar.gz"
     #git clone -q "$proftpdurl"
     #chmod -R 700 "$HOME/$proftpdversion"
     echo -n "$proftpdversion" > "$HOME"/proftpd/.proftpdversion
