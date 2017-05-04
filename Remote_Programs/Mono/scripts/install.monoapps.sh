@@ -208,7 +208,7 @@ cronscript () {
     wget -qO ~/.userdocs/cronjobs/"$appname".cronjob "https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/Bash_Scripts/cronscript.sh"
     #
     [[ "$appname" = "sonarr" ]] && sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/$appname.cronjob
-	[[ "$appname" = "radarr" ]] && sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/$appname.cronjob
+    [[ "$appname" = "radarr" ]] && sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/$appname.cronjob
     [[ "$appname" = "jackett"  ]] && sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/$appname.cronjob
     [[ "$appname" = "emby" ]] && sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/$appname.cronjob
     #
@@ -286,10 +286,10 @@ sqlite3setup () {
 }
 #
 programpaths () {
-	[[ "$appname" = "sonarr" ]] && apppaths="$HOME/.config/NzbDrone/config.xml"
-	[[ "$appname" = "radarr" ]] && apppaths="$HOME/.config/Radarr/config.xml"
-	[[ "$appname" = "jackett" ]] && apppaths="$HOME/.config/Jackett/ServerConfig.json"
-	[[ "$appname" = "emby" ]] && apppaths="$HOME/.emby/ProgramData-Server/config/system.xml"
+    [[ "$appname" = "sonarr" ]] && apppaths="$HOME/.config/NzbDrone/config.xml"
+    [[ "$appname" = "radarr" ]] && apppaths="$HOME/.config/Radarr/config.xml"
+    [[ "$appname" = "jackett" ]] && apppaths="$HOME/.config/Jackett/ServerConfig.json"
+    [[ "$appname" = "emby" ]] && apppaths="$HOME/.emby/ProgramData-Server/config/system.xml"
 }
 #
 genericproxypass () {
@@ -386,7 +386,7 @@ genericremove () {
             rm -rf ~/.userdocs/cronjobs/"$appname".cronjob
             rm -rf ~/.userdocs/logins/"$appname".login
             rm -rf ~/.userdocs/pids/"$appname".pids
-			rm -rf ~/.userdocs/logs/$appname.log
+            rm -rf ~/.userdocs/logs/$appname.log
             #
             rm -rf ~/.apache2/conf.d/"$appname".conf
             rm -rf ~/.nginx/conf.d/000-default-server.d/"$appname".conf
@@ -399,7 +399,7 @@ genericremove () {
             rm -rf ~/.userdocs/cronjobs/$appname.cronjob
             rm -rf ~/.userdocs/logins/$appname.login
             rm -rf ~/.userdocs/pids/$appname.pids
-			rm -rf ~/.userdocs/logs/$appname.log
+            rm -rf ~/.userdocs/logs/$appname.log
             #
             rm -rf ~/.apache2/conf.d/$appname.conf
             rm -rf ~/.nginx/conf.d/000-default-server.d/$appname.conf
@@ -412,7 +412,7 @@ genericremove () {
             rm -rf ~/.userdocs/cronjobs/"$appname".cronjob
             rm -rf ~/.userdocs/logins/"$appname".login
             rm -rf ~/.userdocs/pids/"$appname".pids
-			rm -rf ~/.userdocs/logs/$appname.log
+            rm -rf ~/.userdocs/logs/$appname.log
             #
             rm -rf ~/.apache2/conf.d/"$appname".conf
             rm -rf ~/.nginx/conf.d/000-default-server.d/"$appname".conf
@@ -425,7 +425,7 @@ genericremove () {
             rm -rf ~/.userdocs/cronjobs/"$appname".cronjob
             rm -rf ~/.userdocs/logins/"$appname".login
             rm -rf ~/.userdocs/pids/"$appname".pids
-			rm -rf ~/.userdocs/logs/$appname.log
+            rm -rf ~/.userdocs/logs/$appname.log
             #
             sed -i '/^export PATH=~\/bin:$PATH$/d' ~/.bashrc
             sed -i '/^export LD_LIBRARY_PATH=~\/lib:$LD_LIBRARY_PATH$/d' ~/.bashrc
@@ -680,8 +680,8 @@ do
             prerequisites
             #
             appname="sonarr"
-			#
-			programpaths
+            #
+            programpaths
             #
             [[ -f ~/.$appname/NzbDrone.exe ]] && sonarrcheck1="ON" || sonarrcheck1="NO"
             [[ -f ~/.userdocs/versions/$appname.version ]] && sonarrcheck2="ON" || sonarrcheck2="NO"
@@ -746,8 +746,8 @@ do
             prerequisites
             #
             appname="radarr"
-			#
-			programpaths
+            #
+            programpaths
             #
             [[ -f ~/.$appname/${appname^}.exe ]] && radarrcheck1="ON" || radarrcheck1="NO"
             [[ -f ~/.userdocs/versions/$appname.version ]] && radarrcheck2="ON" || radarrcheck2="NO"
@@ -812,8 +812,8 @@ do
             prerequisites
             #
             appname="jackett"
-			#
-			programpaths
+            #
+            programpaths
             #
             [[ -f ~/.jackett/JackettConsole.exe ]] && jackettcheck1="ON" || jackettcheck1="NO"
             [[ -f ~/.userdocs/versions/jackett.version ]] && jackettcheck2="ON" || jackettcheck2="NO"
@@ -881,8 +881,8 @@ do
             sqlite3setup
             #
             appname="emby"
-			#
-			programpaths
+            #
+            programpaths
             #
             [[ -f ~/.emby/MediaBrowser.Server.Mono.exe ]] && embycheck1="ON" || embycheck1="NO"
             [[ -f ~/.userdocs/versions/emby.version ]] && embycheck2="ON" || embycheck2="NO"
