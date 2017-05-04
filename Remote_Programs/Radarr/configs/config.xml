@@ -1,5 +1,5 @@
 <Config>
-  <Port>8989</Port>
+  <Port>7878</Port>
   <UrlBase></UrlBase>
   <BindAddress>*</BindAddress>
   <SslPort>9898</SslPort>
@@ -9,4 +9,7 @@
   <LogLevel>Info</LogLevel>
   <Branch>master</Branch>
   <LaunchBrowser>False</LaunchBrowser>
+  <SslCertHash></SslCertHash>
+  <UpdateMechanism>BuiltIn</UpdateMechanism>
+  <AnalyticsEnabled>False</AnalyticsEnabled>
 </Config>
