@@ -835,7 +835,7 @@ do
                     mkdir -p ~/.config/Jackett
                     wget -qO ~/.config/Jackett/ServerConfig.json "$jacketconfig"
                     sed -i 's|"Port": PORT,|"Port": '"$jackettappport"',|g' ~/.config/Jackett/ServerConfig.json
-                    sed -i 's|"BasePathOverride": PATH|"BasePathOverride": "/'"$(whoami)"'/jackett/"|g' ~/.config/Jackett/ServerConfig.json
+                    sed -i 's|"BasePathOverride": PATH|"BasePathOverride": "/'"$(whoami)"'/jackett"|g' ~/.config/Jackett/ServerConfig.json
                 fi
                 #
                 cronjobadd
