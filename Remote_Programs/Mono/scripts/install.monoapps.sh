@@ -127,7 +127,7 @@ sonarrurl="http://update.sonarr.tv/v2/master/mono/NzbDrone.master.tar.gz"
 sonarrv="$(curl -s https://github.com/Sonarr/Sonarr/releases | grep -o '/Sonarr/Sonarr/archive/.*\.zip' | sort -V | tail -1 | sed -rn 's|/Sonarr/Sonarr/archive/v(.*).zip|\1|p')"
 sonarrconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Sonarr/configs/config.xml"
 #
-radarrurl="https://github.com/Radarr/Radarr/releases/download/v0.2.0.654/Radarr.develop.0.2.0.654.linux.tar.gz"
+radarrurl="https://github.com/Radarr/Radarr/releases/download/v0.2.0.696/Radarr.develop.0.2.0.696.linux.tar.gz"
 radarrv="$(curl -s https://github.com/Radarr/Radarr/releases | grep -o '/Radarr/Radarr/archive/.*\.zip' | sort -V | tail -1 | sed -rn 's|/Radarr/Radarr/archive/v(.*).zip|\1|p')"
 radarrconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Radarr/configs/config.xml"
 #
@@ -150,7 +150,7 @@ embyappporthttps="$(shuf -i 10001-32001 -n 1)"
 ############################
 #
 # Disables the built in script updater permanently by setting this variable to 0.
-updaterenabled="0"
+updaterenabled="1"
 #
 ############################
 ####### Variable End #######
