@@ -206,6 +206,8 @@ cronjobremove () {
 #
 cronscript () {
     wget -qO ~/.userdocs/cronjobs/"$appname".cronjob "https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/Bash_Scripts/cronscript.sh"
+	#
+	sed -i 's|# screen command|screen -dmS APPNAME ~/bin/mono --debug PATH|g' ~/.userdocs/cronjobs/$appname.cronjob
     #
     [[ "$appname" = "sonarr" ]] && sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/$appname.cronjob
     [[ "$appname" = "radarr" ]] && sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/$appname.cronjob
