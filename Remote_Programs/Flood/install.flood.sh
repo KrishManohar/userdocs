@@ -10,7 +10,7 @@
 #
 # Bash Command for easy reference:
 #
-# wget -qO ~/somescript http://git.io/vfN2U && bash ~/somescript
+# wget -qO ~/install.flood https://git.io/vHqf6 && bash ~/install.flood
 #
 # The GPLv3 License (GNU)
 #
@@ -76,13 +76,13 @@ scriptauthor="userdocs"
 contributors="None credited"
 #
 # Set the http://git.io/ shortened URL for the raw github URL here:
-gitiourl=""
+gitiourl="https://git.io/vHqf6"
 #
 # Don't edit: This is the bash command shown when using the info option.
 gitiocommand="wget -qO ~/$scriptname $gitiourl && bash ~/$scriptname"
 #
 # This is the raw github url of the script to use with the built in updater.
-scripturl="https://raw.githubusercontent.com/userdocs/userdocs/"
+scripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Flood/install.flood.sh"
 #
 # This will generate a 20 character random passsword for use with your applications.
 apppass="$(< /dev/urandom tr -dc '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' | head -c20; echo;)"
@@ -108,7 +108,7 @@ floodconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_P
 ############################
 #
 # Disables the built in script updater permanently by setting this variable to 0.
-updaterenabled="1"
+updaterenabled="0"
 #
 ############################
 ####### Variable End #######
