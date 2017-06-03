@@ -50,6 +50,7 @@
 if [[ ! -z "$1" && "$1" = 'changelog' ]]
 then
     echo
+    echo 'v1.0.4 - better method to cd into mono tmp dir to compile. Better checks to make sure mono still installs when script errored out.'
     echo 'v1.0.3 - Radarr added - pre release - script tweaks'
     echo 'v1.0.1 - i think i fixed something'
     echo 'v1.0.0 - a functional install/updater/removal script for mono/sonarr/jackett/emby on feral and whatbox with proxypass where applicable'
@@ -71,7 +72,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.0.3"
+scriptversion="1.0.4"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
@@ -108,7 +109,7 @@ gitissue="https://github.com/userdocs/userdocs/issues/new"
 ## Custom Variables Start ##
 ############################
 #
-cmakeurl="https://cmake.org/files/v3.7/cmake-3.7.0-Linux-x86_64.tar.gz"
+cmakeurl="https://cmake.org/files/v3.8/cmake-3.8.2-Linux-x86_64.tar.gz"
 #
 sqlite3url="https://www.sqlite.org/$(date +"%Y")/$(curl -s https://www.sqlite.org/download.html | egrep -om 1 'sqlite-autoconf-(.*).tar.gz')"
 sqlite3v="$(curl -s https://www.sqlite.org/download.html | egrep -om 1 'sqlite-autoconf-(.*).tar.gz' | sed -rn 's/sqlite-autoconf-(.*).tar.gz/\1/p')"
@@ -118,7 +119,6 @@ libtoolv="$(curl -s http://ftp.heanet.ie/mirrors/gnu/libtool/ | egrep -o 'libtoo
 #
 monourl="http://download.mono-project.com/sources/mono/$(curl -s http://download.mono-project.com/sources/mono/ | egrep -o 'mono-[^"]*\.tar\.bz2' | tail -1)"
 monovfull="$(curl -s http://download.mono-project.com/sources/mono/ | egrep -o 'mono-[^"]*\.tar\.bz2' | tail -1 | sed -rn 's/mono-(.*).tar.bz2/\1/p')"
-monovshort="$(curl -s http://download.mono-project.com/sources/mono/ | egrep -o 'mono-[^"]*\.tar\.bz2' | tail -1 | sed -rn 's/mono-(.*).tar.bz2/\1/p' | awk -F'.' '{ print $1 "." $2 "." $3 }')"
 #
 genericproxyapache="https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/proxypass/apache/generic.conf"
 genericproxynginx="https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/proxypass/nginx/generic.conf"
@@ -657,8 +657,9 @@ do
             [[ -f ~/bin/mono ]] && monocheck1="ON" || monocheck1="NO"
             [[ -f ~/.userdocs/versions/mono.version ]] && monocheck2="ON" || monocheck2="NO"
             [[ "$(cat ~/.userdocs/versions/mono.version 2> /dev/null)" = "$monovfull" ]] && monocheck3="ON" || monocheck3="NO"
+            [[ "$(~/bin/mono -V 2> /dev/null | head -1 | sed -rn 's/(.*)version (.*) \((.*)/\2/p')" = "$(cat ~/.userdocs/versions/mono.version 2> /dev/null)" ]] && monocheck4="ON" || monocheck4="NO"
             #
-            if [[ "$monocheck1" != 'ON' || "$monocheck2" != 'ON' || "$monocheck3" != 'ON' ]] 
+            if [[ "$monocheck1" != 'ON' || "$monocheck2" != 'ON' || "$monocheck3" != 'ON' || "$monocheck4" != 'ON' ]]
             then
                 echo "Installing mono. This will take a long time. Put the kettle on."; echo
                 #
@@ -667,10 +668,12 @@ do
                 rm -rf ~/.userdocs/tmp/cmake.tar.gz
                 #
                 wget -qO ~/.userdocs/tmp/mono.tar.bz2 "$monourl" ~/.userdocs/logs/mono.download.log 2>&1
-                tar xf ~/.userdocs/tmp/mono.tar.bz2 -C ~/.userdocs/tmp && cd ~/.userdocs/tmp/mono-"$monovshort"
-                ./autogen.sh --prefix="$HOME" > ~/.userdocs/logs/mono.install.log 2>&1
-                make get-monolite-latest >> ~/.userdocs/logs/mono.install.log 2>&1
-                make >> ~/.userdocs/logs/mono.log 2>&1 && make install >> ~/.userdocs/logs/mono.install.log 2>&1
+                monodir="$(tar -tjf ~/.userdocs/tmp/mono.tar.bz2 | head -1 | cut -f1 -d"/")"
+                tar xf ~/.userdocs/tmp/mono.tar.bz2 -C ~/.userdocs/tmp && cd ~/.userdocs/tmp/"$monodir"
+                ./autogen.sh --prefix="$HOME" > ~/.userdocs/logs/mono.autogen.log 2>&1
+                make get-monolite-latest > ~/.userdocs/logs/mono.monolite.log 2>&1
+                make > ~/.userdocs/logs/mono.make.log 2>&1
+                make install > ~/.userdocs/logs/mono.install.log 2>&1
                 rm -rf ~/.userdocs/tmp/mono{-*,.tar.bz2}
                 #
                 echo -n "$monovfull" > ~/.userdocs/versions/mono.version
