@@ -72,7 +72,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.0.4"
+scriptversion="1.0.5"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
@@ -366,10 +366,10 @@ genericrestart () {
     #
     if [[ -z "$(screen -ls $appname | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p')" ]]
     then
-        [[ "$appname" = "sonarr" ]] && screen -dmS $appname ~/bin/mono --debug ~/.$appname/NzbDrone.exe
-        [[ "$appname" = "radarr" ]] && screen -dmS $appname ~/bin/mono --debug ~/.$appname/Radarr.exe
-        [[ "$appname" = "jackett" ]] && screen -dmS $appname ~/bin/mono --debug ~/.$appname/JackettConsole.exe
-        [[ "$appname" = "emby" ]] && screen -dmS $appname ~/bin/mono --debug ~/.$appname/MediaBrowser.Server.Mono.exe
+        [[ "$appname" = "sonarr" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; ~/bin/mono --debug ~/.$appname/NzbDrone.exe^M"
+        [[ "$appname" = "radarr" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; ~/bin/mono --debug ~/.$appname/Radarr.exe^M"
+        [[ "$appname" = "jackett" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; ~/bin/mono --debug ~/.$appname/JackettConsole.exe^M"
+        [[ "$appname" = "emby" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; ~/bin/mono --debug ~/.$appname/MediaBrowser.Server.Mono.exee^M"
         echo "${appname^} was restarted"
     fi
 }
