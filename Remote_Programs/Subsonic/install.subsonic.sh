@@ -48,18 +48,8 @@
 if [[ ! -z "$1" && "$1" = 'changelog' ]]
 then
     echo
-    #
-    # put your version changes in the single quotes and then uncomment the line.
-    #
-    #echo 'v0.1.0 - My changes go here'
-    #echo 'v0.0.9 - My changes go here'
-    #echo 'v0.0.8 - My changes go here'
-    #echo 'v0.0.7 - My changes go here'
-    #echo 'v0.0.6 - My changes go here'
-    #echo 'v0.0.5 - My changes go here'
-    #echo 'v0.0.4 - My changes go here'
-    #echo 'v0.0.3 - My changes go here'
-    #echo 'v0.0.2 - My changes go here'
+    echo 'v2.6.1 - bug fixes and small tweaks. No more rsk script as the method has been replaced with teh template built in method.'
+    echo 'v2.6.0 - script and template updated to fall inline with userdocs template method.'
     echo 'v2.5.0 - Rework of template so that manual script editing and updating is becoming obselete in regards to program updates'
     #
     echo
@@ -75,7 +65,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="2.5.2"
+scriptversion="2.6.1"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.subsonic"
@@ -100,10 +90,8 @@ apppass="$(< /dev/urandom tr -dc '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij
 # This will generate a random port for the script between the range 10001 to 32001 to use with applications. You can ignore this unless needed.
 appport="$(shuf -i 10001-32001 -n 1)"
 #
-# This wil take the previously generated port and test it to make sure it is not in use, generating it again until it has selected an open port.
+# This will take the previously generated port and test it to make sure it is not in use, generating it again until it has selected an open port.
 while [[ "$(netstat -ln | grep ':'"$appport"'' | grep -c 'LISTEN')" -ge "1" ]]; do appport="$(shuf -i 10001-32001 -n 1)"; done
-#
-appname="subsonic"
 #
 # Bug reporting variables.
 gitissue="https://github.com/userdocs/userdocs/issues/new"
@@ -112,28 +100,37 @@ gitissue="https://github.com/userdocs/userdocs/issues/new"
 ## Custom Variables Start ##
 ############################
 #
+# The current version of subsonic can be set here and will be used in the rest of the script.
 subsonicversion="6.1.1"
 #
+# This variable must be set and in lowercase. It will define multiple values in the scipt such as installation paths, filenames and be used to configure files.
+appname="subsonic"
+#
+# This is the command that will be used to start the program and used in the cron scripts. It just needs to be the basic start command for the app.
+startcommand="~/.$appname/$appname.sh"
+#
+# This command will check to see if subsonic is installed and use the configured port instead of q random port.
+[[ -f "$HOME/.$appname/$appname.sh" ]] && appport="$(cat "$HOME/.$appname/$appname.sh" | sed -rn 's/SUBSONIC_PORT=\$\{SUBSONIC_PORT:-(.*)\}/\1/p')"
+#
+# This variable is set to one if the nginx proxypass requires a socket, for example this is used with flood.
+# socketpath=""
+#
+# These variables are for getting the most recent version of java creating teh required urls and version numbers for the script.
 getversion="$(curl -Ls http://java.com/en/download/linux_manual.jsp | sed -rn 's/(.*)>Recommended Version (.*) Update (.*)<(.*)/\2/p')"
 getupdate="$(curl -Ls http://java.com/en/download/linux_manual.jsp | sed -rn 's/(.*)>Recommended Version (.*) Update (.*)<(.*)/\3/p')"
 javaversion="The Latest Java available is $getversion Update $getupdate"
 javadecimal="1.$getversion.0_$getupdate"
-#
-# Check the version of the installed java binary in the PATH
-currentjavaversion="$(java -version 2>&1 | sed -rn 's/(.*)"(.*)"(.*)/\2/p')"
-#
-# Gets the Java version from the last time this script installed Java by checking the ~/.userdocs/versions/java.version file
+javaupdateurl="$(curl -Ls http://java.com/en/download/linux_manual.jsp | egrep -om 1 '<a title="Download Java software for Linux x64" href="http://javadl\.oracle\.com/webapps/download/AutoDL\?BundleId=(.*)" ' | sed -rn 's/(.*)href="(.*)"(.*)/\2/p')"
+# currentjavaversion="$(java -version 2>&1 | sed -rn 's/(.*)"(.*)"(.*)/\2/p')"
 installedjavaversion="$(cat ~/.userdocs/versions/java.version 2> /dev/null)"
 #
-# Java URL which shoudl always return the most  current linux x64 url download
-javaupdateurl="$(curl -Ls http://java.com/en/download/linux_manual.jsp | egrep -om 1 '<a title="Download Java software for Linux x64" href="http://javadl\.oracle\.com/webapps/download/AutoDL\?BundleId=(.*)" ' | sed -rn 's/(.*)href="(.*)"(.*)/\2/p')"
 # Defines the memory variable
-# buffer
 maxmemory="4096"
 #
+# These variables are for getting the subsonic standalone files and creating the version echo.
 subsonicfv="https://s3-eu-west-1.amazonaws.com/subsonic-public/download/subsonic-$subsonicversion-standalone.tar.gz"
 subsonicfvs="subsonic $subsonicversion"
-# ffmpeg files
+# hese variables are for getting the ffmpeg files and creating the version echo.
 sffmpegfv="http://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz"
 sffmpegfvs="ffmpeg-release-64bit-static.tar.xz"
 #
@@ -142,35 +139,47 @@ sffmpegfvs="ffmpeg-release-64bit-static.tar.xz"
 ############################
 #
 # Disables the built in script updater permanently by setting this variable to 0.
-updaterenabled="1"
+updaterenabled="0"
 #
 ############################
 ####### Variable End #######
 ############################
 #
 ############################
-###### Function Start ######
+## Generic Function Start ##
 ############################
 #
-cronjobadd () {
-    # adding jobs to cron: Set the variable tmpcron to a randomly generated temporary file.
+function_prerequisites () {
+    mkdir -p ~/bin
+    mkdir -p ~/.userdocs/{versions,cronjobs,logins,logs,pids,tmp}
+    #
+    [[ $(echo "$PATH" | grep -oc ~/bin) -eq "0" ]] && export PATH=~/bin:"$PATH"
+	[[ $(echo "$TMPDIR" | grep -oc ~/.userdocs/tmp) -eq "0" ]] && export TMPDIR=~/.userdocs/tmp
+    #
+    echo 'This is a folder generated by the userdocs installation scripts that you may have used to house important information or components of the script.' > ~/.userdocs/readme.txt
+}
+#
+function_cronjobadd () {
     tmpcron="$(mktemp)"
-    # Check if the job exists already by grepping whatever is between ^$
     if [[ "$(crontab -l 2> /dev/null | grep -oc '^\* \* \* \* \* bash -l ~/.userdocs/cronjobs/'"$appname"'.cronjob >> ~/.userdocs/cronjobs/logs/'"$appname"'.log 2>&1$')" == "0" ]]
     then
-        # sometimes the cronjob will be to run a custom script generated by the installer, located in the directory ~/.cronjobs
         mkdir -p ~/.userdocs/cronjobs/logs
-        echo "Appending ${appname^} to crontab."
+        echo "Appending ${appname^} to crontab."; echo
         crontab -l 2> /dev/null > "$tmpcron"
         echo '* * * * * bash -l ~/.userdocs/cronjobs/'"$appname"'.cronjob >> ~/.userdocs/cronjobs/logs/'"$appname"'.log 2>&1' >> "$tmpcron"
         crontab "$tmpcron"
         rm "$tmpcron"
     else
-        echo "The ${appname^} cronjob is already in crontab"
+        echo "The ${appname^} cronjob is already in crontab"; echo
     fi
+    #
+    rm -f ~/.userdocs/cronjobs/$appname.cronjob
+    wget -qO ~/.userdocs/cronjobs/$appname.cronjob "https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/Bash_Scripts/cronscript.sh"
+	sed -i 's|# screen command|screen -dmS '"$appname"' \&\& screen -S '"$appname"' -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; '"$startcommand"'^M"|g' ~/.userdocs/cronjobs/"$appname".cronjob
+	sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/"$appname".cronjob
 }
 #
-cronjobremove () {
+function_cronjobremove () {
     tmpcron="$(mktemp)"
     if [[ "$(crontab -l 2> /dev/null | grep -oc '^\* \* \* \* \* bash -l ~/.userdocs/cronjobs/'"$appname"'.cronjob >> ~/.userdocs/cronjobs/logs/'"$appname"'.log 2>&1$')" == "1" ]]
     then
@@ -184,39 +193,116 @@ cronjobremove () {
     fi
 }
 #
-cronscript () {
-    # Create the cron script.
-    echo '#!/bin/bash
-    if [[ -z "$(ps -p $(cat ~/private/subsonic/subsonic.sh.PID) --no-headers)" && -d ~/private/subsonic ]]
-    then
-        bash ~/private/subsonic/subsonic.sh
-        echo "Restarted @ $(date +"%H:%M on the %d.%m.%y")" >> ~/.userdocs/cronjobs/logs/subsonic.log
-    else
-        exit
-    fi' > ~/.userdocs/cronjobs/subsonic.cronjob
+function_generichosturl () {
+    echo -e "\033[32m""${appname^} is accessible at: https://$(hostname -f)/$(whoami)/$appname/""\e[0m"; echo
+    echo "It may take a few minutes to load. Refresh the page to see the app."; echo
 }
 #
-proxypass () {
-if [[ -f ~/private/subsonic/subsonic.sh ]]
-then
-    mkdir -p ~/.apache2/conf.d
-    echo -en 'Include /etc/apache2/mods-available/proxy.load\nInclude /etc/apache2/mods-available/proxy_http.load\nInclude /etc/apache2/mods-available/headers.load\nInclude /etc/apache2/mods-available/ssl.load\n\nProxyRequests Off\nProxyPreserveHost On\nProxyVia On\nSSLProxyEngine on\n\nProxyPass /subsonic http://10.0.0.1:'$(sed -n -e 's/SUBSONIC_PORT=\([0-9]\+\)/\1/p' ~/private/subsonic/subsonic.sh 2> /dev/null)'/${USER}/subsonic\nProxyPassReverse /subsonic http://10.0.0.1:'$(sed -n -e 's/SUBSONIC_PORT=\([0-9]\+\)/\1/p' ~/private/subsonic/subsonic.sh 2> /dev/null)'/${USER}/subsonic\nRedirect /${USER}/subsonic https://${APACHE_HOSTNAME}/${USER}/subsonic' > "$HOME/.apache2/conf.d/subsonic.conf"
-    /usr/sbin/apache2ctl -k graceful > /dev/null 2>&1
-    # Nginx proxypass
-    if [[ -d ~/.nginx/conf.d/000-default-server.d ]]
-    then
+function_genericproxypass () {
+    #
+	genericproxyapache="https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/proxypass/apache/generic.conf"
+	genericproxynginx="https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/proxypass/nginx/generic.conf"
+	# If the proxypass requires a socket.
+	socket="0"
+	if [[ -d ~/.nginx ]]
+	then
         mkdir -p ~/.nginx/proxy
-        echo -e 'location /subsonic {\n\nproxy_temp_path '"$HOME"'/.nginx/proxy;\n\nproxy_set_header        Host            $http_x_host;\nproxy_set_header        X-Real-IP       $remote_addr;\nproxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;\nrewrite /subsonic/(.*) /'$(whoami)'/subsonic/$1 break;\nproxy_pass http://10.0.0.1:'$(sed -n -e 's/SUBSONIC_PORT=\([0-9]\+\)/\1/p' ~/private/subsonic/subsonic.sh 2> /dev/null)'/'$(whoami)'/subsonic/;\nproxy_redirect http:// https://;\n\n}' > ~/.nginx/conf.d/000-default-server.d/subsonic.conf
-        /usr/sbin/nginx -s reload -c ~/.nginx/nginx.conf > /dev/null 2>&1
-    fi
-    echo -e "The" "\033[36m""nginx/apache proxypass""\e[0m" "has been installed."
-    echo
-    echo -e "Subsonic is accessible at:" "\033[32m""https://$(hostname -f)/$(whoami)/subsonic/""\e[0m"
-    echo
-fi
+		wget -qO ~/.nginx/conf.d/000-default-server.d/"$appname".conf "$genericproxynginx"
+        #
+        if [[ "$appname" =~ ^(subsonic|sonarr|radarr)$ ]]
+        then
+            sed -i 's|# rewrite /(.*) /username/$1 break;|rewrite /(.*) /username/$1 break;|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
+        else
+            sed -i 's|# rewrite /generic/(.*) /$1 break;|rewrite /generic/(.*) /$1 break;|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
+        fi
+        #
+        sed -i 's|HOME|'"$HOME"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
+		sed -i 's|generic|'"$appname"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
+		sed -i 's|username|'"$(whoami)"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
+		sed -i 's|PORT|'$appport'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
+        #
+		#
+		if [[ "$socket" -eq "1" ]]
+		then
+			sed -i 's|# include   /etc/nginx/scgi_params;|include   /etc/nginx/scgi_params;|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
+			sed -i 's|# scgi_pass unix://SOCKETPATH;|scgi_pass unix://'$socketpath';|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
+		fi
+		#
+		/usr/sbin/nginx -s reload -c ~/.nginx/nginx.conf > /dev/null 2>&1
+		echo "The nginx proxypass was installed"
+		echo
+	fi
+    #
+    wget -qO ~/.apache2/conf.d/"$appname".conf "$genericproxyapache"
+    sed -i "s|generic|$appname|g" ~/.apache2/conf.d/"$appname".conf
+    sed -i 's|PORT|'$appport'|g' ~/.apache2/conf.d/"$appname".conf
+    #
+    /usr/sbin/apache2ctl -k graceful > /dev/null 2>&1
+    echo "The Apache proxypass was installed"; echo
+    #
 }
 #
-installjava () {
+function_genericrestart () {
+    kill -9 "$(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p')" > /dev/null 2>&1
+    rm -f $HOME/.userdocs/pids/"$appname".pid
+    #
+    screen -wipe > /dev/null 2>&1
+    #
+    if [[ -d "$HOME/.$appname" ]]
+    then
+        if [[ -z "$(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p')" ]]
+        then
+            screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; $startcommand^M"
+            echo -n $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > "$HOME/.userdocs/pids/$appname.pid"
+            echo "${appname^} was restarted"
+            echo
+        fi
+    fi
+}
+#
+function_genericremove () {
+    #
+    read -ep "Would you like to remove $appname completely? " -i "n" makeitso
+    echo
+    if [[ "$makeitso" =~ ^[Yy]$ ]]
+    then
+        kill -9 "$(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p')" > /dev/null 2>&1
+        #
+        screen -wipe > /dev/null 2>&1
+        #
+		rm -rf "$HOME/.$appname"
+		rm -rf ~/.userdocs/versions/"$appname".version
+		rm -rf ~/.userdocs/cronjobs/"$appname".cronjob
+		rm -rf ~/.userdocs/logins/"$appname".login
+		rm -rf ~/.userdocs/pids/"$appname".pid
+		rm -rf ~/.userdocs/logs/"$appname".log
+		#
+		rm -rf "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
+		/usr/sbin/nginx -s reload -c ~/.nginx/nginx.conf > /dev/null 2>&1
+        rm -rf "$HOME/.apache2/conf.d/$appname.conf"
+        /usr/sbin/apache2ctl -k graceful > /dev/null 2>&1
+        #
+        function_cronjobremove
+        #
+        echo "${appname^} was completely removed."
+		echo
+		sleep 1
+    else
+        echo "Nothing was removed"
+		echo
+		sleep 1
+    fi
+}
+#
+############################
+### Generic Function End ###
+############################
+#
+############################
+## Custom Functions Start ##
+############################
+#
+function_installjava () {
     if [[ ! -f ~/bin/java && -f ~/.userdocs/versions/java.version ]]
     then
         rm -f ~/.javaversion ~/.userdocs/.javaversion ~/.userdocs/versions/java.version
@@ -225,25 +311,94 @@ installjava () {
     if [[ "$installedjavaversion" != "$javadecimal" ]]
     then
         echo "Please wait a moment while java is installed"; echo
-        rm -rf ~/private/java
         wget -qO ~/.userdocs/tmp/java.tar.gz "$javaupdateurl"
         tar xf ~/.userdocs/tmp/java.tar.gz --strip-components=1 -C ~/
-        rm -rf ~/.userdocs/tmp/*
+        rm -rf ~/.userdocs/tmp/java.tar.gz
         echo "$javadecimal" > ~/.userdocs/versions/java.version
-        rm -f {Welcome.html,THIRDPARTYLICENSEREADME-JAVAFX.txt,THIRDPARTYLICENSEREADME.txt,release,README,LICENSE,COPYRIGHT}
-        echo -e "\033[31m""Important:""\e[0m" "Java" "\033[32m""$javadecimal""\e[0m" "has been installed to" "\033[36m""$HOME/""\e[0m"
-        #
-        if [[ -f ~/private/subsonic/subsonic.sh.PID ]] 
-        then
-            kill -9 "$(cat ~/private/subsonic/subsonic.sh.PID 2> /dev/null)" 2> /dev/null
-            [[ -z "$(ps -p $(cat ~/private/subsonic/subsonic.sh.PID) --no-headers)" && -d ~/private/subsonic ]] && bash ~/private/subsonic/subsonic.sh
-        fi
+        rm -f ~/{Welcome.html,THIRDPARTYLICENSEREADME-JAVAFX.txt,THIRDPARTYLICENSEREADME.txt,release,README,LICENSE,COPYRIGHT}
+        echo -e "\033[31m""Important:""\e[0m" "Java" "\033[32m""$javadecimal""\e[0m" "has been installed to" "\033[36m""$HOME/bin""\e[0m"
         echo
     fi
 }
 #
+function_installsubsonic () {
+    echo -n "$subsonicversion" > ~/.userdocs/versions/"$appname".version
+    mkdir -p ~/."$appname"/{transcode,playlists,Podcasts}
+    echo -e "\033[32m""$subsonicfvs""\e[0m" "is downloading and installing now."; echo
+    #
+    wget -qO ~/.userdocs/tmp/"$appname".tar.gz "$subsonicfv"
+    tar xf ~/.userdocs/tmp/"$appname".tar.gz -C ~/."$appname"
+    # transcoding files
+    wget -qO ~/.userdocs/tmp/ffmpeg.tar.gz "$sffmpegfv"
+    tar xf ~/.userdocs/tmp/ffmpeg.tar.gz --strip-components=1 -C ~/."$appname"/transcode/
+    chmod -f 700 ~/."$appname"/transcode/{Audioffmpeg,ffmpeg,lame,xmp}
+    rm -rf ~/.userdocs/tmp/"$appname".tar.gz
+    rm -rf ~/.userdocs/tmp/ffmpeg.tar.gz
+    cp -f /usr/bin/lame ~/."$appname"/transcode/ 2> /dev/null
+    chmod -f 700 ~/."$appname"/transcode/lame
+    cp -f /usr/bin/flac ~/."$appname"/transcode/ 2> /dev/null
+    chmod -f 700 ~/."$appname"/transcode/flac
+}
+#
+function_updatesubsonic () {
+    kill -9 "$(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p')" > /dev/null 2>&1
+    #
+    screen -wipe > /dev/null 2>&1
+    #
+    echo -n "$subsonicversion" > ~/.userdocs/versions/"$appname".version
+    mkdir -p ~/."$appname"/{transcode,playlists,Podcasts}
+    echo -e "\033[32m""$subsonicfvs""\e[0m" "is downloading and updating now."; echo
+    #
+    mkdir -p ~/.userdocs/tmp/"$appname"
+    wget -qO ~/.userdocs/tmp/"$appname".tar.gz "$subsonicfv"
+    tar xf ~/.userdocs/tmp/"$appname".tar.gz -C ~/.userdocs/tmp/"$appname"
+    rm -f ~/.userdocs/tmp/"$appname"/"$appname".sh
+    cp -rf ~/.userdocs/tmp/"$appname"/. ~/."$appname"/
+    # transcoding files
+    wget -qO ~/.userdocs/tmp/ffmpeg.tar.gz "$sffmpegfv"
+    tar xf ~/.userdocs/tmp/ffmpeg.tar.gz --strip-components=1 -C ~/."$appname"/transcode/
+    chmod -f 700 ~/."$appname"/transcode/{Audioffmpeg,ffmpeg,lame,xmp}
+    rm -rf ~/.userdocs/tmp/"$appname"{,.tar.gz}
+    rm -rf ~/.userdocs/tmp/ffmpeg.tar.gz
+    cp -f /usr/bin/lame ~/."$appname"/transcode/ 2> /dev/null
+    chmod -f 700 ~/."$appname"/transcode/lame
+    cp -f /usr/bin/flac ~/."$appname"/transcode/ 2> /dev/null
+    chmod -f 700 ~/."$appname"/transcode/flac
+    #
+    screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; $startcommand^M"
+    echo -n $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > "$HOME/.userdocs/pids/$appname.pid"
+    echo "${appname^} was restarted"
+    echo
+}
+#
+function_editsubsonic () {
+    echo -e "\033[31m""Configuring the start-up script.""\e[0m"; echo
+    sed -i 's|\${LOG} 2>\&1 &|\${LOG} 2>\&1|g' "$HOME/.$appname/$appname.sh"
+    sed -i 's|JAVA=java|JAVA=~/bin/java|g' "$HOME/.$appname/$appname.sh"
+    sed -i 's|SUBSONIC_HOME=${SUBSONIC_HOME:-/var/subsonic}|SUBSONIC_HOME=${SUBSONIC_HOME:-$HOME/'".$appname"'}|g' "$HOME/.$appname/$appname.sh"
+    sed -i 's|SUBSONIC_PORT=${SUBSONIC_PORT:-4040}|SUBSONIC_PORT=${SUBSONIC_PORT:-'$appport'}|g' "$HOME/.$appname/$appname.sh"
+    sed -i 's|SUBSONIC_CONTEXT_PATH=${SUBSONIC_CONTEXT_PATH:-/}|SUBSONIC_CONTEXT_PATH=${SUBSONIC_CONTEXT_PATH:-/$(whoami)/subsonic}|g' "$HOME/.$appname/$appname.sh"
+    sed -i 's|SUBSONIC_MAX_MEMORY=${SUBSONIC_MAX_MEMORY:-150}|SUBSONIC_MAX_MEMORY=${SUBSONIC_MAX_MEMORY:-'$maxmemory'}|g' "$HOME/.$appname/$appname.sh"
+    sed -i 's|SUBSONIC_PIDFILE=${SUBSONIC_PIDFILE}|SUBSONIC_PIDFILE=${SUBSONIC_PIDFILE:-$HOME/.userdocs/pids/'"$appname"'-java.pid}|g' "$HOME/.$appname/$appname.sh"
+    sed -i 's|SUBSONIC_DEFAULT_PODCAST_FOLDER=${SUBSONIC_DEFAULT_PODCAST_FOLDER:-/var/music/Podcast}|SUBSONIC_DEFAULT_PODCAST_FOLDER=${SUBSONIC_DEFAULT_PODCAST_FOLDER:-$HOME/'".$appname"'/Podcast}|g' "$HOME/.$appname/$appname.sh"
+    sed -i 's|SUBSONIC_DEFAULT_PLAYLIST_FOLDER=${SUBSONIC_DEFAULT_PLAYLIST_FOLDER:-/var/playlists}|SUBSONIC_DEFAULT_PLAYLIST_FOLDER=${SUBSONIC_DEFAULT_PLAYLIST_FOLDER:-$HOME/'".$appname"'/playlists}|g' "$HOME/.$appname/$appname.sh"
+    sed -i 's|quiet=0|quiet=1|g' "$HOME/.$appname/$appname.sh"
+    sed -i "23 i export LC_ALL=en_GB.UTF-8\n" "$HOME/.$appname/$appname.sh"
+    sed -i '23 i export LANG=en_GB.UTF-8' "$HOME/.$appname/$appname.sh"
+    sed -i '23 i export LANGUAGE=en_GB.UTF-8' "$HOME/.$appname/$appname.sh"
+    #
+    echo -e "\033[35m""User input is required for this next step:""\e[0m"
+    #
+    echo -e "\033[33m""Note on user input:""\e[0m" "It is OK to use a relative path like:" "\033[33m""~/private/rtorrent/data""\e[0m"
+    #
+    read -ep "Enter the path to your media or leave blank and press enter to skip: " path
+    echo
+    #
+    sed -i 's|SUBSONIC_DEFAULT_MUSIC_FOLDER=${SUBSONIC_DEFAULT_MUSIC_FOLDER:-/var/music}|SUBSONIC_DEFAULT_MUSIC_FOLDER=${SUBSONIC_DEFAULT_MUSIC_FOLDER:-'$path'}|g' "$HOME/.$appname/$appname.sh"
+}
+#
 ############################
-####### Function End #######
+### Custom Functions End ###
 ############################
 #
 ############################
@@ -382,11 +537,14 @@ fi
 ############################
 #
 ############################
-## Positional Param Start ##
+### Prerequisites Starts ###
 ############################
 #
+function_prerequisites
+function_installjava
+#
 ############################
-### Positional Param End ###
+#### Prerequisites Ends ####
 ############################
 #
 ############################
@@ -399,57 +557,28 @@ then
 else
     echo -e "Hello $(whoami), you have the latest version of the" "\033[36m""$scriptname""\e[0m" "script. This script version is:" "\033[31m""$scriptversion""\e[0m"
     echo
-    echo -e "The version of the" "\033[33m""Subsonic""\e[0m" "server being used in this script is:" "\033[31m""$subsonicversion""\e[0m"
+    echo -e "The version of the" "\033[33m""${appname^}""\e[0m" "server being used in this script is:" "\033[31m""$subsonicversion""\e[0m"
     echo -e "The version of the" "\033[33m""Java""\e[0m" "being used in this script is:" "\033[31m""$javaversion""\e[0m"
     echo
-    if [[ -f "$HOME/private/subsonic/.version" ]]
+    if [[ -f "$HOME/.userdocs/versions/$appname.version" ]]
     then
-        echo -e "Your currently installed version of Subsonic is:" "\033[32m""$(sed -n '1p' $HOME/private/subsonic/.version)""\e[0m"
+        echo -e "Your currently installed version of ${appname^} is:" "\033[32m""$(sed -n '1p' $HOME/.userdocs/versions/$appname.version)""\e[0m"
         echo
     fi
-fi
-#
-#############################
-#### subsonicrsk starts  ####
-#############################
-#
-wget -qO ~/bin/subsonicrsk https://git.io/vH28S
-chmod -f 700 ~/bin/subsonicrsk
-#
-#############################
-##### subsonicrsk ends  #####
-#############################
-#
-#############################
-#### subsonicron starts  ####
-#############################
-#
-cronjobadd
-cronscript
-#
-#############################
-##### subsonicron ends  #####
-#############################
-#
-#############################
-##### proxypass starts  #####
-#############################
-#
-proxypass
-#
-#############################
-###### proxypass ends  ######
-#############################
-#
-if [[ "$updatestatus" == "y" ]]
-then
-    :
-else
-    echo -e "The" "\033[36m""~/bin/subsonicrsk""\e[0m" "has been updated."
-    echo
+    #
+    if [[ -d "$HOME/.$appname" ]]
+    then
+        function_cronjobremove
+        function_genericproxypass
+        function_genericrestart
+        function_cronjobadd
+        function_generichosturl
+    fi
+    #
     read -ep "The scripts have been updated, do you wish to continue [y] or exit now [q] : " -i "y" updatestatus
     echo
 fi
+#
 #
 if [[ "$updatestatus" =~ ^[Yy]$ ]]
 then
@@ -458,119 +587,29 @@ then
 #### User Script Starts ####
 ############################
 #
-    mkdir -p ~/private
     #
-    #############################
-    #### Install Java Start  ####
-    #############################
-    #
-    installjava
-    #
-    #############################
-    ##### Install Java End  #####
-    #############################
-    #
-    if [[ ! -d ~/private/subsonic ]]
+    if [[ ! -d "$HOME/.$appname" ]]
     then
-        echo -e "Congratulations," "\033[31m""Java is installed""\e[0m"". Continuing with the installation."
-        echo
-        mkdir -p ~/.userdocs/tmp/
-        mkdir -p ~/private/subsonic/{transcode,playlists,Podcasts}
+        function_installsubsonic
+        function_editsubsonic
+        function_genericproxypass
+        function_genericrestart
+        function_cronjobadd
+        function_generichosturl
         #
-        echo -n "$subsonicversion" > ~/private/subsonic/.version
-        #
-        echo -e "\033[32m""$subsonicfvs""\e[0m" "Is downloading now."
-        echo
-        #
-        wget -qO ~/.userdocs/tmp/subsonic.tar.gz "$subsonicfv"
-        tar xf ~/.userdocs/tmp/subsonic.tar.gz -C ~/private/subsonic/
-        wget -qO ~/.userdocs/tmp/ffmpeg.tar.gz "$sffmpegfv"
-        tar xf ~/.userdocs/tmp/ffmpeg.tar.gz --strip-components=1 -C ~/private/subsonic/transcode/
-        chmod -f 700 ~/private/subsonic/transcode/{Audioffmpeg,ffmpeg,lame,xmp}
-        rm -rf ~/.userdocs/tmp/*
-        cp -f /usr/bin/lame ~/private/subsonic/transcode/ 2> /dev/null
-        chmod -f 700 ~/private/subsonic/transcode/lame
-        cp -f /usr/bin/flac ~/private/subsonic/transcode/ 2> /dev/null
-        chmod -f 700 ~/private/subsonic/transcode/flac
-        #
-        echo -e "\033[31m""Configuring the start-up script.""\e[0m"
-        #
-        echo -e "\033[35m""User input is required for this next step:""\e[0m"
-        #
-        echo -e "\033[33m""Note on user input:""\e[0m" "It is OK to use a relative path like:" "\033[33m""~/private/rtorrent/data""\e[0m"
-        #
-        sed -i 's|SUBSONIC_HOME=${SUBSONIC_HOME:-/var/subsonic}|SUBSONIC_HOME=${SUBSONIC_HOME:-$HOME/private/subsonic}|g' ~/private/subsonic/subsonic.sh
-        sed -i 's|SUBSONIC_PORT=${SUBSONIC_PORT:-4040}|SUBSONIC_PORT=${SUBSONIC_PORT:-'$appport'}|g' ~/private/subsonic/subsonic.sh
-        sed -i 's|SUBSONIC_CONTEXT_PATH=${SUBSONIC_CONTEXT_PATH:-/}|SUBSONIC_CONTEXT_PATH=${SUBSONIC_CONTEXT_PATH:-/$(whoami)/subsonic}|g' ~/private/subsonic/subsonic.sh
-        sed -i 's|SUBSONIC_MAX_MEMORY=${SUBSONIC_MAX_MEMORY:-150}|SUBSONIC_MAX_MEMORY=${SUBSONIC_MAX_MEMORY:-'$maxmemory'}|g' ~/private/subsonic/subsonic.sh
-        sed -i 's|SUBSONIC_PIDFILE=${SUBSONIC_PIDFILE}|SUBSONIC_PIDFILE=${SUBSONIC_PIDFILE:-$HOME/private/subsonic/subsonic.sh.PID}|g' ~/private/subsonic/subsonic.sh
-        #
-        read -ep "Enter the path to your media or leave blank and press enter to skip: " path
-        #
-        sed -i 's|SUBSONIC_DEFAULT_MUSIC_FOLDER=${SUBSONIC_DEFAULT_MUSIC_FOLDER:-/var/music}|SUBSONIC_DEFAULT_MUSIC_FOLDER=${SUBSONIC_DEFAULT_MUSIC_FOLDER:-'$path'}|g' ~/private/subsonic/subsonic.sh
-        sed -i 's|SUBSONIC_DEFAULT_PODCAST_FOLDER=${SUBSONIC_DEFAULT_PODCAST_FOLDER:-/var/music/Podcast}|SUBSONIC_DEFAULT_PODCAST_FOLDER=${SUBSONIC_DEFAULT_PODCAST_FOLDER:-$HOME/private/subsonic/Podcast}|g' ~/private/subsonic/subsonic.sh
-        sed -i 's|SUBSONIC_DEFAULT_PLAYLIST_FOLDER=${SUBSONIC_DEFAULT_PLAYLIST_FOLDER:-/var/playlists}|SUBSONIC_DEFAULT_PLAYLIST_FOLDER=${SUBSONIC_DEFAULT_PLAYLIST_FOLDER:-$HOME/private/subsonic/playlists}|g' ~/private/subsonic/subsonic.sh
-        sed -i 's|quiet=0|quiet=1|g' ~/private/subsonic/subsonic.sh
-        sed -i "23 i export LC_ALL=en_GB.UTF-8\n" ~/private/subsonic/subsonic.sh
-        sed -i '23 i export LANG=en_GB.UTF-8' ~/private/subsonic/subsonic.sh
-        sed -i '23 i export LANGUAGE=en_GB.UTF-8' ~/private/subsonic/subsonic.sh
-        # Apache proxypass
-        mkdir -p ~/.apache2/conf.d
-        echo -en 'Include /etc/apache2/mods-available/proxy.load\nInclude /etc/apache2/mods-available/proxy_http.load\nInclude /etc/apache2/mods-available/headers.load\nInclude /etc/apache2/mods-available/ssl.load\n\nProxyRequests Off\nProxyPreserveHost On\nProxyVia On\nSSLProxyEngine on\n\nProxyPass /subsonic http://10.0.0.1:'"$appport"'/${USER}/subsonic\nProxyPassReverse /subsonic http://10.0.0.1:'"$appport"'/${USER}/subsonic\nRedirect /${USER}/subsonic https://${APACHE_HOSTNAME}/${USER}/subsonic' > "$HOME/.apache2/conf.d/subsonic.conf"
-        /usr/sbin/apache2ctl -k graceful > /dev/null 2>&1
-        echo
-        # Nginx proxypass
-        if [[ -d ~/.nginx/conf.d/000-default-server.d ]]
-        then
-            mkdir -p ~/.nginx/proxy
-            echo -e 'location /subsonic {\n\nproxy_temp_path '"$HOME"'/.nginx/proxy;\n\nproxy_set_header        Host            $http_x_host;\nproxy_set_header        X-Real-IP       $remote_addr;\nproxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;\nrewrite /subsonic/(.*) /'$(whoami)'/subsonic/$1 break;\nproxy_pass http://10.0.0.1:'"$appport"'/'$(whoami)'/subsonic/;\nproxy_redirect http:// https://;\n\n}' > ~/.nginx/conf.d/000-default-server.d/subsonic.conf
-            /usr/sbin/nginx -s reload -c ~/.nginx/nginx.conf > /dev/null 2>&1
-        fi
-        echo -e "\033[31m""Start-up script successfully configured.""\e[0m"
-        echo "Executing the start-up script now."
-        [[ -z "$(ps -p $(cat ~/private/subsonic/subsonic.sh.PIDxx 2> /dev/null) --no-headers 2> /dev/null)" && -d ~/private/subsonic ]] && bash ~/private/subsonic/subsonic.sh
-        echo -e "A restart/start/kill script has been created at:" "\033[35m""~/bin/subsonicrsk""\e[0m"
-        echo -e "\033[32m""Subsonic is now started, use the links below to access it. Don't forget to set path to FULL path to you music folder in the gui.""\e[0m"
-        echo
-        echo -e "Subsonic is accessible at:" "\033[32m""https://$(hostname -f)/$(whoami)/subsonic/""\e[0m"
-        echo -e "It may take a minute or two to load properly."
-        echo
-        echo -e "Subsonic started at PID:" "\033[31m""$(cat ~/private/subsonic/subsonic.sh.PID 2> /dev/null)""\e[0m"
-        echo
-        bash
         exit
     else
-        echo -e "\033[31m""Subsonic appears to already be installed.""\e[0m" "Please kill the PID:" "\033[33m""$(cat ~/private/subsonic/subsonic.sh.PID 2> /dev/null)""\e[0m" "if it is running and delete the" "\033[36m""~/private/subsonic directory""\e[0m"
+        echo -e "\033[31m""${appname^} appears to already be installed.""\e[0m"
         echo
         read -ep "Would you like me to kill the process and remove the directories for you? [y] or update your installation [u] quit now [q]: "  confirm
         echo
         if [[ "$confirm" =~ ^[Yy]$ ]]
         then
-            echo "Killing the process and removing files."
-            kill -9 "$(cat ~/private/subsonic/subsonic.sh.PID 2> /dev/null)" 2> /dev/null
+            function_cronjobremove
+            function_genericremove
+            function_genericrestart
+            #
             echo -e "\033[31m" "Done""\e[0m"
-            echo "Removing ~/private/subsonic"
-            rm -rf ~/private/subsonic
-            echo -e "\033[31m" "Done""\e[0m"
-            echo "Removing scripts."
-            cronjobremove
-            rm -f ~/bin/subsonic.4.8
-            rm -f ~/subsonic.4.8.sh
-            rm -f ~/subsonicstart.sh
-            rm -f ~/subsonicrestart.sh
-            rm -f ~/subsonickill.sh
-            rm -f ~/subsonicrsk.sh
-            rm -f ~/bin/subsonicrsk
-            rm -f ~/bin/subsonicron
-            rm -f ~/.cronjobs/subsonic.cronjob
-            rm -f ~/.nginx/conf.d/000-default-server.d/subsonic.conf
-            rm -f ~/.apache2/conf.d/subsonic.conf
-            /usr/sbin/apache2ctl -k graceful > /dev/null 2>&1
-            /usr/sbin/nginx -s reload -c ~/.nginx/nginx.conf > /dev/null 2>&1
-            echo -e "\033[31m" "Done""\e[0m"
-            echo "Finalising removal."
-            rm -rf ~/private/subsonic
-            echo -e "\033[31m" "Done and Done""\e[0m"
             echo
             read -ep "Would you like you relaunch the installer [y] or quit [q]: " -i "y"  confirm
             echo
@@ -579,51 +618,19 @@ then
                 echo -e "\033[32m""Relaunching the installer.""\e[0m"
                 if [[ -f ~/bin/"$scriptname" ]]
                 then
-                    bash ~/bin/"$scriptname"
+                    ~/bin/"$scriptname"
+                    exit
                 else
-                    wget -qO ~/bin/"$scriptname" "$scripturl"
-                    bash ~/bin/"$scriptname"
+                    bash $(realpath $0)
+                    exit
                 fi
             else
                 exit
             fi
         elif [[ "$confirm" =~ ^[Uu]$ ]]
         then
-            echo -e "Subsonic is being updated. This will only take a moment."
-            kill -9 "$(cat ~/private/subsonic/subsonic.sh.PID 2> /dev/null)" 2> /dev/null
-            mkdir -p ~/.userdocs/tmp
-            wget -qO ~/subsonic.tar.gz "$subsonicfv"
-            tar xf ~/subsonic.tar.gz -C ~/.userdocs/tmp
-            rm -f ~/.userdocs/tmp/subsonic.sh
-            cp -rf ~/.userdocs/tmp/. ~/private/subsonic/
-            wget -qO ~/ffmpeg.zip "$sffmpegfv"
-            unzip -qo ~/ffmpeg.zip -d ~/private/subsonic/transcode
-            chmod -f 700 ~/private/subsonic/transcode/{Audioffmpeg,ffmpeg,lame,xmp}
-            echo -n "$subsonicversion" > ~/private/subsonic/.version
-            rm -rf ~/subsonic.tar.gz ~/ffmpeg.zip ~/.userdocs/tmp/*
-            sed -i "s|^SUBSONIC_CONTEXT_PATH=/$|SUBSONIC_CONTEXT_PATH=/$(whoami)/subsonic|g" ~/private/subsonic/subsonic.sh
-            # Apache proxypass
-            mkdir -p ~/.apache2/conf.d
-            echo -en 'Include /etc/apache2/mods-available/proxy.load\nInclude /etc/apache2/mods-available/proxy_http.load\nInclude /etc/apache2/mods-available/headers.load\nInclude /etc/apache2/mods-available/ssl.load\n\nProxyRequests Off\nProxyPreserveHost On\nProxyVia On\nSSLProxyEngine on\n\nProxyPass /subsonic http://10.0.0.1:'$(sed -n -e 's/SUBSONIC_PORT=\([0-9]\+\)/\1/p' ~/private/subsonic/subsonic.sh 2> /dev/null)'/${USER}/subsonic\nProxyPassReverse /subsonic http://10.0.0.1:'$(sed -n -e 's/SUBSONIC_PORT=\([0-9]\+\)/\1/p' ~/private/subsonic/subsonic.sh 2> /dev/null)'/${USER}/subsonic\nRedirect /${USER}/subsonic https://${APACHE_HOSTNAME}/${USER}/subsonic' > "$HOME/.apache2/conf.d/subsonic.conf"
-            /usr/sbin/apache2ctl -k graceful > /dev/null 2>&1
-            echo
-            # Nginx proxypass
-            if [[ -d ~/.nginx/conf.d/000-default-server.d ]]
-            then
-                mkdir -p ~/.nginx/proxy
-                echo -e 'location /subsonic {\n\nproxy_temp_path '"$HOME"'/.nginx/proxy;\n\nproxy_set_header        Host            $http_x_host;\nproxy_set_header        X-Real-IP       $remote_addr;\nproxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;\nrewrite /subsonic/(.*) /'$(whoami)'/subsonic/$1 break;\nproxy_pass http://10.0.0.1:'$(sed -n -e 's/SUBSONIC_PORT=\([0-9]\+\)/\1/p' ~/private/subsonic/subsonic.sh 2> /dev/null)'/'$(whoami)'/subsonic/;\nproxy_redirect http:// https://;\n\n}' > ~/.nginx/conf.d/000-default-server.d/subsonic.conf
-                /usr/sbin/nginx -s reload -c ~/.nginx/nginx.conf > /dev/null 2>&1
-            fi
-            [[ -z "$(ps -p $(cat ~/private/subsonic/subsonic.sh.PID) --no-headers)" && -d ~/private/subsonic ]] && bash ~/private/subsonic/subsonic.sh
-            echo -e "A restart/start/kill script has been created at:" "\033[35m""~/bin/subsonicrsk""\e[0m"
-            echo -e "\033[32m""Subsonic is now started, use the link below to access it. Don't forget to set path to FULL path to you music folder in the gui.""\e[0m"
-            echo
-            echo -e "Subsonic is accessible at:" "\033[32m""https://$(hostname -f)/$(whoami)/subsonic/""\e[0m"
-            echo -e "It may take a minute or two to load properly."
-            echo
-            echo -e "Subsonic started at PID:" "\033[31m""$(cat ~/private/subsonic/subsonic.sh.PID 2> /dev/null)""\e[0m"
-            echo
-            bash
+            echo -e "${appname^} is being updated. This will only take a moment."
+            function_updatesubsonic
             exit
         else
             echo "You chose to quit and exit the script"
