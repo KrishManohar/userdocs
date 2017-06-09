@@ -48,7 +48,7 @@
 if [[ ! -z "$1" && "$1" = 'changelog' ]]
 then
     echo
-    echo 'v2.6.1 - bug fixes and small tweaks. No more rsk script as the method has been replaced with teh template built in method.'
+    echo 'v2.6.1 - bug fixes and small tweaks. No more rsk script as the method has been replaced with the template built in method.'
     echo 'v2.6.0 - script and template updated to fall inline with userdocs template method.'
     echo 'v2.5.0 - Rework of template so that manual script editing and updating is becoming obselete in regards to program updates'
     #
@@ -65,7 +65,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="2.6.1"
+scriptversion="2.6.2"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.subsonic"
@@ -115,7 +115,7 @@ startcommand="~/.$appname/$appname.sh"
 # This variable is set to one if the nginx proxypass requires a socket, for example this is used with flood.
 # socketpath=""
 #
-# These variables are for getting the most recent version of java creating teh required urls and version numbers for the script.
+# These variables are for getting the most recent version of java creating the required urls and version numbers for the script.
 getversion="$(curl -Ls http://java.com/en/download/linux_manual.jsp | sed -rn 's/(.*)>Recommended Version (.*) Update (.*)<(.*)/\2/p')"
 getupdate="$(curl -Ls http://java.com/en/download/linux_manual.jsp | sed -rn 's/(.*)>Recommended Version (.*) Update (.*)<(.*)/\3/p')"
 javaversion="The Latest Java available is $getversion Update $getupdate"
@@ -139,7 +139,7 @@ sffmpegfvs="ffmpeg-release-64bit-static.tar.xz"
 ############################
 #
 # Disables the built in script updater permanently by setting this variable to 0.
-updaterenabled="0"
+updaterenabled="1"
 #
 ############################
 ####### Variable End #######
@@ -173,8 +173,8 @@ function_cronjobadd () {
         echo "The ${appname^} cronjob is already in crontab"; echo
     fi
     #
-    rm -f ~/.userdocs/cronjobs/$appname.cronjob
-    wget -qO ~/.userdocs/cronjobs/$appname.cronjob "https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/Bash_Scripts/cronscript.sh"
+    rm -f ~/.userdocs/cronjobs/"$appname".cronjob
+    wget -qO ~/.userdocs/cronjobs/"$appname".cronjob "https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/Bash_Scripts/cronscript.sh"
 	sed -i 's|# screen command|screen -dmS '"$appname"' \&\& screen -S '"$appname"' -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; '"$startcommand"'^M"|g' ~/.userdocs/cronjobs/"$appname".cronjob
 	sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/"$appname".cronjob
 }
@@ -194,7 +194,7 @@ function_cronjobremove () {
 }
 #
 function_generichosturl () {
-    echo -e "\033[32m""${appname^} is accessible at: https://$(hostname -f)/$(whoami)/$appname/""\e[0m"; echo
+    echo -e "${appname^} is accessible at:" "\033[32m""https://$(hostname -f)/$(whoami)/$appname/""\e[0m"; echo
     echo "It may take a few minutes to load. Refresh the page to see the app."; echo
 }
 #
@@ -209,7 +209,7 @@ function_genericproxypass () {
         mkdir -p ~/.nginx/proxy
 		wget -qO ~/.nginx/conf.d/000-default-server.d/"$appname".conf "$genericproxynginx"
         #
-        if [[ "$appname" =~ ^(subsonic|sonarr|radarr)$ ]]
+        if [[ "$appname" =~ ^(subsonic|sonarr|radarr|madsonic)$ ]]
         then
             sed -i 's|# rewrite /(.*) /username/$1 break;|rewrite /(.*) /username/$1 break;|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
         else
@@ -219,13 +219,13 @@ function_genericproxypass () {
         sed -i 's|HOME|'"$HOME"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
 		sed -i 's|generic|'"$appname"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
 		sed -i 's|username|'"$(whoami)"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
-		sed -i 's|PORT|'$appport'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
+		sed -i 's|PORT|'"$appport"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
         #
 		#
 		if [[ "$socket" -eq "1" ]]
 		then
 			sed -i 's|# include   /etc/nginx/scgi_params;|include   /etc/nginx/scgi_params;|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
-			sed -i 's|# scgi_pass unix://SOCKETPATH;|scgi_pass unix://'$socketpath';|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
+			sed -i 's|# scgi_pass unix://SOCKETPATH;|scgi_pass unix://'"$socketpath"';|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
 		fi
 		#
 		/usr/sbin/nginx -s reload -c ~/.nginx/nginx.conf > /dev/null 2>&1
@@ -235,7 +235,7 @@ function_genericproxypass () {
     #
     wget -qO ~/.apache2/conf.d/"$appname".conf "$genericproxyapache"
     sed -i "s|generic|$appname|g" ~/.apache2/conf.d/"$appname".conf
-    sed -i 's|PORT|'$appport'|g' ~/.apache2/conf.d/"$appname".conf
+    sed -i 's|PORT|'"$appport"'|g' ~/.apache2/conf.d/"$appname".conf
     #
     /usr/sbin/apache2ctl -k graceful > /dev/null 2>&1
     echo "The Apache proxypass was installed"; echo
@@ -244,7 +244,7 @@ function_genericproxypass () {
 #
 function_genericrestart () {
     kill -9 "$(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p')" > /dev/null 2>&1
-    rm -f $HOME/.userdocs/pids/"$appname".pid
+    rm -f ~/.userdocs/pids/"$appname".pid
     #
     screen -wipe > /dev/null 2>&1
     #
@@ -252,7 +252,7 @@ function_genericrestart () {
     then
         if [[ -z "$(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p')" ]]
         then
-            screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; $startcommand^M"
+            screen -dmS "$appname" && screen -S "$appname" -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; $startcommand^M"
             echo -n $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > "$HOME/.userdocs/pids/$appname.pid"
             echo "${appname^} was restarted"
             echo
@@ -262,7 +262,7 @@ function_genericrestart () {
 #
 function_genericremove () {
     #
-    read -ep "Would you like to remove $appname completely? " -i "n" makeitso
+    read -ep "Would you like to remove $appname completely? " -i "y" makeitso
     echo
     if [[ "$makeitso" =~ ^[Yy]$ ]]
     then
@@ -270,6 +270,8 @@ function_genericremove () {
         #
         screen -wipe > /dev/null 2>&1
         #
+		sleep 5
+		#
 		rm -rf "$HOME/.$appname"
 		rm -rf ~/.userdocs/versions/"$appname".version
 		rm -rf ~/.userdocs/cronjobs/"$appname".cronjob
@@ -282,15 +284,14 @@ function_genericremove () {
         rm -rf "$HOME/.apache2/conf.d/$appname.conf"
         /usr/sbin/apache2ctl -k graceful > /dev/null 2>&1
         #
-        function_cronjobremove
-        #
         echo "${appname^} was completely removed."
 		echo
-		sleep 1
+		sleep 2
+		rm -rf "$HOME/.$appname"
     else
         echo "Nothing was removed"
 		echo
-		sleep 1
+		sleep 2
     fi
 }
 #
@@ -345,6 +346,8 @@ function_updatesubsonic () {
     #
     screen -wipe > /dev/null 2>&1
     #
+	sleep 5
+	#
     echo -n "$subsonicversion" > ~/.userdocs/versions/"$appname".version
     mkdir -p ~/."$appname"/{transcode,playlists,Podcasts}
     echo -e "\033[32m""$subsonicfvs""\e[0m" "is downloading and updating now."; echo
@@ -365,7 +368,7 @@ function_updatesubsonic () {
     cp -f /usr/bin/flac ~/."$appname"/transcode/ 2> /dev/null
     chmod -f 700 ~/."$appname"/transcode/flac
     #
-    screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; $startcommand^M"
+    screen -dmS "$appname" && screen -S "$appname" -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; $startcommand^M"
     echo -n $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > "$HOME/.userdocs/pids/$appname.pid"
     echo "${appname^} was restarted"
     echo
@@ -394,7 +397,7 @@ function_editsubsonic () {
     read -ep "Enter the path to your media or leave blank and press enter to skip: " path
     echo
     #
-    sed -i 's|SUBSONIC_DEFAULT_MUSIC_FOLDER=${SUBSONIC_DEFAULT_MUSIC_FOLDER:-/var/music}|SUBSONIC_DEFAULT_MUSIC_FOLDER=${SUBSONIC_DEFAULT_MUSIC_FOLDER:-'$path'}|g' "$HOME/.$appname/$appname.sh"
+    sed -i 's|SUBSONIC_DEFAULT_MUSIC_FOLDER=${SUBSONIC_DEFAULT_MUSIC_FOLDER:-/var/music}|SUBSONIC_DEFAULT_MUSIC_FOLDER=${SUBSONIC_DEFAULT_MUSIC_FOLDER:-'"$path"'}|g' "$HOME/.$appname/$appname.sh"
 }
 #
 ############################
@@ -616,9 +619,9 @@ then
             if [[ "$confirm" =~ ^[Yy]$ ]]
             then
                 echo -e "\033[32m""Relaunching the installer.""\e[0m"
-                if [[ -f ~/bin/"$scriptname" ]]
+                if [[ -f "$HOME/bin/$scriptname.sh" ]]
                 then
-                    ~/bin/"$scriptname"
+                    "$HOME/bin/$scriptname.sh"
                     exit
                 else
                     bash $(realpath $0)
