@@ -342,7 +342,7 @@ function_installmadsonic () {
 }
 #
 function_editmadsonic () {
-    wget -qO "$HOME/$appname/$appname.sh" https://git.io/vHMaR
+    wget -qO "$HOME/.$appname/$appname.sh" https://git.io/vHMaR
     #
     echo -e "\033[31m""Configuring the start-up script.""\e[0m"; echo
     #
@@ -352,10 +352,10 @@ function_editmadsonic () {
     #
     echo -e "\033[33m""Note on user input:""\e[0m" "It is OK to use a relative path like:" "\033[33m""~/private/rtorrent/data""\e[0m"
     #
-    read -ep "Enter the path to your media or leave blank and press enter to skip: " path
+    read -ep "Enter the path to your media or leave blank and press enter to skip: " -i "~/.$appname/artists" path
     echo
     #
-    sed -i 's|MADSONIC_DEFAULT_MUSIC_FOLDER=~/.madsonic/artists|MADSONIC_DEFAULT_MUSIC_FOLDER='"$path"'|g' -i "~/.$appname/artists" "$HOME/.$appname/$appname.sh"
+    sed -i 's|MADSONIC_DEFAULT_MUSIC_FOLDER=~/.madsonic/artists|MADSONIC_DEFAULT_MUSIC_FOLDER='"$path"'|g' "$HOME/.$appname/$appname.sh"
 }
 #
 function_updatemadsonic () {
