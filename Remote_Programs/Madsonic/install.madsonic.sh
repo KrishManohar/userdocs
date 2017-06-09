@@ -110,7 +110,7 @@ appname="madsonic"
 startcommand="~/.$appname/$appname.sh"
 #
 # This command will check to see if madsonic is installed and use the configured port instead of q random port.
-[[ -f "$HOME/.$appname/$appname.sh" ]] && appport="$(cat "$HOME/.$appname/$appname.sh" | sed -rn 's/MADSONIC_PORT=(.*)/\1/p')"
+[[ -f "$HOME/.$appname/$appname.sh" ]] && appport="$(cat "$HOME/.$appname/$appname.sh" | sed -rn 's/^MADSONIC_PORT=(.*)/\1/p')"
 #
 # This variable is set to one if the nginx proxypass requires a socket, for example this is used with flood.
 # socketpath=""
@@ -219,7 +219,7 @@ function_genericproxypass () {
         sed -i 's|HOME|'"$HOME"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
 		sed -i 's|generic|'"$appname"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
 		sed -i 's|username|'"$(whoami)"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
-		sed -i 's|PORT|'$appport'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
+		sed -i 's|PORT|'"$appport"'|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
         #
 		#
 		if [[ "$socket" -eq "1" ]]
