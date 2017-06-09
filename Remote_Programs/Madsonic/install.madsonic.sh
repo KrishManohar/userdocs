@@ -262,13 +262,15 @@ function_genericrestart () {
 #
 function_genericremove () {
     #
-    read -ep "Would you like to remove $appname completely? " -i "n" makeitso
+    read -ep "Would you like to remove $appname completely? " -i "y" makeitso
     echo
     if [[ "$makeitso" =~ ^[Yy]$ ]]
     then
         kill -9 "$(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p')" > /dev/null 2>&1
         #
         screen -wipe > /dev/null 2>&1
+        #
+		sleep 5
         #
 		rm -rf "$HOME/.$appname"
 		rm -rf ~/.userdocs/versions/"$appname".version
@@ -282,15 +284,14 @@ function_genericremove () {
         rm -rf "$HOME/.apache2/conf.d/$appname.conf"
         /usr/sbin/apache2ctl -k graceful > /dev/null 2>&1
         #
-        function_cronjobremove
-        #
         echo "${appname^} was completely removed."
 		echo
-		sleep 1
+		sleep 2
+		rm -rf "$HOME/.$appname"
     else
         echo "Nothing was removed"
 		echo
-		sleep 1
+		sleep 2
     fi
 }
 #
@@ -600,7 +601,6 @@ then
             function_cronjobremove
             function_genericremove
             function_genericrestart
-            function_genericremove
             #
             echo -e "\033[31m" "Done""\e[0m"
             echo
@@ -609,9 +609,9 @@ then
             if [[ "$confirm" =~ ^[Yy]$ ]]
             then
                 echo -e "\033[32m""Relaunching the installer.""\e[0m"
-                if [[ -f ~/bin/"$scriptname" ]]
+                if [[ -f "$HOME/bin/$scriptname.sh" ]]
                 then
-                    ~/bin/"$scriptname"
+                    "$HOME/bin/$scriptname.sh"
                     exit
                 else
                     bash $(realpath $0)
