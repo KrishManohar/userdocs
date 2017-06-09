@@ -8,7 +8,7 @@
 #
 # Script Contributors: 
 #
-# Bash Command for easy reference: wget -qO ~/install.madsonic https://git.io/v1J6i && bash ~/install.madsonic
+# Bash Command for easy reference: wget -qO ~/install.madsonic https://git.io/vHMVn && bash ~/install.madsonic
 #
 # The GPLv3 License (GNU)
 #
@@ -76,14 +76,14 @@ scriptauthor="userdocs"
 # Contributor's names go here.
 contributors="None credited"
 #
-gitiourl="https://git.io/v1J6i"
+gitiourl="https://git.io/vHMVn"
 # Set the http://git.io/ shortened URL for the raw github URL here:
 #
 # Don't edit: This is the bash command shown when using the info option.
 gitiocommand="wget -qO ~/$scriptname $gitiourl && bash ~/$scriptname"
 #
 # This is the raw github url of the script to use with the built in updater.
-scripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/madsonic/install.madsonic.sh"
+scripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Madsonic/install.madsonic.sh"
 #
 # This will generate a 20 character random passsword for use with your applications.
 apppass="$(< /dev/urandom tr -dc '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' | head -c20; echo;)"
@@ -101,7 +101,7 @@ gitissue="https://github.com/userdocs/userdocs/issues/new"
 ############################
 #
 # The current version of madsonic can be set here and will be used in the rest of the script.
-madsonicversion="6.1.1"
+madsonicversion="6.2.9080"
 #
 # This variable must be set and in lowercase. It will define multiple values in the scipt such as installation paths, filenames and be used to configure files.
 appname="madsonic"
