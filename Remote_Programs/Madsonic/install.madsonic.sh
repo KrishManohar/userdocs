@@ -48,7 +48,8 @@
 if [[ ! -z "$1" && "$1" = 'changelog' ]]
 then
     echo
-    echo 'v2.6.1 - bug fixes and small tweaks. No more rsk script as the method has been replaced with teh template built in method.'
+    echo 'v2.6.3 - script parity'
+    echo 'v2.6.1 - bug fixes and small tweaks. No more rsk script as the method has been replaced with the template built in method.'
     echo 'v2.6.0 - script and template updated to fall inline with userdocs template method.'
     echo 'v2.5.0 - Rework of template so that manual script editing and updating is becoming obselete in regards to program updates'
     #
@@ -65,7 +66,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="2.6.1"
+scriptversion="2.6.3"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.madsonic"
@@ -100,8 +101,8 @@ gitissue="https://github.com/userdocs/userdocs/issues/new"
 ## Custom Variables Start ##
 ############################
 #
-# The current version of madsonic can be set here and will be used in the rest of the script.
-madsonicversion="6.2.9080"
+# The current version of $appname can be set here and will be used in the rest of the script.
+appversion="6.2.9080"
 #
 # This variable must be set and in lowercase. It will define multiple values in the scipt such as installation paths, filenames and be used to configure files.
 appname="madsonic"
@@ -109,13 +110,13 @@ appname="madsonic"
 # This is the command that will be used to start the program and used in the cron scripts. It just needs to be the basic start command for the app.
 startcommand="~/.$appname/$appname.sh"
 #
-# This command will check to see if madsonic is installed and use the configured port instead of q random port.
+# This command will check to see if $appname is installed and use the configured port instead of q random port.
 [[ -f "$HOME/.$appname/$appname.sh" ]] && appport="$(cat "$HOME/.$appname/$appname.sh" | sed -rn 's/^MADSONIC_PORT=(.*)/\1/p')"
 #
 # This variable is set to one if the nginx proxypass requires a socket, for example this is used with flood.
 # socketpath=""
 #
-# These variables are for getting the most recent version of java creating teh required urls and version numbers for the script.
+# These variables are for getting the most recent version of java creating the required urls and version numbers for the script.
 getversion="$(curl -Ls http://java.com/en/download/linux_manual.jsp | sed -rn 's/(.*)>Recommended Version (.*) Update (.*)<(.*)/\2/p')"
 getupdate="$(curl -Ls http://java.com/en/download/linux_manual.jsp | sed -rn 's/(.*)>Recommended Version (.*) Update (.*)<(.*)/\3/p')"
 javaversion="The Latest Java available is $getversion Update $getupdate"
@@ -127,9 +128,9 @@ installedjavaversion="$(cat ~/.userdocs/versions/java.version 2> /dev/null)"
 # Defines the memory variable
 maxmemory="4096"
 #
-# These variables are for getting the madsonic standalone files and creating the version echo.
-madsonicfv="http://madsonic.org/download/6.2/20161222_madsonic-6.2.9080-standalone.tar.gz"
-madsonicfvs="madsonic $madsonicversion"
+# These variables are for getting the $appname standalone files and creating the version echo.
+appnamefv="http://madsonic.org/download/6.2/20161222_madsonic-6.2.9080-standalone.tar.gz"
+appnamefvs="$appname $appversion"
 # hese variables are for getting the ffmpeg files and creating the version echo.
 sffmpegfv="http://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz"
 sffmpegfvs="ffmpeg-release-64bit-static.tar.xz"
@@ -173,8 +174,8 @@ function_cronjobadd () {
         echo "The ${appname^} cronjob is already in crontab"; echo
     fi
     #
-    rm -f ~/.userdocs/cronjobs/$appname.cronjob
-    wget -qO ~/.userdocs/cronjobs/$appname.cronjob "https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/Bash_Scripts/cronscript.sh"
+    rm -f ~/.userdocs/cronjobs/"$appname".cronjob
+    wget -qO ~/.userdocs/cronjobs/"$appname".cronjob "https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/Bash_Scripts/cronscript.sh"
 	sed -i 's|# screen command|screen -dmS '"$appname"' \&\& screen -S '"$appname"' -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; '"$startcommand"'^M"|g' ~/.userdocs/cronjobs/"$appname".cronjob
 	sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/"$appname".cronjob
 }
@@ -194,7 +195,7 @@ function_cronjobremove () {
 }
 #
 function_generichosturl () {
-    echo -e "\033[32m""${appname^} is accessible at: https://$(hostname -f)/$(whoami)/$appname/""\e[0m"; echo
+    echo -e "${appname^} is accessible at:" "\033[32m""https://$(hostname -f)/$(whoami)/$appname/""\e[0m"; echo
     echo "It may take a few minutes to load. Refresh the page to see the app."; echo
 }
 #
@@ -225,7 +226,7 @@ function_genericproxypass () {
 		if [[ "$socket" -eq "1" ]]
 		then
 			sed -i 's|# include   /etc/nginx/scgi_params;|include   /etc/nginx/scgi_params;|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
-			sed -i 's|# scgi_pass unix://SOCKETPATH;|scgi_pass unix://'$socketpath';|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
+			sed -i 's|# scgi_pass unix://SOCKETPATH;|scgi_pass unix://'"$socketpath"';|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
 		fi
 		#
 		/usr/sbin/nginx -s reload -c ~/.nginx/nginx.conf > /dev/null 2>&1
@@ -235,7 +236,7 @@ function_genericproxypass () {
     #
     wget -qO ~/.apache2/conf.d/"$appname".conf "$genericproxyapache"
     sed -i "s|generic|$appname|g" ~/.apache2/conf.d/"$appname".conf
-    sed -i 's|PORT|'$appport'|g' ~/.apache2/conf.d/"$appname".conf
+    sed -i 's|PORT|'"$appport"'|g' ~/.apache2/conf.d/"$appname".conf
     #
     /usr/sbin/apache2ctl -k graceful > /dev/null 2>&1
     echo "The Apache proxypass was installed"; echo
@@ -246,7 +247,7 @@ function_genericrestart () {
     while [[ -n $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') ]]
     do
         kill -9 $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > /dev/null 2>&1
-        rm -f $HOME/.userdocs/pids/"$appname".pid
+        rm -f "$HOME/.userdocs/pids/$appname.pid"
         #
         screen -wipe > /dev/null 2>&1
     done
@@ -255,7 +256,7 @@ function_genericrestart () {
     then
         if [[ -z "$(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p')" ]]
         then
-            screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; $startcommand^M"
+            screen -dmS "$appname" && screen -S "$appname" -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; $startcommand^M"
             echo -n $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > "$HOME/.userdocs/pids/$appname.pid"
             echo "${appname^} was restarted"
             echo
@@ -325,13 +326,13 @@ function_installjava () {
     fi
 }
 #
-function_installmadsonic () {
-    echo -n "$madsonicversion" > ~/.userdocs/versions/"$appname".version
+function_installapp () {
+    echo -n "$appversion" > ~/.userdocs/versions/"$appname".version
     mkdir -p ~/.madsonic/{playlists,artists,incoming,podcast,transcode}
     mkdir -p ~/.madsonic/playlists/{import,export,backup}
-    echo -e "\033[32m""$madsonicfvs""\e[0m" "is downloading and installing now."; echo
+    echo -e "\033[32m""$appnamefvs""\e[0m" "is downloading and installing now."; echo
     #
-    wget -qO ~/.userdocs/tmp/"$appname".tar.gz "$madsonicfv"
+    wget -qO ~/.userdocs/tmp/"$appname".tar.gz "$appnamefv"
     tar xf ~/.userdocs/tmp/"$appname".tar.gz -C ~/."$appname"
     # transcoding files
     wget -qO ~/.userdocs/tmp/ffmpeg.tar.gz "$sffmpegfv"
@@ -345,7 +346,7 @@ function_installmadsonic () {
     chmod -f 700 ~/."$appname"/transcode/flac
 }
 #
-function_editmadsonic () {
+function_editapp () {
     wget -qO "$HOME/.$appname/$appname.sh" https://git.io/vHMaR
     #
     echo -e "\033[31m""Configuring the start-up script.""\e[0m"; echo
@@ -362,21 +363,22 @@ function_editmadsonic () {
     sed -i 's|MADSONIC_DEFAULT_MUSIC_FOLDER=~/.madsonic/artists|MADSONIC_DEFAULT_MUSIC_FOLDER='"$path"'|g' "$HOME/.$appname/$appname.sh"
 }
 #
-function_updatemadsonic () {
+function_updateapp () {
     while [[ -n $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') ]]
     do
         kill -9 $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > /dev/null 2>&1
+        rm -f "$HOME/.userdocs/pids/$appname.pid"
         #
         screen -wipe > /dev/null 2>&1
     done
     #
-    echo -n "$madsonicversion" > ~/.userdocs/versions/"$appname".version
-    mkdir -p ~/.madsonic/{playlists,artists,incoming,podcast,transcode}
-    mkdir -p ~/.madsonic/playlists/{import,export,backup}
-    echo -e "\033[32m""$madsonicfvs""\e[0m" "is downloading and updating now."; echo
+    echo -n "$appversion" > ~/.userdocs/versions/"$appname".version
+    mkdir -p ~/."$appname"/{playlists,artists,incoming,podcast,transcode}
+    mkdir -p ~/."$appname"/playlists/{import,export,backup}
+    echo -e "\033[32m""$appnamefvs""\e[0m" "is downloading and updating now."; echo
     #
     mkdir -p ~/.userdocs/tmp/"$appname"
-    wget -qO ~/.userdocs/tmp/"$appname".tar.gz "$madsonicfv"
+    wget -qO ~/.userdocs/tmp/"$appname".tar.gz "$appnamefv"
     tar xf ~/.userdocs/tmp/"$appname".tar.gz -C ~/.userdocs/tmp/"$appname"
     rm -f ~/.userdocs/tmp/"$appname"/"$appname".sh
     cp -rf ~/.userdocs/tmp/"$appname"/. ~/."$appname"/
@@ -391,7 +393,7 @@ function_updatemadsonic () {
     cp -f /usr/bin/flac ~/."$appname"/transcode/ 2> /dev/null
     chmod -f 700 ~/."$appname"/transcode/flac
     #
-    screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; $startcommand^M"
+    screen -dmS "$appname" && screen -S "$appname" -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; $startcommand^M"
     echo -n $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > "$HOME/.userdocs/pids/$appname.pid"
     echo "${appname^} was restarted"; echo
     function_generichosturl
@@ -557,7 +559,7 @@ then
 else
     echo -e "Hello $(whoami), you have the latest version of the" "\033[36m""$scriptname""\e[0m" "script. This script version is:" "\033[31m""$scriptversion""\e[0m"
     echo
-    echo -e "The version of the" "\033[33m""${appname^}""\e[0m" "server being used in this script is:" "\033[31m""$madsonicversion""\e[0m"
+    echo -e "The version of the" "\033[33m""${appname^}""\e[0m" "server being used in this script is:" "\033[31m""$appversion""\e[0m"
     echo -e "The version of the" "\033[33m""Java""\e[0m" "being used in this script is:" "\033[31m""$javaversion""\e[0m"
     echo
     if [[ -f "$HOME/.userdocs/versions/$appname.version" ]]
@@ -590,8 +592,8 @@ then
     #
     if [[ ! -d "$HOME/.$appname" ]]
     then
-        function_installmadsonic
-        function_editmadsonic
+        function_installapp
+        function_editapp
         function_genericproxypass
         function_genericrestart
         function_cronjobadd
@@ -631,7 +633,7 @@ then
         then
             echo -e "${appname^} is being updated. This will only take a moment."; echo
             function_cronjobremove
-            function_updatemadsonic
+            function_updateapp
             function_cronjobadd
             exit
         else

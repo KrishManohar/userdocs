@@ -48,6 +48,7 @@
 if [[ ! -z "$1" && "$1" = 'changelog' ]]
 then
     echo
+    echo 'v2.6.3 - script parity'
     echo 'v2.6.1 - bug fixes and small tweaks. No more rsk script as the method has been replaced with the template built in method.'
     echo 'v2.6.0 - script and template updated to fall inline with userdocs template method.'
     echo 'v2.5.0 - Rework of template so that manual script editing and updating is becoming obselete in regards to program updates'
@@ -65,7 +66,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="2.6.2"
+scriptversion="2.6.3"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.subsonic"
@@ -100,8 +101,8 @@ gitissue="https://github.com/userdocs/userdocs/issues/new"
 ## Custom Variables Start ##
 ############################
 #
-# The current version of subsonic can be set here and will be used in the rest of the script.
-subsonicversion="6.1.1"
+# The current version of $appname can be set here and will be used in the rest of the script.
+appversion="6.1.1"
 #
 # This variable must be set and in lowercase. It will define multiple values in the scipt such as installation paths, filenames and be used to configure files.
 appname="subsonic"
@@ -109,7 +110,7 @@ appname="subsonic"
 # This is the command that will be used to start the program and used in the cron scripts. It just needs to be the basic start command for the app.
 startcommand="~/.$appname/$appname.sh"
 #
-# This command will check to see if subsonic is installed and use the configured port instead of q random port.
+# This command will check to see if $appname is installed and use the configured port instead of q random port.
 [[ -f "$HOME/.$appname/$appname.sh" ]] && appport="$(cat "$HOME/.$appname/$appname.sh" | sed -rn 's/SUBSONIC_PORT=\$\{SUBSONIC_PORT:-(.*)\}/\1/p')"
 #
 # This variable is set to one if the nginx proxypass requires a socket, for example this is used with flood.
@@ -127,9 +128,9 @@ installedjavaversion="$(cat ~/.userdocs/versions/java.version 2> /dev/null)"
 # Defines the memory variable
 maxmemory="4096"
 #
-# These variables are for getting the subsonic standalone files and creating the version echo.
-subsonicfv="https://s3-eu-west-1.amazonaws.com/subsonic-public/download/subsonic-$subsonicversion-standalone.tar.gz"
-subsonicfvs="subsonic $subsonicversion"
+# These variables are for getting the $appname standalone files and creating the version echo.
+appnamefv="https://s3-eu-west-1.amazonaws.com/subsonic-public/download/subsonic-$appversion-standalone.tar.gz"
+appnamefvs="$appname $appversion"
 # hese variables are for getting the ffmpeg files and creating the version echo.
 sffmpegfv="http://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz"
 sffmpegfvs="ffmpeg-release-64bit-static.tar.xz"
@@ -243,10 +244,13 @@ function_genericproxypass () {
 }
 #
 function_genericrestart () {
-    kill -9 "$(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p')" > /dev/null 2>&1
-    rm -f ~/.userdocs/pids/"$appname".pid
-    #
-    screen -wipe > /dev/null 2>&1
+    while [[ -n $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') ]]
+    do
+        kill -9 $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > /dev/null 2>&1
+        rm -f "$HOME/.userdocs/pids/$appname.pid"
+        #
+        screen -wipe > /dev/null 2>&1
+    done
     #
     if [[ -d "$HOME/.$appname" ]]
     then
@@ -266,12 +270,12 @@ function_genericremove () {
     echo
     if [[ "$makeitso" =~ ^[Yy]$ ]]
     then
-        kill -9 "$(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p')" > /dev/null 2>&1
+        kill -9 $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > /dev/null 2>&1
         #
         screen -wipe > /dev/null 2>&1
         #
 		sleep 5
-		#
+        #
 		rm -rf "$HOME/.$appname"
 		rm -rf ~/.userdocs/versions/"$appname".version
 		rm -rf ~/.userdocs/cronjobs/"$appname".cronjob
@@ -322,12 +326,13 @@ function_installjava () {
     fi
 }
 #
-function_installsubsonic () {
-    echo -n "$subsonicversion" > ~/.userdocs/versions/"$appname".version
+function_installapp () {
+    echo -n "$appversion" > ~/.userdocs/versions/"$appname".version
     mkdir -p ~/."$appname"/{transcode,playlists,Podcasts}
-    echo -e "\033[32m""$subsonicfvs""\e[0m" "is downloading and installing now."; echo
     #
-    wget -qO ~/.userdocs/tmp/"$appname".tar.gz "$subsonicfv"
+    echo -e "\033[32m""$appnamefvs""\e[0m" "is downloading and installing now."; echo
+    #
+    wget -qO ~/.userdocs/tmp/"$appname".tar.gz "$appnamefv"
     tar xf ~/.userdocs/tmp/"$appname".tar.gz -C ~/."$appname"
     # transcoding files
     wget -qO ~/.userdocs/tmp/ffmpeg.tar.gz "$sffmpegfv"
@@ -341,19 +346,39 @@ function_installsubsonic () {
     chmod -f 700 ~/."$appname"/transcode/flac
 }
 #
-function_updatesubsonic () {
-    kill -9 "$(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p')" > /dev/null 2>&1
+function_editapp () {
+    wget -qO "$HOME/.$appname/$appname.sh" https://git.io/vHDE4
     #
-    screen -wipe > /dev/null 2>&1
+    echo -e "\033[31m""Configuring the start-up script.""\e[0m"; echo
     #
-	sleep 5
-	#
-    echo -n "$subsonicversion" > ~/.userdocs/versions/"$appname".version
+    sed -i 's|SUBSONIC_PORT=${SUBSONIC_PORT:-4040}|SUBSONIC_PORT=${SUBSONIC_PORT:-'$appport'}|g' "$HOME/.$appname/$appname.sh"
+    #
+    echo -e "\033[35m""User input is required for this next step:""\e[0m"
+    #
+    echo -e "\033[33m""Note on user input:""\e[0m" "It is OK to use a relative path like:" "\033[33m""~/private/rtorrent/data""\e[0m"
+    #
+    read -ep "Enter the path to your media or leave blank and press enter to skip: " -i "~/private/rtorrent/data" path
+    echo
+    #
+    sed -i 's|SUBSONIC_DEFAULT_MUSIC_FOLDER=${SUBSONIC_DEFAULT_MUSIC_FOLDER:-/var/music}|SUBSONIC_DEFAULT_MUSIC_FOLDER=${SUBSONIC_DEFAULT_MUSIC_FOLDER:-'"$path"'}|g' "$HOME/.$appname/$appname.sh"
+}
+#
+function_updateapp () {
+    while [[ -n $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') ]]
+    do
+        kill -9 $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > /dev/null 2>&1
+        rm -f "$HOME/.userdocs/pids/$appname.pid"
+        #
+        screen -wipe > /dev/null 2>&1
+    done
+    #
+    echo -n "$appversion" > ~/.userdocs/versions/"$appname".version
     mkdir -p ~/."$appname"/{transcode,playlists,Podcasts}
-    echo -e "\033[32m""$subsonicfvs""\e[0m" "is downloading and updating now."; echo
+    #                                                     
+    echo -e "\033[32m""$appnamefvs""\e[0m" "is downloading and updating now."; echo
     #
     mkdir -p ~/.userdocs/tmp/"$appname"
-    wget -qO ~/.userdocs/tmp/"$appname".tar.gz "$subsonicfv"
+    wget -qO ~/.userdocs/tmp/"$appname".tar.gz "$appnamefv"
     tar xf ~/.userdocs/tmp/"$appname".tar.gz -C ~/.userdocs/tmp/"$appname"
     rm -f ~/.userdocs/tmp/"$appname"/"$appname".sh
     cp -rf ~/.userdocs/tmp/"$appname"/. ~/."$appname"/
@@ -370,34 +395,8 @@ function_updatesubsonic () {
     #
     screen -dmS "$appname" && screen -S "$appname" -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; $startcommand^M"
     echo -n $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > "$HOME/.userdocs/pids/$appname.pid"
-    echo "${appname^} was restarted"
-    echo
-}
-#
-function_editsubsonic () {
-    echo -e "\033[31m""Configuring the start-up script.""\e[0m"; echo
-    sed -i 's|\${LOG} 2>\&1 &|\${LOG} 2>\&1|g' "$HOME/.$appname/$appname.sh"
-    sed -i 's|JAVA=java|JAVA=~/bin/java|g' "$HOME/.$appname/$appname.sh"
-    sed -i 's|SUBSONIC_HOME=${SUBSONIC_HOME:-/var/subsonic}|SUBSONIC_HOME=${SUBSONIC_HOME:-$HOME/'".$appname"'}|g' "$HOME/.$appname/$appname.sh"
-    sed -i 's|SUBSONIC_PORT=${SUBSONIC_PORT:-4040}|SUBSONIC_PORT=${SUBSONIC_PORT:-'$appport'}|g' "$HOME/.$appname/$appname.sh"
-    sed -i 's|SUBSONIC_CONTEXT_PATH=${SUBSONIC_CONTEXT_PATH:-/}|SUBSONIC_CONTEXT_PATH=${SUBSONIC_CONTEXT_PATH:-/$(whoami)/subsonic}|g' "$HOME/.$appname/$appname.sh"
-    sed -i 's|SUBSONIC_MAX_MEMORY=${SUBSONIC_MAX_MEMORY:-150}|SUBSONIC_MAX_MEMORY=${SUBSONIC_MAX_MEMORY:-'$maxmemory'}|g' "$HOME/.$appname/$appname.sh"
-    sed -i 's|SUBSONIC_PIDFILE=${SUBSONIC_PIDFILE}|SUBSONIC_PIDFILE=${SUBSONIC_PIDFILE:-$HOME/.userdocs/pids/'"$appname"'-java.pid}|g' "$HOME/.$appname/$appname.sh"
-    sed -i 's|SUBSONIC_DEFAULT_PODCAST_FOLDER=${SUBSONIC_DEFAULT_PODCAST_FOLDER:-/var/music/Podcast}|SUBSONIC_DEFAULT_PODCAST_FOLDER=${SUBSONIC_DEFAULT_PODCAST_FOLDER:-$HOME/'".$appname"'/Podcast}|g' "$HOME/.$appname/$appname.sh"
-    sed -i 's|SUBSONIC_DEFAULT_PLAYLIST_FOLDER=${SUBSONIC_DEFAULT_PLAYLIST_FOLDER:-/var/playlists}|SUBSONIC_DEFAULT_PLAYLIST_FOLDER=${SUBSONIC_DEFAULT_PLAYLIST_FOLDER:-$HOME/'".$appname"'/playlists}|g' "$HOME/.$appname/$appname.sh"
-    sed -i 's|quiet=0|quiet=1|g' "$HOME/.$appname/$appname.sh"
-    sed -i "23 i export LC_ALL=en_GB.UTF-8\n" "$HOME/.$appname/$appname.sh"
-    sed -i '23 i export LANG=en_GB.UTF-8' "$HOME/.$appname/$appname.sh"
-    sed -i '23 i export LANGUAGE=en_GB.UTF-8' "$HOME/.$appname/$appname.sh"
-    #
-    echo -e "\033[35m""User input is required for this next step:""\e[0m"
-    #
-    echo -e "\033[33m""Note on user input:""\e[0m" "It is OK to use a relative path like:" "\033[33m""~/private/rtorrent/data""\e[0m"
-    #
-    read -ep "Enter the path to your media or leave blank and press enter to skip: " path
-    echo
-    #
-    sed -i 's|SUBSONIC_DEFAULT_MUSIC_FOLDER=${SUBSONIC_DEFAULT_MUSIC_FOLDER:-/var/music}|SUBSONIC_DEFAULT_MUSIC_FOLDER=${SUBSONIC_DEFAULT_MUSIC_FOLDER:-'"$path"'}|g' "$HOME/.$appname/$appname.sh"
+    echo "${appname^} was restarted"; echo
+    function_generichosturl
 }
 #
 ############################
@@ -560,7 +559,7 @@ then
 else
     echo -e "Hello $(whoami), you have the latest version of the" "\033[36m""$scriptname""\e[0m" "script. This script version is:" "\033[31m""$scriptversion""\e[0m"
     echo
-    echo -e "The version of the" "\033[33m""${appname^}""\e[0m" "server being used in this script is:" "\033[31m""$subsonicversion""\e[0m"
+    echo -e "The version of the" "\033[33m""${appname^}""\e[0m" "server being used in this script is:" "\033[31m""$appversion""\e[0m"
     echo -e "The version of the" "\033[33m""Java""\e[0m" "being used in this script is:" "\033[31m""$javaversion""\e[0m"
     echo
     if [[ -f "$HOME/.userdocs/versions/$appname.version" ]]
@@ -593,8 +592,8 @@ then
     #
     if [[ ! -d "$HOME/.$appname" ]]
     then
-        function_installsubsonic
-        function_editsubsonic
+        function_installapp
+        function_editapp
         function_genericproxypass
         function_genericrestart
         function_cronjobadd
@@ -632,8 +631,10 @@ then
             fi
         elif [[ "$confirm" =~ ^[Uu]$ ]]
         then
-            echo -e "${appname^} is being updated. This will only take a moment."
-            function_updatesubsonic
+            echo -e "${appname^} is being updated. This will only take a moment."; echo
+            function_cronjobremove
+            function_updateapp
+            function_cronjobadd
             exit
         else
             echo "You chose to quit and exit the script"
