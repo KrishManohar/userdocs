@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-if [[ -z "$(screen -ls APPNAME | sed -rn 's/[^\s](.*).APPNAME(.*)/\1/p')" && ! -f "$HOME/.userdocs/tmp/$appname.lock" ]]
+if [[ -z "$(screen -ls APPNAME | sed -rn 's/[^\s](.*).APPNAME(.*)/\1/p')" && ! -f "$HOME/.userdocs/tmp/APPNAME.lock" ]]
 then
     # screen command
 	echo -n "$(screen -ls APPNAME | sed -rn 's/[^\s](.*).APPNAME(.*)/\1/p')" > ~/.userdocs/pids/APPNAME.pid
