@@ -125,9 +125,9 @@ updaterenabled="1"
 #
 function_showMenu () {
     #
-    echo "1) wip - Install Flood for rtorrent"
-    echo "2) wip - Install Flood for an rtorrent custom instance"
-    echo "3) wip - Remove Flood for rtorrent"
+    echo "1) Install Flood for rtorrent"
+    echo "2) Update Flood for rtorrent"
+    echo "3) Remove Flood for rtorrent"
     echo "4) wip - Remove Flood for an rtorrent custom instance"
     echo "5) Quit the script"
     #
@@ -147,7 +147,7 @@ function_installnode () {
 	echo
 }
 #
-function_ installflood () {
+function_installflood () {
 	if [[ ! -d ~/.$appname ]]
 	then
 		echo "Flood is installing. Please wait until the install is complete."
@@ -186,6 +186,7 @@ function_updateflood () {
     #
     function_genericrestart
     function_cronjobadd
+    echo
 }
 #
 ############################
@@ -543,11 +544,11 @@ do
         "2")
             function_updateflood
             #
-            echo
             ;;
         "3")
             function_cronjobremove
 			function_genericremove
+            #
             ;;
         "4")
             echo "nothing to see here yet"
