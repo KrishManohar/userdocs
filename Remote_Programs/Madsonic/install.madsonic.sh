@@ -8,11 +8,13 @@
 #
 # Script Contributors: 
 #
-# Bash Command for easy reference: wget -qO ~/install.madsonic https://git.io/vHMVn && bash ~/install.madsonic
+# Bash Command for easy reference:
+#
+# wget -qO ~/install.madsonic https://git.io/vHMVn && bash ~/install.madsonic
 #
 # The GPLv3 License (GNU)
 #
-# Copyright (c) 2016 userdocs
+# Copyright (c) 2017 userdocs
 #
 # This script is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,7 +37,7 @@
 #### Script Notes Start ####
 ############################
 #
-##
+## See readme.md
 #
 ############################
 ##### Script Notes End #####
@@ -77,8 +79,8 @@ scriptauthor="userdocs"
 # Contributor's names go here.
 contributors="None credited"
 #
-gitiourl="https://git.io/vHMVn"
 # Set the http://git.io/ shortened URL for the raw github URL here:
+gitiourl="https://git.io/vHMVn"
 #
 # Don't edit: This is the bash command shown when using the info option.
 gitiocommand="wget -qO ~/$scriptname $gitiourl && bash ~/$scriptname"
@@ -144,6 +146,108 @@ updaterenabled="1"
 #
 ############################
 ####### Variable End #######
+############################
+#
+############################
+#
+############################
+## Custom Functions Start ##
+############################
+#
+function_installjava () {
+    if [[ ! -f ~/bin/java && -f ~/.userdocs/versions/java.version ]]
+    then
+        rm -f ~/.javaversion ~/.userdocs/.javaversion ~/.userdocs/versions/java.version
+        export installedjavaversion=""
+    fi
+    if [[ "$installedjavaversion" != "$javadecimal" ]]
+    then
+        echo "Please wait a moment while java is installed"; echo
+        wget -qO ~/.userdocs/tmp/java.tar.gz "$javaupdateurl"
+        tar xf ~/.userdocs/tmp/java.tar.gz --strip-components=1 -C ~/
+        rm -rf ~/.userdocs/tmp/java.tar.gz
+        echo "$javadecimal" > ~/.userdocs/versions/java.version
+        rm -f ~/{Welcome.html,THIRDPARTYLICENSEREADME-JAVAFX.txt,THIRDPARTYLICENSEREADME.txt,release,README,LICENSE,COPYRIGHT}
+        echo -e "\033[31m""Important:""\e[0m" "Java" "\033[32m""$javadecimal""\e[0m" "has been installed to" "\033[36m""$HOME/bin""\e[0m"
+        echo
+    fi
+}
+#
+function_installapp () {
+    echo -n "$appversion" > ~/.userdocs/versions/"$appname".version
+    mkdir -p ~/.madsonic/{playlists,artists,incoming,podcast,transcode}
+    mkdir -p ~/.madsonic/playlists/{import,export,backup}
+    echo -e "\033[32m""$appnamefvs""\e[0m" "is downloading and installing now."; echo
+    #
+    wget -qO ~/.userdocs/tmp/"$appname".tar.gz "$appnamefv"
+    tar xf ~/.userdocs/tmp/"$appname".tar.gz -C ~/."$appname"
+    # transcoding files
+    wget -qO ~/.userdocs/tmp/ffmpeg.tar.gz "$sffmpegfv"
+    tar xf ~/.userdocs/tmp/ffmpeg.tar.gz --strip-components=1 -C ~/."$appname"/transcode/
+    chmod -f 700 ~/."$appname"/transcode/{Audioffmpeg,ffmpeg,lame,xmp}
+    rm -rf ~/.userdocs/tmp/"$appname".tar.gz
+    rm -rf ~/.userdocs/tmp/ffmpeg.tar.gz
+    cp -f /usr/bin/lame ~/."$appname"/transcode/ 2> /dev/null
+    chmod -f 700 ~/."$appname"/transcode/lame
+    cp -f /usr/bin/flac ~/."$appname"/transcode/ 2> /dev/null
+    chmod -f 700 ~/."$appname"/transcode/flac
+}
+#
+function_editapp () {
+    wget -qO "$HOME/.$appname/$appname.sh" https://git.io/vHMaR
+    #
+    echo -e "\033[31m""Configuring the start-up script.""\e[0m"; echo
+    #
+    sed -i 's|MADSONIC_PORT=4040|MADSONIC_PORT='"$appport"'|g' "$HOME/.$appname/$appname.sh"
+    #
+    echo -e "\033[35m""User input is required for this next step:""\e[0m"
+    #
+    echo -e "\033[33m""Note on user input:""\e[0m" "It is OK to use a relative path like:" "\033[33m""~/private/rtorrent/data""\e[0m"
+    #
+    read -ep "Enter the path to your media or leave blank and press enter to skip: " -i "~/.$appname/artists" path
+    echo
+    #
+    sed -i 's|MADSONIC_DEFAULT_MUSIC_FOLDER=~/.madsonic/artists|MADSONIC_DEFAULT_MUSIC_FOLDER='"$path"'|g' "$HOME/.$appname/$appname.sh"
+}
+#
+function_updateapp () {
+    while [[ -n $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') ]]
+    do
+        kill -9 $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > /dev/null 2>&1
+        rm -f "$HOME/.userdocs/pids/$appname.pid"
+        #
+        screen -wipe > /dev/null 2>&1
+    done
+    #
+    echo -n "$appversion" > ~/.userdocs/versions/"$appname".version
+    mkdir -p ~/."$appname"/{playlists,artists,incoming,podcast,transcode}
+    mkdir -p ~/."$appname"/playlists/{import,export,backup}
+    echo -e "\033[32m""$appnamefvs""\e[0m" "is downloading and updating now."; echo
+    #
+    mkdir -p ~/.userdocs/tmp/"$appname"
+    wget -qO ~/.userdocs/tmp/"$appname".tar.gz "$appnamefv"
+    tar xf ~/.userdocs/tmp/"$appname".tar.gz -C ~/.userdocs/tmp/"$appname"
+    rm -f ~/.userdocs/tmp/"$appname"/"$appname".sh
+    cp -rf ~/.userdocs/tmp/"$appname"/. ~/."$appname"/
+    # transcoding files
+    wget -qO ~/.userdocs/tmp/ffmpeg.tar.gz "$sffmpegfv"
+    tar xf ~/.userdocs/tmp/ffmpeg.tar.gz --strip-components=1 -C ~/."$appname"/transcode/
+    chmod -f 700 ~/."$appname"/transcode/{Audioffmpeg,ffmpeg,lame,xmp}
+    rm -rf ~/.userdocs/tmp/"$appname"{,.tar.gz}
+    rm -rf ~/.userdocs/tmp/ffmpeg.tar.gz
+    cp -f /usr/bin/lame ~/."$appname"/transcode/ 2> /dev/null
+    chmod -f 700 ~/."$appname"/transcode/lame
+    cp -f /usr/bin/flac ~/."$appname"/transcode/ 2> /dev/null
+    chmod -f 700 ~/."$appname"/transcode/flac
+    #
+    screen -dmS "$appname" && screen -S "$appname" -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; $startcommand^M"
+    echo -n $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > "$HOME/.userdocs/pids/$appname.pid"
+    echo "${appname^} was restarted"; echo
+    function_generichosturl
+}
+#
+############################
+### Custom Functions End ###
 ############################
 #
 ############################
@@ -252,7 +356,7 @@ function_genericrestart () {
         screen -wipe > /dev/null 2>&1
     done
     #
-    if [[ -d "$HOME/.$appname" ]]
+    if [[ -d "$HOME/.$appname" && ! -f "$HOME/.userdocs/tmp/$appname.lock" ]]
     then
         if [[ -z "$(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p')" ]]
         then
@@ -270,9 +374,13 @@ function_genericremove () {
     echo
     if [[ "$makeitso" =~ ^[Yy]$ ]]
     then
-        kill -9 $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > /dev/null 2>&1
-        #
-        screen -wipe > /dev/null 2>&1
+        while [[ -n $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') ]]
+        do
+            kill -9 $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > /dev/null 2>&1
+            rm -f "$HOME/.userdocs/pids/$appname.pid"
+            #
+            screen -wipe > /dev/null 2>&1
+        done
         #
 		sleep 5
         #
@@ -282,6 +390,7 @@ function_genericremove () {
 		rm -rf ~/.userdocs/logins/"$appname".login
 		rm -rf ~/.userdocs/pids/"$appname".pid
 		rm -rf ~/.userdocs/logs/"$appname".log
+        rm -rf ~/.userdocs/tmp/"$appname".lock
 		#
 		rm -rf "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
 		/usr/sbin/nginx -s reload -c ~/.nginx/nginx.conf > /dev/null 2>&1
@@ -301,106 +410,6 @@ function_genericremove () {
 #
 ############################
 ### Generic Function End ###
-############################
-#
-############################
-## Custom Functions Start ##
-############################
-#
-function_installjava () {
-    if [[ ! -f ~/bin/java && -f ~/.userdocs/versions/java.version ]]
-    then
-        rm -f ~/.javaversion ~/.userdocs/.javaversion ~/.userdocs/versions/java.version
-        export installedjavaversion=""
-    fi
-    if [[ "$installedjavaversion" != "$javadecimal" ]]
-    then
-        echo "Please wait a moment while java is installed"; echo
-        wget -qO ~/.userdocs/tmp/java.tar.gz "$javaupdateurl"
-        tar xf ~/.userdocs/tmp/java.tar.gz --strip-components=1 -C ~/
-        rm -rf ~/.userdocs/tmp/java.tar.gz
-        echo "$javadecimal" > ~/.userdocs/versions/java.version
-        rm -f ~/{Welcome.html,THIRDPARTYLICENSEREADME-JAVAFX.txt,THIRDPARTYLICENSEREADME.txt,release,README,LICENSE,COPYRIGHT}
-        echo -e "\033[31m""Important:""\e[0m" "Java" "\033[32m""$javadecimal""\e[0m" "has been installed to" "\033[36m""$HOME/bin""\e[0m"
-        echo
-    fi
-}
-#
-function_installapp () {
-    echo -n "$appversion" > ~/.userdocs/versions/"$appname".version
-    mkdir -p ~/.madsonic/{playlists,artists,incoming,podcast,transcode}
-    mkdir -p ~/.madsonic/playlists/{import,export,backup}
-    echo -e "\033[32m""$appnamefvs""\e[0m" "is downloading and installing now."; echo
-    #
-    wget -qO ~/.userdocs/tmp/"$appname".tar.gz "$appnamefv"
-    tar xf ~/.userdocs/tmp/"$appname".tar.gz -C ~/."$appname"
-    # transcoding files
-    wget -qO ~/.userdocs/tmp/ffmpeg.tar.gz "$sffmpegfv"
-    tar xf ~/.userdocs/tmp/ffmpeg.tar.gz --strip-components=1 -C ~/."$appname"/transcode/
-    chmod -f 700 ~/."$appname"/transcode/{Audioffmpeg,ffmpeg,lame,xmp}
-    rm -rf ~/.userdocs/tmp/"$appname".tar.gz
-    rm -rf ~/.userdocs/tmp/ffmpeg.tar.gz
-    cp -f /usr/bin/lame ~/."$appname"/transcode/ 2> /dev/null
-    chmod -f 700 ~/."$appname"/transcode/lame
-    cp -f /usr/bin/flac ~/."$appname"/transcode/ 2> /dev/null
-    chmod -f 700 ~/."$appname"/transcode/flac
-}
-#
-function_editapp () {
-    wget -qO "$HOME/.$appname/$appname.sh" https://git.io/vHMaR
-    #
-    echo -e "\033[31m""Configuring the start-up script.""\e[0m"; echo
-    #
-    sed -i 's|MADSONIC_PORT=4040|MADSONIC_PORT='"$appport"'|g' "$HOME/.$appname/$appname.sh"
-    #
-    echo -e "\033[35m""User input is required for this next step:""\e[0m"
-    #
-    echo -e "\033[33m""Note on user input:""\e[0m" "It is OK to use a relative path like:" "\033[33m""~/private/rtorrent/data""\e[0m"
-    #
-    read -ep "Enter the path to your media or leave blank and press enter to skip: " -i "~/.$appname/artists" path
-    echo
-    #
-    sed -i 's|MADSONIC_DEFAULT_MUSIC_FOLDER=~/.madsonic/artists|MADSONIC_DEFAULT_MUSIC_FOLDER='"$path"'|g' "$HOME/.$appname/$appname.sh"
-}
-#
-function_updateapp () {
-    while [[ -n $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') ]]
-    do
-        kill -9 $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > /dev/null 2>&1
-        rm -f "$HOME/.userdocs/pids/$appname.pid"
-        #
-        screen -wipe > /dev/null 2>&1
-    done
-    #
-    echo -n "$appversion" > ~/.userdocs/versions/"$appname".version
-    mkdir -p ~/."$appname"/{playlists,artists,incoming,podcast,transcode}
-    mkdir -p ~/."$appname"/playlists/{import,export,backup}
-    echo -e "\033[32m""$appnamefvs""\e[0m" "is downloading and updating now."; echo
-    #
-    mkdir -p ~/.userdocs/tmp/"$appname"
-    wget -qO ~/.userdocs/tmp/"$appname".tar.gz "$appnamefv"
-    tar xf ~/.userdocs/tmp/"$appname".tar.gz -C ~/.userdocs/tmp/"$appname"
-    rm -f ~/.userdocs/tmp/"$appname"/"$appname".sh
-    cp -rf ~/.userdocs/tmp/"$appname"/. ~/."$appname"/
-    # transcoding files
-    wget -qO ~/.userdocs/tmp/ffmpeg.tar.gz "$sffmpegfv"
-    tar xf ~/.userdocs/tmp/ffmpeg.tar.gz --strip-components=1 -C ~/."$appname"/transcode/
-    chmod -f 700 ~/."$appname"/transcode/{Audioffmpeg,ffmpeg,lame,xmp}
-    rm -rf ~/.userdocs/tmp/"$appname"{,.tar.gz}
-    rm -rf ~/.userdocs/tmp/ffmpeg.tar.gz
-    cp -f /usr/bin/lame ~/."$appname"/transcode/ 2> /dev/null
-    chmod -f 700 ~/."$appname"/transcode/lame
-    cp -f /usr/bin/flac ~/."$appname"/transcode/ 2> /dev/null
-    chmod -f 700 ~/."$appname"/transcode/flac
-    #
-    screen -dmS "$appname" && screen -S "$appname" -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; $startcommand^M"
-    echo -n $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > "$HOME/.userdocs/pids/$appname.pid"
-    echo "${appname^} was restarted"; echo
-    function_generichosturl
-}
-#
-############################
-### Custom Functions End ###
 ############################
 #
 ############################
