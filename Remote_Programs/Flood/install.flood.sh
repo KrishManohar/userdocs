@@ -50,6 +50,7 @@
 if [[ ! -z "$1" && "$1" = 'changelog' ]]
 then
     echo
+    echo 'v0.0.3 - rtorrent install, update and removal complete.'
     echo 'v0.0.2 - Updated templated'
     echo 'v0.0.1 - Updated templated'
     echo
@@ -65,7 +66,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="0.0.2"
+scriptversion="0.0.3"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.flood"
@@ -107,6 +108,9 @@ socketpath="$HOME/private/rtorrent/.socket"
 appname="flood"
 #    
 startcommand="~/bin/npm start --prefix ~/."$appname""
+#
+# This command will check to see if $appname is installed and use the configured port instead of q random port.
+[[ -f "$HOME/.$appname/config.js" ]] && appport="$(cat "$HOME/.$appname/config.js" | sed -rn 's/  floodServerPort: (.*),(.*)/\1/p')"
 #
 ############################
 ### Custom Variables End ###
@@ -184,9 +188,9 @@ function_updateflood () {
     npm install --production
     cd && rm -f "$HOME/.userdocs/tmp/$appname.lock"
     #
+    function_genericproxypass
     function_genericrestart
     function_cronjobadd
-    echo
 }
 #
 ############################
@@ -324,6 +328,7 @@ function_genericremove () {
             #
             screen -wipe > /dev/null 2>&1
         done
+        #
 		sleep 5
         #
 		rm -rf "$HOME/.$appname"
