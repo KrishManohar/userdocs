@@ -243,10 +243,13 @@ function_genericproxypass () {
 }
 #
 function_genericrestart () {
-    kill -9 "$(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p')" > /dev/null 2>&1
-    rm -f $HOME/.userdocs/pids/"$appname".pid
-    #
-    screen -wipe > /dev/null 2>&1
+    while [[ -n $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') ]]
+    do
+        kill -9 $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > /dev/null 2>&1
+        rm -f $HOME/.userdocs/pids/"$appname".pid
+        #
+        screen -wipe > /dev/null 2>&1
+    done
     #
     if [[ -d "$HOME/.$appname" ]]
     then
@@ -266,7 +269,7 @@ function_genericremove () {
     echo
     if [[ "$makeitso" =~ ^[Yy]$ ]]
     then
-        kill -9 "$(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p')" > /dev/null 2>&1
+        kill -9 $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > /dev/null 2>&1
         #
         screen -wipe > /dev/null 2>&1
         #
@@ -324,7 +327,7 @@ function_installjava () {
 #
 function_installmadsonic () {
     echo -n "$madsonicversion" > ~/.userdocs/versions/"$appname".version
-    mkdir -p ~/.madsonic/{playlists,artists,incoming,podcast}
+    mkdir -p ~/.madsonic/{playlists,artists,incoming,podcast,transcode}
     mkdir -p ~/.madsonic/playlists/{import,export,backup}
     echo -e "\033[32m""$madsonicfvs""\e[0m" "is downloading and installing now."; echo
     #
@@ -360,12 +363,16 @@ function_editmadsonic () {
 }
 #
 function_updatemadsonic () {
-    kill -9 "$(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p')" > /dev/null 2>&1
-    #
-    screen -wipe > /dev/null 2>&1
+    while [[ -n $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') ]]
+    do
+        kill -9 $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > /dev/null 2>&1
+        #
+        screen -wipe > /dev/null 2>&1
+    done
     #
     echo -n "$madsonicversion" > ~/.userdocs/versions/"$appname".version
-    mkdir -p ~/."$appname"/{transcode,playlists,Podcasts}
+    mkdir -p ~/.madsonic/{playlists,artists,incoming,podcast,transcode}
+    mkdir -p ~/.madsonic/playlists/{import,export,backup}
     echo -e "\033[32m""$madsonicfvs""\e[0m" "is downloading and updating now."; echo
     #
     mkdir -p ~/.userdocs/tmp/"$appname"
@@ -386,8 +393,8 @@ function_updatemadsonic () {
     #
     screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; $startcommand^M"
     echo -n $(screen -ls "$appname" | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p') > "$HOME/.userdocs/pids/$appname.pid"
-    echo "${appname^} was restarted"
-    echo
+    echo "${appname^} was restarted"; echo
+    function_generichosturl
 }
 #
 ############################
@@ -622,8 +629,10 @@ then
             fi
         elif [[ "$confirm" =~ ^[Uu]$ ]]
         then
-            echo -e "${appname^} is being updated. This will only take a moment."
+            echo -e "${appname^} is being updated. This will only take a moment."; echo
+            function_cronjobremove
             function_updatemadsonic
+            function_cronjobadd
             exit
         else
             echo "You chose to quit and exit the script"
