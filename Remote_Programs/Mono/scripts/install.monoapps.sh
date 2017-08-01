@@ -216,7 +216,7 @@ cronscript () {
     #
     [[ "$appname" = "sonarr" ]] && sed -i 's|PATH|~/.sonarr/NzbDrone.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
     [[ "$appname" = "radarr" ]] && sed -i 's|PATH|~/.radarr/Radarr.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
-    [[ "$appname" = "jackett"  ]] && sed -i 's|PATH|~/.jackett/JackettConsole.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
+    [[ "$appname" = "jackett"  ]] && sed -i 's|PATH|~/.jackett/JackettConsole.exe -c libcurl|g' ~/.userdocs/cronjobs/$appname.cronjob
     [[ "$appname" = "emby" ]] && sed -i 's|PATH|~/.emby/MediaBrowser.Server.Mono.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
     #
 }
@@ -374,7 +374,7 @@ genericrestart () {
     then
         [[ "$appname" = "sonarr" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; ~/bin/mono --debug ~/.$appname/NzbDrone.exe^M"
         [[ "$appname" = "radarr" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; ~/bin/mono --debug ~/.$appname/Radarr.exe^M"
-        [[ "$appname" = "jackett" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; ~/bin/mono --debug ~/.$appname/JackettConsole.exe^M"
+        [[ "$appname" = "jackett" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; ~/bin/mono --debug ~/.$appname/JackettConsole.exe -c libcurl^M"
         [[ "$appname" = "emby" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; ~/bin/mono --debug ~/.$appname/MediaBrowser.Server.Mono.exe^M"
         echo "${appname^} was restarted"
     fi
