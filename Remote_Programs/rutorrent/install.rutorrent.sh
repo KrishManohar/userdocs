@@ -12,7 +12,7 @@ rm -rf ~/www/$(whoami).$(hostname -f)/public_html/rutorrent
 mv -f ~/.userdocs/tmp/rutorrent ~/www/$(whoami).$(hostname -f)/public_html/rutorrent
 rm -rf ~/.userdocs/tmp/rutorrent
 #
-# Install ratio color pllugin
+# Install ratio color plugin
 wget -qO ~/.userdocs/tmp/ratiocolor.zip https://github.com/Gyran/rutorrent-ratiocolor/archive/master.zip
 unzip -qo ~/.userdocs/tmp/ratiocolor.zip -d ~/.userdocs/tmp/
 mv -f ~/.userdocs/tmp/rutorrent-ratiocolor-master ~/www/$(whoami).$(hostname -f)/public_html/rutorrent/plugins/ratiocolor
