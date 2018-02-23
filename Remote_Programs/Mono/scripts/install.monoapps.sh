@@ -72,7 +72,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.0.5"
+scriptversion="1.0.8"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
@@ -109,7 +109,7 @@ gitissue="https://github.com/userdocs/userdocs/issues/new"
 ## Custom Variables Start ##
 ############################
 #
-cmakeurl="https://cmake.org/files/v3.8/cmake-3.8.2-Linux-x86_64.tar.gz"
+cmakeurl="https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.tar.gz"
 #
 sqlite3url="https://www.sqlite.org/$(date +"%Y")/$(curl -s https://www.sqlite.org/download.html | egrep -om 1 'sqlite-autoconf-(.*).tar.gz')"
 sqlite3v="$(curl -s https://www.sqlite.org/download.html | egrep -om 1 'sqlite-autoconf-(.*).tar.gz' | sed -rn 's/sqlite-autoconf-(.*).tar.gz/\1/p')"
@@ -117,8 +117,8 @@ sqlite3v="$(curl -s https://www.sqlite.org/download.html | egrep -om 1 'sqlite-a
 libtoolurl="http://ftpmirror.gnu.org/libtool/$(curl -s http://ftp.heanet.ie/mirrors/gnu/libtool/ | egrep -o 'libtool-[^"]*\.tar.xz' | sort -V | tail -1)"
 libtoolv="$(curl -s http://ftp.heanet.ie/mirrors/gnu/libtool/ | egrep -o 'libtool-[^"]*\.tar.xz' | sort -V | tail -1 | sed -rn 's/libtool-(.*).tar.xz/\1/p')"
 #
-monourl="http://download.mono-project.com/sources/mono/$(curl -s http://download.mono-project.com/sources/mono/ | egrep -o 'mono-[^"]*\.tar\.bz2' | tail -1)"
-monovfull="$(curl -s http://download.mono-project.com/sources/mono/ | egrep -o 'mono-[^"]*\.tar\.bz2' | tail -1 | sed -rn 's/mono-(.*).tar.bz2/\1/p')"
+monovfull="$(curl -s http://www.mono-project.com/download/stable/ | sed -rn 's#(.*)<h5>The latest Stable Mono release is: <strong>(.*) Stable \((.*)\)</strong></h5>#\3#p')"
+monourl="https://download.mono-project.com/sources/mono/mono-$monovfull.tar.bz2"
 #
 genericproxyapache="https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/proxypass/apache/generic.conf"
 genericproxynginx="https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/proxypass/nginx/generic.conf"
@@ -127,8 +127,8 @@ sonarrurl="http://update.sonarr.tv/v2/master/mono/NzbDrone.master.tar.gz"
 sonarrv="$(curl -s https://github.com/Sonarr/Sonarr/releases | grep -o '/Sonarr/Sonarr/archive/.*\.zip' | sort -V | tail -1 | sed -rn 's|/Sonarr/Sonarr/archive/v(.*).zip|\1|p')"
 sonarrconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Sonarr/configs/config.xml"
 #
-radarrurl="https://github.com/Radarr/Radarr/releases/download/v0.2.0.696/Radarr.develop.0.2.0.696.linux.tar.gz"
 radarrv="$(curl -s https://github.com/Radarr/Radarr/releases | grep -o '/Radarr/Radarr/archive/.*\.zip' | sort -V | tail -1 | sed -rn 's|/Radarr/Radarr/archive/v(.*).zip|\1|p')"
+radarrurl="https://github.com/Radarr/Radarr/releases/download/v$radarrv/Radarr.develop.$radarrv.linux.tar.gz"
 radarrconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Radarr/configs/config.xml"
 #
 jacketturl="$(curl -sL https://api.github.com/repos/Jackett/Jackett/releases/latest | grep -P 'browser(.*)Jackett.Binaries.Mono.tar.gz' | cut -d\" -f4)"
@@ -374,7 +374,7 @@ genericrestart () {
     then
         [[ "$appname" = "sonarr" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; ~/bin/mono --debug ~/.$appname/NzbDrone.exe^M"
         [[ "$appname" = "radarr" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; ~/bin/mono --debug ~/.$appname/Radarr.exe^M"
-        [[ "$appname" = "jackett" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; ~/bin/mono --debug ~/.$appname/JackettConsole.exe -c libcurl^M"
+        [[ "$appname" = "jackett" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=.userdocs/tmp; ~/bin/mono --debug ~/.$appname/JackettConsole.exe -c libcurl^M"
         [[ "$appname" = "emby" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=~/.userdocs/tmp; ~/bin/mono --debug ~/.$appname/MediaBrowser.Server.Mono.exe^M"
         echo "${appname^} was restarted"
     fi
@@ -687,6 +687,7 @@ do
                 rm -rf ~/.userdocs/tmp/mono{-*,.tar.bz2}
                 #
                 echo -n "$monovfull" > ~/.userdocs/versions/mono.version
+				cd ~
             else
                 echo "Mono is already and installed and the latest version"; echo
             fi
