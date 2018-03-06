@@ -10,7 +10,7 @@
 #
 # Bash Command for easy reference:
 #
-# wget -qO ~/install.znc http://git.io/vfKaT && bash ~/install.znc
+# wget -qO ~/install.znc https://git.io/vAdDE && bash ~/install.znc
 #
 # The MIT License (MIT)
 #
@@ -94,13 +94,13 @@ scriptauthor="adamaze"
 contributors="randomessence"
 #
 # Set the http://git.io/ shortened URL for the raw github URL here:
-gitiourl="http://git.io/vvfyN"
+gitiourl="https://git.io/vAdDE"
 #
 # Don't edit: This is the bash command shown when using the info option.
 gitiocommand="wget -qO ~/$scriptname $gitiourl && bash ~/$scriptname"
 #
 # This is the raw github url of the script to use with the built in updater.
-scripturl="https://raw.githubusercontent.com/feralhosting/feralfilehosting/master/Feral%20Wiki/Software/ZNC%20-%20Basic%20Setup/scripts/install.znc.sh"
+scripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/znc/scripts/install.znc.sh"
 #
 # This will generate a 20 character random passsword for use with your applications.
 apppass="$(< /dev/urandom tr -dc '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' | head -c20; echo;)"
@@ -129,15 +129,15 @@ host2https="https://$(hostname -f)/$(whoami)/"
 [[ -d ~/private/transmission/data ]] && transmissiondata="$HOME/private/transmission/data"
 #
 # Bug reporting varaibles.
-gitissue="https://github.com/feralhosting/feralfilehosting/issues/new"
+gitissue="https://github.com/userdocs/userdocs/issues/new"
 #
 ############################
 ## Custom Variables Start ##
 ############################
 #
 zncdownload="http://znc.in/releases/znc-latest.tar.gz"
-znctemplate="http://git.io/vvTzB"
-zncpassgen="$(wget -qO - http://git.io/vvTgf | sed 's/SETAPASS/'"$apppass"'/g' | python)"
+znctemplate="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/znc/conf/znc-template.conf"
+zncpassgen="$(wget -qO - https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/znc/scripts/zncsalt.py | sed 's/SETAPASS/'"$apppass"'/g' | python)"
 #
 ############################
 ### Custom Variables End ###
