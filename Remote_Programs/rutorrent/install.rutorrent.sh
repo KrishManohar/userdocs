@@ -4,7 +4,10 @@
 ##### Basic Info Start #####
 ############################
 #
+# wget -qO ~/update.rutorrent https://git.io/vxCjS && bash ~/update.rutorrent
+#
 # Install ruTorrent 3.8 from github repo
+mkdir -p ~/.userdocs/tmp
 git clone https://github.com/Novik/ruTorrent.git ~/.userdocs/tmp/rutorrent
 wget -qO ~/.userdocs/tmp/rutorrent/conf/config.php https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/rutorrent/conf/config.php
 cp -f ~/www/$(whoami).$(hostname -f)/public_html/rutorrent/.{htaccess,htpasswd} ~/.userdocs/tmp/rutorrent/
