@@ -12,22 +12,27 @@
 #
 # wget -qO ~/install.proftpd https://git.io/vyPfn && bash ~/install.proftpd
 #
-# The GPLv3 License (GNU)
+# The MIT License (MIT)
 #
 # Copyright (c) 2016 userdocs
 #
-# This script is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 #
 ############################
 ###### Basic Info End ######
@@ -37,7 +42,7 @@
 #### Script Notes Start ####
 ############################
 #
-# Don't forget to change the conf file variable size if the configurations are modified.
+## See readme.md
 #
 ############################
 ##### Script Notes End #####
@@ -63,7 +68,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.3.4"
+scriptversion="1.3.5"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.proftpd"
@@ -89,8 +94,9 @@ apppass="$(< /dev/urandom tr -dc '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij
 appport="$(shuf -i 10001-32001 -n 1)"
 #
 # This wil take the previously generated port and test it to make sure it is not in use, generating it again until it has selected an open port.
-while [[ "$(netstat -ln | grep ':'"$appport"'' | grep -c 'LISTEN')" -eq "1" ]]; do appport="$(shuf -i 10001-32001 -n 1)"; done
+while [[ "$(ss -ln | grep -co ''"$appport"'')" -ge "1" ]]; do appport="$(shuf -i 10001-32001 -n 1)"; done
 #
+appname="proftpd"
 #
 # Bug reporting variables.
 gitissue="https://github.com/userdocs/userdocs/issues/new"
@@ -105,11 +111,8 @@ proftpdversion="proftpd-1.3.6"
 installedproftpdversion="$(cat $HOME/proftpd/.proftpdversion 2> /dev/null)"
 #
 proftpdconf="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/proftpd/conf/proftpd.conf"
-proftpdconfsize="3796"
 sftpconf="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/proftpd/conf/sftp.conf"
-sftpconfsize="832"
 ftpsconf="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/proftpd/conf/ftps.conf"
-ftpsconfsize="940"
 scripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/proftpd/scripts/install.proftpd.sh"
 #
 proftpdurl="ftp://ftp.proftpd.org/distrib/source/proftpd-1.3.6.tar.gz"
@@ -117,12 +120,12 @@ proftpdurl="ftp://ftp.proftpd.org/distrib/source/proftpd-1.3.6.tar.gz"
 sftpport="$(shuf -i 10001-32001 -n 1)"
 #
 # This wil take the previously generated port and test it to make sure it is not in use, generating it again until it has selected an open port.
-while [[ "$(netstat -ln | grep ':'"$sftpport"'' | grep -c 'LISTEN')" -eq "1" ]]; do sftpport="$(shuf -i 10001-32001 -n 1)"; done
+while [[ "$(ss -ln | grep -co ''"$sftpport"'')" -ge "1" ]]; do sftpport="$(shuf -i 10001-32001 -n 1)"; done
 #
 ftpsport="$(shuf -i 10001-32001 -n 1)"
 #
 # This wil take the previously generated port and test it to make sure it is not in use, generating it again until it has selected an open port.
-while [[ "$(netstat -ln | grep ':'"$ftpsport"'' | grep -c 'LISTEN')" -eq "1" ]]; do ftpsport="$(shuf -i 10001-32001 -n 1)"; done
+while [[ "$(ss -ln | grep -co ''"$ftpsport"'')" -ge "1" ]]; do ftpsport="$(shuf -i 10001-32001 -n 1)"; done
 #
 ############################
 ### Custom Variables End ###
@@ -138,6 +141,42 @@ updaterenabled="0"
 ############################
 ###### Function Start ######
 ############################
+#
+cronjobadd () {
+    # adding jobs to cron: Set the variable tmpcron to a randomly generated temporary file.
+    tmpcron="$(mktemp)"
+    # Check if the job exists already by grepping whatever is between ^$
+    if [[ "$(crontab -l 2> /dev/null | grep -oc '^\* \* \* \* \* bash -l ~/.userdocs/cronjobs/'"$appname"'.cronjob >> ~/.userdocs/cronjobs/logs/'"$appname"'.log 2>&1$')" == "0" ]]
+    then
+        # sometimes the cronjob will be to run a custom script generated by the installer, located in the directory ~/.userdocs/cronjobs
+        mkdir -p ~/.userdocs/cronjobs/logs
+        echo "Appending ${appname^} to crontab."
+        crontab -l 2> /dev/null > "$tmpcron"
+        echo '* * * * * bash -l ~/.userdocs/cronjobs/'"$appname"'.cronjob >> ~/.userdocs/cronjobs/logs/'"$appname"'.log 2>&1' >> "$tmpcron"
+        crontab "$tmpcron"
+        rm "$tmpcron"
+    else
+        echo "The ${appname^} cronjob is already in crontab"
+    fi
+}
+#
+cronjobremove () {
+    tmpcron="$(mktemp)"
+    if [[ "$(crontab -l 2> /dev/null | grep -oc '^\* \* \* \* \* bash -l ~/.userdocs/cronjobs/'"$appname"'.cronjob >> ~/.userdocs/cronjobs/logs/'"$appname"'.log 2>&1$')" == "1" ]]
+    then
+        crontab -l 2> /dev/null > "$tmpcron"
+        sed -i '/^\* \* \* \* \* bash -l ~\/.userdocs\/cronjobs\/'"$appname"'.cronjob >> ~\/.userdocs\/cronjobs\/logs\/'"$appname"'.log 2>&1$/d' "$tmpcron"
+        sed -i '/^$/d' "$tmpcron"
+        crontab "$tmpcron"
+        rm "$tmpcron"
+    else
+        :
+    fi
+}
+#
+cronscript () {
+	wget -qO ~/.userdocs/cronjobs/"$appname".cronjob "https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/proftpd/cron/cronscript.sh"
+}
 #
 remotepath () {
     path1="media"
@@ -169,51 +208,51 @@ jailpath () {
 }
 #
 filezillaxml () {
-    mkdir -p ~/.proftpd-filezilla
+    mkdir -p ~/.userdocs/logins
     #
     filezillauser="$(whoami)"
     #
-    wget -qO ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml "$filezilla"
+    wget -qO ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml "$filezilla"
     #
-    sed -ri 's|HOSTNAME|'"$(hostname -f)"'|g' ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml
+    sed -ri 's|HOSTNAME|'"$(hostname -f)"'|g' ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml
     #
-    sed -ri 's|DAEMONPORTSFTP|'"$sftpport"'|g' ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml
-    sed -ri 's|DAEMONPORTFTPS|'"$ftpsport"'|g' ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml
+    sed -ri 's|DAEMONPORTSFTP|'"$sftpport"'|g' ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml
+    sed -ri 's|DAEMONPORTFTPS|'"$ftpsport"'|g' ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml
     #
-    sed -ri 's|DAEMONPROTOCOLSFTP|1|g' ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml
-    sed -ri 's|DAEMONPROTOCOLFTPS|4|g' ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml
+    sed -ri 's|DAEMONPROTOCOLSFTP|1|g' ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml
+    sed -ri 's|DAEMONPROTOCOLFTPS|4|g' ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml
     #
-    sed -ri 's|USERNAME|'"$filezillauser"'|g' ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml
-    sed -ri 's|PASSWORD|'"$(echo -n $apppass | base64)"'|g' ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml
+    sed -ri 's|USERNAME|'"$filezillauser"'|g' ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml
+    sed -ri 's|PASSWORD|'"$(echo -n $apppass | base64)"'|g' ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml
     #
-    sed -ri 's|SERVERNAMESFTP|'"$filezillauser $(hostname) sftp"'|g' ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml
-    sed -ri 's|SERVERNAMEFTPS|'"$filezillauser $(hostname) ftps"'|g' ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml
+    sed -ri 's|SERVERNAMESFTP|'"$filezillauser $(hostname) sftp"'|g' ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml
+    sed -ri 's|SERVERNAMEFTPS|'"$filezillauser $(hostname) ftps"'|g' ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml
     #
-    sed -ri 's|REMOTEDIR|'"$(remotepath)"'|g' ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml
+    sed -ri 's|REMOTEDIR|'"$(remotepath)"'|g' ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml
 }
 #
 filezillaxmladduser () {
-    mkdir -p ~/.proftpd-filezilla
+    mkdir -p ~/.userdocs/logins
     #
     filezillauser="$name"
     #
-    wget -qO ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml "$filezilla"
+    wget -qO ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml "$filezilla"
     #
-    sed -ri 's|HOSTNAME|'"$(hostname -f)"'|g' ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml
+    sed -ri 's|HOSTNAME|'"$(hostname -f)"'|g' ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml
     #
-    sed -ri 's|DAEMONPORTSFTP|'"$(sed -nr 's/^Port (.*)/\1/p' ~/proftpd/etc/sftp.conf)"'|g' ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml
-    sed -ri 's|DAEMONPORTFTPS|'"$(sed -nr 's/^Port (.*)/\1/p' ~/proftpd/etc/ftps.conf)"'|g' ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml
+    sed -ri 's|DAEMONPORTSFTP|'"$(sed -nr 's/^Port (.*)/\1/p' ~/proftpd/etc/sftp.conf)"'|g' ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml
+    sed -ri 's|DAEMONPORTFTPS|'"$(sed -nr 's/^Port (.*)/\1/p' ~/proftpd/etc/ftps.conf)"'|g' ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml
     #
-    sed -ri 's|DAEMONPROTOCOLSFTP|1|g' ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml
-    sed -ri 's|DAEMONPROTOCOLFTPS|4|g' ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml
+    sed -ri 's|DAEMONPROTOCOLSFTP|1|g' ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml
+    sed -ri 's|DAEMONPROTOCOLFTPS|4|g' ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml
     #
-    sed -ri 's|USERNAME|'"$filezillauser"'|g' ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml
-    sed -ri 's|PASSWORD|'"$(echo -n $apppass | base64)"'|g' ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml
+    sed -ri 's|USERNAME|'"$filezillauser"'|g' ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml
+    sed -ri 's|PASSWORD|'"$(echo -n $apppass | base64)"'|g' ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml
     #
-    sed -ri 's|SERVERNAMESFTP|'"$filezillauser $(hostname) sftp"'|g' ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml
-    sed -ri 's|SERVERNAMEFTPS|'"$filezillauser $(hostname) ftps"'|g' ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml
+    sed -ri 's|SERVERNAMESFTP|'"$filezillauser $(hostname) sftp"'|g' ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml
+    sed -ri 's|SERVERNAMEFTPS|'"$filezillauser $(hostname) ftps"'|g' ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml
     #
-    sed -ri 's|REMOTEDIR|'"$(remotepath) $(jailpath)"'|g' ~/.proftpd-filezilla/"$filezillauser"."$(hostname -f)".xml
+    sed -ri 's|REMOTEDIR|'"$(remotepath) $(jailpath)"'|g' ~/.userdocs/logins/"$filezillauser"."$(hostname -f)".xml
 }
 #
 ############################
@@ -278,7 +317,7 @@ then
     echo
     echo "Filezilla site templates that you can import into Filezilla were generated in:"
     echo
-    echo -e "\033[36m""~/.proftpd-filezilla/username.$(hostname -f).xml""\e[0m"
+    echo -e "\033[36m""~/.userdocs/logins/username.$(hostname -f).xml""\e[0m"
     #
     ###################################
     ###### Custom Help Info Ends ######
@@ -427,7 +466,7 @@ then
     "$binarycmd" --passwd --name="$name" --delete-user --file="$passwdfile"
     "$binarycmd" --group --name="$name" --delete-group --file="$groupdfile"
     #
-    rm -f ~/.proftpd-filezilla/"$name"."$(hostname -f)".xml
+    rm -f ~/.userdocs/logins/"$name"."$(hostname -f)".xml
     #
     echo
     echo -e "\033[32m""Available users after:""\e[0m"
@@ -497,7 +536,7 @@ then
         filezillaxmladduser
         echo "Filezilla site templates that you can import into Filezilla were generated in:"
         echo
-        echo -e "\033[36m""~/.proftpd-filezilla/$name.$(hostname -f).xml""\e[0m"
+        echo -e "\033[36m""~/.userdocs/logins/$name.$(hostname -f).xml""\e[0m"
         #
         echo
         exit
@@ -575,9 +614,26 @@ then
             # Some tidy up
             rm -rf ~/"$proftpdversion"{,.tar.gz}
             chmod 440 ~/proftpd/etc/ftpd{.passwd,.group}
+			#
+			sftpport="$(sed -nr 's/^Port (.*)/\1/p' ~/proftpd/etc/sftp.conf)"
+			ftpsport="$(sed -nr 's/^Port (.*)/\1/p' ~/proftpd/etc/ftps.conf)"
+			#
+			wget -qO "$HOME/proftpd/etc/sftp.conf" "$sftpconf"
+			wget -qO "$HOME/proftpd/etc/ftps.conf" "$ftpsconf"
+			# sftp.conf
+			sed -i 's|/media/DiskID/home/my_username|'"$HOME"'|g' "$HOME/proftpd/etc/sftp.conf"
+			sed -i 's|Port 23001|Port '"$sftpport"'|g' "$HOME/proftpd/etc/sftp.conf"
+			# ftps.conf
+			sed -i 's|/media/DiskID/home/my_username|'"$HOME"'|g' "$HOME/proftpd/etc/ftps.conf"
+			sed -i 's|Port 23002|Port '"$ftpsport"'|g' "$HOME/proftpd/etc/ftps.conf"
+			#
             "$HOME"/proftpd/sbin/proftpd -c "$HOME"/proftpd/etc/sftp.conf >/dev/null 2>&1
             "$HOME"/proftpd/sbin/proftpd -c "$HOME"/proftpd/etc/ftps.conf >/dev/null 2>&1
             echo -e "proftpd sftp and ftps servers were started."
+			#
+			echo
+			cronjobadd
+			cronscript
             echo
             exit
         elif [[ "$agree2update" =~ ^[Rr]$ ]]
@@ -588,6 +644,7 @@ then
             then
                 killall -9 -u "$(whoami)" proftpd >/dev/null 2>&1
                 rm -rf "$HOME"/proftpd >/dev/null 2>&1
+				cronjobremove
             else
                 echo "You chose to exit"
                 echo
@@ -627,18 +684,9 @@ then
     ssh-keygen -q -t rsa -f "$HOME"/proftpd/etc/keys/sftp_rsa -N '' && ssh-keygen -q -t dsa -f "$HOME"/proftpd/etc/keys/sftp_dsa -N ''
     openssl req -new -x509 -nodes -days 365 -subj '/C=GB/ST=none/L=none/CN=none' -newkey rsa:3072 -sha256 -keyout "$HOME"/proftpd/ssl/proftpd.key.pem -out "$HOME"/proftpd/ssl/proftpd.cert.pem >/dev/null 2>&1
     # Get the conf files from github and configure them for this user
-    until [[ "$(stat -c %s ~/proftpd/etc/proftpd.conf 2> /dev/null)" -eq "$proftpdconfsize" ]]
-    do
-        wget -qO "$HOME"/proftpd/etc/proftpd.conf "$proftpdconf"
-    done
-    until [[ "$(stat -c %s ~/proftpd/etc/sftp.conf 2> /dev/null)" -eq "$sftpconfsize" ]]
-    do
-        wget -qO "$HOME"/proftpd/etc/sftp.conf "$sftpconf"
-    done
-    until [[ "$(stat -c %s ~/proftpd/etc/ftps.conf 2> /dev/null)" -eq "$ftpsconfsize" ]]
-    do
-        wget -qO "$HOME"/proftpd/etc/ftps.conf "$ftpsconf"
-    done
+	wget -qO "$HOME/proftpd/etc/proftpd.conf" "$proftpdconf"
+	wget -qO "$HOME/proftpd/etc/sftp.conf" "$sftpconf"
+	wget -qO "$HOME/proftpd/etc/ftps.conf" "$ftpsconf"
     # proftpd.conf
     sed -i 's|/media/DiskID/home/my_username|'"$HOME"'|g' "$HOME/proftpd/etc/proftpd.conf"
     sed -i 's|User my_username|User '"$(whoami)"'|g' "$HOME/proftpd/etc/proftpd.conf"
@@ -672,10 +720,14 @@ then
     echo
     echo "Filezilla site templates that you can import into Filezilla were generated in:"
     echo
-    echo -e "\033[36m""~/.proftpd-filezilla/$(whoami).$(hostname -f).xml""\e[0m"
+    echo -e "\033[36m""~/.userdocs/logins/$(whoami).$(hostname -f).xml""\e[0m"
     echo
     echo -e "Use this command to see important information:" "\033[36m""$scriptname help""\e[0m"
     echo
+	#
+	cronjobadd
+	cronscript
+	#
 #
 ############################
 ##### User Script End  #####
