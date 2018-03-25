@@ -12,22 +12,27 @@
 #
 # wget -qO ~/install.monoapps https://git.io/vzyZ4 && bash ~/install.monoapps
 #
-# The GPLv3 License (GNU)
+# The MIT License (MIT)
 #
 # Copyright (c) 2016 userdocs
 #
-# This script is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 #
 ############################
 ###### Basic Info End ######
@@ -50,6 +55,7 @@
 if [[ ! -z "$1" && "$1" = 'changelog' ]]
 then
     echo
+	echo 'v1.1.1 - Debian Stretch fixes.'
 	echo 'v1.1.0 - Stable and functional release.'
     echo 'v1.0.4 - better method to cd into mono tmp dir to compile. Better checks to make sure mono still installs when script errored out.'
     echo 'v1.0.3 - Radarr added - pre release - script tweaks'
@@ -73,7 +79,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.1.0"
+scriptversion="1.1.1"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
@@ -99,7 +105,7 @@ apppass="$(< /dev/urandom tr -dc '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij
 appport="$(shuf -i 10001-32001 -n 1)"
 #
 # This will take the previously generated port and test it to make sure it is not in use, generating it again until it has selected an open port.
-[[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(netstat -ln | grep ':'"$appport"'' | grep -c 'LISTEN')" -ge "1" ]]; do appport="$(shuf -i 10001-32001 -n 1)"; done
+[[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$appport"'')" -ge "1" ]]; do appport="$(shuf -i 10001-32001 -n 1)"; done
 #
 appname=""
 #
@@ -136,15 +142,15 @@ jacketturl="$(curl -sL https://api.github.com/repos/Jackett/Jackett/releases/lat
 jackettv="$(curl -sL https://api.github.com/repos/Jackett/Jackett/releases/latest | sed -rn 's/(.*)"tag_name": "v(.*)",/\2/p')"
 jacketconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Jackett/configs/ServerConfig.json"
 jackettappport="$(shuf -i 10001-32001 -n 1)"
-[[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(netstat -ln | grep ':'"$jackettappport"'' | grep -c 'LISTEN')" -ge "1" ]]; do jackettappport="$(shuf -i 10001-32001 -n 1)"; done
+[[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$jackettappport"'')" -ge "1" ]]; do jackettappport="$(shuf -i 10001-32001 -n 1)"; done
 #
 embyurl="$(curl -sL https://api.github.com/repos/MediaBrowser/Emby/releases/latest | grep -P 'browser(.*)Emby.Mono.zip' | cut -d\" -f4)"
 embyv="$(curl -sL https://api.github.com/repos/MediaBrowser/Emby/releases/latest | sed -rn 's/(.*)"tag_name": "(.*)",/\2/p')"
 embyconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Emby/configs/system.xml"
 embyappporthttp="$(shuf -i 10001-32001 -n 1)"
-[[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(netstat -ln | grep ':'"$embyappporthttp"'' | grep -c 'LISTEN')" -ge "1" ]]; do embyappporthttp="$(shuf -i 10001-32001 -n 1)"; done
+[[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$embyappporthttp"'')" -ge "1" ]]; do embyappporthttp="$(shuf -i 10001-32001 -n 1)"; done
 embyappporthttps="$(shuf -i 10001-32001 -n 1)"
-[[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(netstat -ln | grep ':'"$embyappporthttps"'' | grep -c 'LISTEN')" -ge "1" ]]; do embyappporthttps="$(shuf -i 10001-32001 -n 1)"; done
+[[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$embyappporthttps"'')" -ge "1" ]]; do embyappporthttps="$(shuf -i 10001-32001 -n 1)"; done
 #
 ############################
 ### Custom Variables End ###
