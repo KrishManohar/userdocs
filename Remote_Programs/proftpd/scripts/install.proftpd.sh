@@ -56,6 +56,7 @@ if [[ ! -z "$1" && "$1" = 'changelog' ]]
 then
     echo
     curl -s https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/proftpd/changelog
+	echo
     exit
 fi
 #
@@ -68,7 +69,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.3.5"
+scriptversion="1.3.6"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.proftpd"
@@ -132,7 +133,7 @@ while [[ "$(ss -ln | grep -co ''"$ftpsport"'')" -ge "1" ]]; do ftpsport="$(shuf 
 ############################
 #
 # Disables the built in script updater permanently by setting this variable to 0.
-updaterenabled="0"
+updaterenabled="1"
 #
 ############################
 ####### Variable End #######
@@ -506,16 +507,27 @@ then
         exec 0<&6
         echo -e "Using" "\033[32m""$idcount""\e[0m" "for id's."
         echo
-        if [ -n "$2" ]
+        if [[ ! -z "$2" ]]
         then
-            echo -e "Using ""\033[32m""$2""\e[0m"" for name."
+            echo -e "Using ""\033[32m""$2""\e[0m"" for the username."
             name="$2"
             echo
         else
-            read -ep "Please input username: " name
+            read -ep "Please input a username: " name
             echo
         fi
-        echo -e "\033[32m""Do not include the""\e[0m" "\033[36m""~/""\e[0m" "\033[32m""in the path. Use paths that match existing Jails, relative to your Root directory, for example:""\e[0m"
+		#
+		read -ep "Do you want to enter a password [y] or use a random one [r]: " -i "y" mypassword
+		echo
+		if [[ "$mypassword" =~ ^[Yy]$ ]]
+		then
+			read -ep "Please input a password: " apppass
+			echo
+		else
+			:
+		fi
+		#
+		echo -e "\033[32m""Do not include the""\e[0m" "\033[36m""~/""\e[0m" "\033[32m""in the path. Use paths that match existing Jails, relative to your Root directory, for example:""\e[0m"
         echo
         echo -e "\033[36m""private/rtorrent/data""\e[0m"
         echo
