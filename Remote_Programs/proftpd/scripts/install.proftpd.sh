@@ -228,26 +228,26 @@ then
             # Some tidy up
             rm -rf ~/"$proftpdversion"{,.tar.gz}
             chmod 440 ~/proftpd/etc/ftpd{.passwd,.group}
-			#
-			sftpport="$(sed -nr 's/^Port (.*)/\1/p' ~/proftpd/etc/sftp.conf)"
-			ftpsport="$(sed -nr 's/^Port (.*)/\1/p' ~/proftpd/etc/ftps.conf)"
-			#
-			wget -qO "$HOME/proftpd/etc/sftp.conf" "$sftpconf"
-			wget -qO "$HOME/proftpd/etc/ftps.conf" "$ftpsconf"
-			# sftp.conf
-			sed -i 's|/media/DiskID/home/my_username|'"$HOME"'|g' "$HOME/proftpd/etc/sftp.conf"
-			sed -i 's|Port 23001|Port '"$sftpport"'|g' "$HOME/proftpd/etc/sftp.conf"
-			# ftps.conf
-			sed -i 's|/media/DiskID/home/my_username|'"$HOME"'|g' "$HOME/proftpd/etc/ftps.conf"
-			sed -i 's|Port 23002|Port '"$ftpsport"'|g' "$HOME/proftpd/etc/ftps.conf"
-			#
+            #
+            sftpport="$(sed -nr 's/^Port (.*)/\1/p' ~/proftpd/etc/sftp.conf)"
+            ftpsport="$(sed -nr 's/^Port (.*)/\1/p' ~/proftpd/etc/ftps.conf)"
+            #
+            wget -qO "$HOME/proftpd/etc/sftp.conf" "$sftpconf"
+            wget -qO "$HOME/proftpd/etc/ftps.conf" "$ftpsconf"
+            # sftp.conf
+            sed -i 's|/media/DiskID/home/my_username|'"$HOME"'|g' "$HOME/proftpd/etc/sftp.conf"
+            sed -i 's|Port 23001|Port '"$sftpport"'|g' "$HOME/proftpd/etc/sftp.conf"
+            # ftps.conf
+            sed -i 's|/media/DiskID/home/my_username|'"$HOME"'|g' "$HOME/proftpd/etc/ftps.conf"
+            sed -i 's|Port 23002|Port '"$ftpsport"'|g' "$HOME/proftpd/etc/ftps.conf"
+            #
             "$HOME"/proftpd/sbin/proftpd -c "$HOME"/proftpd/etc/sftp.conf >/dev/null 2>&1
             "$HOME"/proftpd/sbin/proftpd -c "$HOME"/proftpd/etc/ftps.conf >/dev/null 2>&1
             echo -e "proftpd sftp and ftps servers were started."
-			#
-			echo
-			cronjobadd
-			cronscript
+            #
+            echo
+            cronjobadd
+            cronscript
             echo
             exit
         elif [[ "$agree2update" =~ ^[Rr]$ ]]
@@ -258,7 +258,7 @@ then
             then
                 killall -9 -u "$(whoami)" proftpd >/dev/null 2>&1
                 rm -rf "$HOME"/proftpd >/dev/null 2>&1
-				cronjobremove
+                cronjobremove
             else
                 echo "You chose to exit"
                 echo
@@ -298,9 +298,9 @@ then
     ssh-keygen -q -t rsa -f "$HOME"/proftpd/etc/keys/sftp_rsa -N '' && ssh-keygen -q -t dsa -f "$HOME"/proftpd/etc/keys/sftp_dsa -N ''
     openssl req -new -x509 -nodes -days 365 -subj '/C=GB/ST=none/L=none/CN=none' -newkey rsa:3072 -sha256 -keyout "$HOME"/proftpd/ssl/proftpd.key.pem -out "$HOME"/proftpd/ssl/proftpd.cert.pem >/dev/null 2>&1
     # Get the conf files from github and configure them for this user
-	wget -qO "$HOME/proftpd/etc/proftpd.conf" "$proftpdconf"
-	wget -qO "$HOME/proftpd/etc/sftp.conf" "$sftpconf"
-	wget -qO "$HOME/proftpd/etc/ftps.conf" "$ftpsconf"
+    wget -qO "$HOME/proftpd/etc/proftpd.conf" "$proftpdconf"
+    wget -qO "$HOME/proftpd/etc/sftp.conf" "$sftpconf"
+    wget -qO "$HOME/proftpd/etc/ftps.conf" "$ftpsconf"
     # proftpd.conf
     sed -i 's|/media/DiskID/home/my_username|'"$HOME"'|g' "$HOME/proftpd/etc/proftpd.conf"
     sed -i 's|User my_username|User '"$(whoami)"'|g' "$HOME/proftpd/etc/proftpd.conf"
@@ -338,10 +338,10 @@ then
     echo
     echo -e "Use this command to see important information:" "\033[36m""$scriptname help""\e[0m"
     echo
-	#
-	cronjobadd
-	cronscript
-	#
+    #
+    cronjobadd
+    cronscript
+    #
 #
 ############################
 ##### User Script End  #####
