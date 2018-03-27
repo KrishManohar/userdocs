@@ -29,4 +29,4 @@ fi
 # Quick Run option part 2: If quick run was set and the updater section completes this will enable quick run again then remove the file.
 [[ -f ~/.quickrun ]] && updatestatus="y"; rm -f ~/.quickrun
 # resets the positional parameters $1 and $2 post update.
-[[ -f ~/.passparams ]] && echo "$(cat ~/.passparams)" | set "$@"
+[[ -f ~/.passparams ]] && echo "$(cat ~/.passparams)" | set "$@"; rm -f ~/.passparams
