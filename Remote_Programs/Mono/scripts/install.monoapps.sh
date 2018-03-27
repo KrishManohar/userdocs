@@ -55,6 +55,7 @@
 if [[ ! -z "$1" && "$1" = 'changelog' ]]
 then
     echo
+	echo 'v1.1.2 - unique port variables for sonarr and radarr'
 	echo 'v1.1.1 - Debian Stretch fixes.'
 	echo 'v1.1.0 - Stable and functional release.'
     echo 'v1.0.4 - better method to cd into mono tmp dir to compile. Better checks to make sure mono still installs when script errored out.'
@@ -79,7 +80,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.1.1"
+scriptversion="1.1.2"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
@@ -133,10 +134,12 @@ genericproxynginx="https://raw.githubusercontent.com/userdocs/userdocs/master/0_
 sonarrurl="http://update.sonarr.tv/v2/master/mono/NzbDrone.master.tar.gz"
 sonarrv="$(curl -s https://github.com/Sonarr/Sonarr/releases | grep -o '/Sonarr/Sonarr/archive/.*\.zip' | sort -V | tail -1 | sed -rn 's|/Sonarr/Sonarr/archive/v(.*).zip|\1|p')"
 sonarrconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Sonarr/configs/config.xml"
+[[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$sonarrappport"'')" -ge "1" ]]; do sonarrappport="$(shuf -i 10001-32001 -n 1)"; done
 #
 radarrv="$(curl -s https://github.com/Radarr/Radarr/releases | grep -o '/Radarr/Radarr/archive/.*\.zip' | sort -V | tail -1 | sed -rn 's|/Radarr/Radarr/archive/v(.*).zip|\1|p')"
 radarrurl="https://github.com/Radarr/Radarr/releases/download/v$radarrv/Radarr.develop.$radarrv.linux.tar.gz"
 radarrconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Radarr/configs/config.xml"
+[[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$radarrappport"'')" -ge "1" ]]; do radarrappport="$(shuf -i 10001-32001 -n 1)"; done
 #
 jacketturl="$(curl -sL https://api.github.com/repos/Jackett/Jackett/releases/latest | grep -P 'browser(.*)Jackett.Binaries.Mono.tar.gz' | cut -d\" -f4)"
 jackettv="$(curl -sL https://api.github.com/repos/Jackett/Jackett/releases/latest | sed -rn 's/(.*)"tag_name": "v(.*)",/\2/p')"
@@ -316,8 +319,8 @@ genericproxypass () {
         [[ "$appname" = "jackett" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)"Port": (.*),|\2|p' $apppaths)"'|g' ~/.apache2/conf.d/$appname.conf
         [[ "$appname" = "emby" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<PublicPort>(.*)</PublicPort>|\2|p' $apppaths)"'|g' ~/.apache2/conf.d/$appname.conf
         #
-        [[ "$appname" = "sonarr" && ! -f "$apppaths" ]] && proxyport="$appport"; sed -i 's|PORT|'"$proxyport"'|g' ~/.apache2/conf.d/$appname.conf
-        [[ "$appname" = "radarr" && ! -f "$apppaths" ]] && proxyport="$appport"; sed -i 's|PORT|'"$proxyport"'|g' ~/.apache2/conf.d/$appname.conf
+        [[ "$appname" = "sonarr" && ! -f "$apppaths" ]] && proxyport="$sonarrappport"; sed -i 's|PORT|'"$proxyport"'|g' ~/.apache2/conf.d/$appname.conf
+        [[ "$appname" = "radarr" && ! -f "$apppaths" ]] && proxyport="$radarrappport"; sed -i 's|PORT|'"$proxyport"'|g' ~/.apache2/conf.d/$appname.conf
         [[ "$appname" = "jackett" && ! -f "$apppaths" ]] && proxyport="$jackettappport"; sed -i 's|PORT|'"$proxyport"'|g' ~/.apache2/conf.d/$appname.conf
         [[ "$appname" = "emby" && ! -f "$apppaths" ]] && proxyport="$embyappporthttp"; sed -i 's|PORT|'"$proxyport"'|g' ~/.apache2/conf.d/$appname.conf
         #
@@ -345,8 +348,8 @@ genericproxypass () {
             [[ "$appname" = "jackett" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)"Port": (.*),|\2|p' $apppaths)"'|g' ~/.nginx/conf.d/000-default-server.d/$appname.conf
             [[ "$appname" = "emby" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<PublicPort>(.*)</PublicPort>|\2|p' $apppaths)"'|g' ~/.nginx/conf.d/000-default-server.d/$appname.conf
             #
-            [[ "$appname" = "sonarr" && ! -f "$apppaths" ]] && proxyport="$appport"; sed -i 's|PORT|'"$proxyport"'|g' ~/.nginx/conf.d/000-default-server.d/$appname.conf
-            [[ "$appname" = "radarr" && ! -f "$apppaths" ]] && proxyport="$appport"; sed -i 's|PORT|'"$proxyport"'|g' ~/.nginx/conf.d/000-default-server.d/$appname.conf
+            [[ "$appname" = "sonarr" && ! -f "$apppaths" ]] && proxyport="$sonarrappport"; sed -i 's|PORT|'"$proxyport"'|g' ~/.nginx/conf.d/000-default-server.d/$appname.conf
+            [[ "$appname" = "radarr" && ! -f "$apppaths" ]] && proxyport="$radarrappport"; sed -i 's|PORT|'"$proxyport"'|g' ~/.nginx/conf.d/000-default-server.d/$appname.conf
             [[ "$appname" = "jackett" && ! -f "$apppaths" ]] && proxyport="$jackettappport"; sed -i 's|PORT|'"$proxyport"'|g' ~/.nginx/conf.d/000-default-server.d/$appname.conf
             [[ "$appname" = "emby" && ! -f "$apppaths" ]] && proxyport="$embyappporthttp"; sed -i 's|PORT|'"$proxyport"'|g' ~/.nginx/conf.d/000-default-server.d/$appname.conf
             #
@@ -723,7 +726,7 @@ do
                 then
                     mkdir -p ~/.config/NzbDrone >> ~/.userdocs/logs/$appname.log 2>&1
                     wget -qO "$apppaths" "$sonarrconfig"
-                    sed -i 's|<Port>8989</Port>|<Port>'"$appport"'</Port>|g' "$apppaths"
+                    sed -i 's|<Port>8989</Port>|<Port>'"$sonarrappport"'</Port>|g' "$apppaths"
                     sed -i 's|<UrlBase></UrlBase>|<UrlBase>/'"$(whoami)"'/'"$appname"'</UrlBase>|g' "$apppaths"
                 fi
                 #
@@ -789,7 +792,7 @@ do
                 then
                     mkdir -p ~/.config/${appname^} >> ~/.userdocs/logs/$appname.log 2>&1
                     wget -qO "$apppaths" "$radarrconfig"
-                    sed -i 's|<Port>7878</Port>|<Port>'"$appport"'</Port>|g' "$apppaths"
+                    sed -i 's|<Port>7878</Port>|<Port>'"$radarrappport"'</Port>|g' "$apppaths"
                     sed -i 's|<UrlBase></UrlBase>|<UrlBase>/'"$(whoami)"'/'"$appname"'</UrlBase>|g' "$apppaths"
                 fi
                 #
