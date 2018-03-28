@@ -39,16 +39,6 @@
 ############################
 #
 ############################
-#### Script Notes Start ####
-############################
-#
-## See readme.md
-#
-############################
-##### Script Notes End #####
-############################
-#
-############################
 ###### Variable Start ######
 ############################
 #
@@ -153,7 +143,7 @@ source <(curl -sL https://raw.githubusercontent.com/userdocs/userdocs/master/mod
 ## Positional Param Start ##
 ############################
 #
-source <(curl -sL https://raw.githubusercontent.com/userdocs/userdocs/master/modules/proftpd/changelog.sh)
+source <(curl -sL https://raw.githubusercontent.com/userdocs/userdocs/master/modules/changelog.sh)
 #
 source <(curl -sL https://raw.githubusercontent.com/userdocs/userdocs/master/modules/info.sh)
 #
