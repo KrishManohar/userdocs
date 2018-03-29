@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-if [[ -z "$(screen -ls rtorrent-SUFFIX | sed -rn 's/[^\s](.*).rtorrent-SUFFIX(.*)/\1/p')" && ! -f "$HOME/.userdocs/tmp/rtorrent-SUFFIX.lock" && -d $HOME/private/rtorrent-SUFFIX]]
+if [[ -z "$(screen -ls rtorrent-SUFFIX | sed -rn 's/[^\s](.*).rtorrent-SUFFIX(.*)/\1/p')" && ! -f "$HOME/.userdocs/tmp/rtorrent-SUFFIX.lock" && -d $HOME/private/rtorrent-SUFFIX ]]
 then
 	kill -9 "$(echo $(ps x | grep -w rtorrent-SUFFIX | grep -v grep | awk '{print $1}'))" > /dev/null 2>&1
 	screen -wipe > /dev/null 2>&1
