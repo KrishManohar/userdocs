@@ -34,5 +34,4 @@ cronscript () {
         wget -qO "$HOME/.userdocs/cronjobs/$appname.cronjob" "$cronscripturl"
 		#
         sed -i "s|APPNAME|$suffix|g" "$HOME/.userdocs/cronjobs/$appname.cronjob"
-    fi
 }
