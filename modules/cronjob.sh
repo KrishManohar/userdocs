@@ -33,5 +33,6 @@ cronjobremove () {
 #
 cronscript () {
         wget -qO "$HOME/.userdocs/cronjobs/$appname.cronjob" "$cronscripturl"
-        sed -i "s|APPNAME|$suffix|g" "$HOME/.userdocs/cronjobs/$appname.cronjob"
+        sed -i "s|APPNAME|$suffix|g" "$HOME/.userdocs/cronjobs/$appname.cronjob" 2> /dev/null
+        sed -i "s|SUFFIX|$suffix|g" "$HOME/.userdocs/cronjobs/$appname.cronjob" 2> /dev/null
 }
