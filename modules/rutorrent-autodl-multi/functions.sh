@@ -146,8 +146,8 @@ passwordprotect () {
         /usr/sbin/nginx -s reload -c ~/.nginx/nginx.conf > /dev/null 2>&1
     fi
     #
-    echo -e 'AuthType Basic\nAuthName "rtorrent-'"$suffix"'"\nAuthUserFile "'"$HOME"'/www/'$(whoami)'.'$(hostname -f)'/public_html/rutorrent-'"$suffix"'/.htpasswd"\nRequire valid-user' > ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/.htaccess
-    chmod 644 ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/.htaccess
+    echo -e 'AuthType Basic\nAuthName "rtorrent-'"$suffix"'"\nAuthUserFile "'"$HOME"'/www/'$(whoami)'.'$(hostname -f)'/public_html/rutorrent-'"$suffix"'/.htpasswd"\nRequire valid-user' > $wwwurl/rutorrent-"$suffix"/.htaccess
+    chmod 644 $wwwurl/rutorrent-"$suffix"/.htaccess
     #
     while [[ -z "$username" ]]
     do
@@ -158,15 +158,15 @@ passwordprotect () {
     echo -e "Generating a random 20 character random password for the user:" "\033[32m""$username""\e[0m"
     echo
     #
-    htpasswd -cbm ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/.htpasswd "$username" "$apppass"
-    chmod 644 ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/.htpasswd
+    htpasswd -cbm $wwwurl/rutorrent-"$suffix"/.htpasswd "$username" "$apppass"
+    chmod 644 $wwwurl/rutorrent-"$suffix"/.htpasswd
     echo
     #
     # nginx copy rutorrent-suffix htpasswd to create the rpc htpasswd file.
     #
     if [[ -d ~/.nginx/conf.d/000-default-server.d ]]
     then
-        cp -f ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/.htpasswd ~/.nginx/conf.d/000-default-server.d/scgi-"$suffix"-htpasswd
+        cp -f $wwwurl/rutorrent-"$suffix"/.htpasswd ~/.nginx/conf.d/000-default-server.d/scgi-"$suffix"-htpasswd
         sed -i 's/\(.*\):\(.*\)/rutorrent:\2/g' ~/.nginx/conf.d/000-default-server.d/scgi-"$suffix"-htpasswd
     fi
     #
