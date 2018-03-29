@@ -42,7 +42,7 @@ installrtorrent () {
 }
 #
 installrutorrent () {
-	git clone "$rutorrentmaster" "$wwwurl/rutorrent-$suffix"
+	git clone -q "$rutorrentmaster" "$wwwurl/rutorrent-$suffix"
 	wget -qO "$wwwurl/rutorrent-$suffix/conf/config.php" "$rutorrentconf"
 	sed -i 's|/private/rtorrent/.socket|/private/rtorrent-'"$suffix"'/.socket|g' "$wwwurl/rutorrent-$suffix/conf/config.php"
     mkdir -p "$wwwurl/rutorrent-$suffix/share/torrents"
