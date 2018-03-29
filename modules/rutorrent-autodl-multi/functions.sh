@@ -37,8 +37,7 @@ installrtorrent () {
 	mkdir -p "$HOME/private/rtorrent-$suffix/data" "$HOME/private/rtorrent-$suffix/watch" "$HOME/private/rtorrent-$suffix/work"
 	wget -qO "$HOME/.rtorrent-$suffix.rc" "$confurl"
 	sed -i 's|/media/DiskID/home/username/private/rtorrent/|'"$HOME"'/private/rtorrent-'"$suffix"'/|g' "$HOME/.rtorrent-$suffix.rc"
-	sed -i 's|/media/DiskID/home/username/www/username.server.feralhosting.com/public_html/rutorrent/php/initplugins.php username|'"$HOME"'/www/'"$(whoami)"'.'"$(hostname -f)"'/public_html/rutorrent-'"$suffix"'/php/initplugins.php '"$(whoami)"'|g' ~/.rtorrent-"$suffix".rc
-	sed -i 's|/private/rtorrent/.socket|/private/rtorrent-'"$suffix"'/.socket|g' "$rutorrentpath/conf/config.php"
+	sed -i 's|/media/DiskID/home/username/www/username.server.feralhosting.com/public_html/rutorrent/php/initplugins.php username|'"$HOME"'/www/'"$(whoami)"'.'"$(hostname -f)"'/public_html/rutorrent-'"$suffix"'/php/initplugins.php '"$(whoami)"'|g' "$HOME/.rtorrent-$suffix.rc"
 	echo 'screen -fa -dmS rtorrent-'"$suffix"' rtorrent -n -o import=~/.rtorrent-'"$suffix"'.rc' >> "$HOME/.userdocs/multirtru.restart.txt"
 }
 #
