@@ -43,7 +43,7 @@
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.4.1"
+scriptversion="1.4.2"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.multirtru"
@@ -63,7 +63,7 @@ gitiocommand="wget -qO ~/$scriptname $gitiourl && bash ~/$scriptname"
 # This is the raw github url of the script to use with the built in updater.
 scripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/rutorrent-autodl-multi/scripts/install.multirtru"
 #
-# This will generate a 20 character random passsword for use with your applications.
+# This will generate a 20 character random password for use with your applications.
 apppass="$(< /dev/urandom tr -dc '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' | head -c20; echo;)"
 # This will generate a random port for the script between the range 10001 to 32001 to use with applications. You can ignore this unless needed.
 appport="$(shuf -i 10001-32001 -n 1)"
@@ -71,15 +71,19 @@ appport="$(shuf -i 10001-32001 -n 1)"
 # This wil take the previously generated port and test it to make sure it is not in use, generating it again until it has selected an open port.
 while [[ "$(ss -ln | grep -co ''"$appport"'')" -ge "1" ]]; do appport="$(shuf -i 10001-32001 -n 1)"; done
 #
+# If you use this script for a single app installation you can set this here. Otherwise leave blank and you will need to set this per installation in a function or before a function is used.
 appname=""
 #
-# Bug reporting variables.
+# Please use the relevant github repository for bug reporting.
 gitissue="https://github.com/userdocs/userdocs/issues/new"
 #
+# Please link to the cronscript module for this installer.
 cronscripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/modules/cronscripts/rutorrent-autodl-multi.sh"
 #
+# Please link to the changelog file.
 changelogurl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/rutorrent-autodl-multi/changelog"
 #
+# Please set the path to your www root here.
 wwwurl="$HOME/www/$(whoami).$(hostname -f)/public_html"
 #
 ############################
@@ -92,26 +96,27 @@ option3="Remove a custom instance"
 option4="Fix autodl on a custom instance"
 option5="Quit the script"
 #
+# The link to the github repository for rutorrent.
 giturl="https://github.com/Novik/ruTorrent.git"
 #
-# autodl configuration passwords
+# autodl configuration passwords are created using this variable.
 autodlpass=$(< /dev/urandom tr -dc '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' | head -c20; echo;)
 #
-# Some basic plugins
+# Some basic plugins urls. Use the github repo.
 ratiocolor="https://github.com/Gyran/rutorrent-ratiocolor/archive/master.zip"
 #
 # rtorrent.rc template
-confurl="https://raw.github.com/feralhosting/feralfilehosting/master/Feral%20Wiki/Software/Multiple%20instances%20-%20rtorrent%20and%20rutorrent/conf/.rtorrent.rc"
-#
-# api rate limiting was messing up my mojo so i used the commands below to bypass the api.
-#
-#autodlirssicommunity="$(curl -s https://api.github.com/repos/autodl-community/autodl-irssi/releases/latest | grep -P '"browser(.*)zip"' | cut -d\" -f4)"
-#autodltrackers="$(curl -s https://api.github.com/repos/autodl-community/autodl-trackers/releases/latest | grep -P '"browser(.*)zip"' | cut -d\" -f4)"
-#autodlrutorrent="$(curl -s https://api.github.com/repos/autodl-community/autodl-rutorrent/releases/latest | grep -P '"browser(.*)zip"' | cut -d\" -f4)"
+confurl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/rtorrent/conf/.rtorrent.rc"
 #
 rutorrentgit="https://github.com/Novik/ruTorrent/archive/master.zip"
 rutorrentmaster="https://github.com/Novik/ruTorrent.git"
 rutorrentconf="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/rutorrent/conf/config.php"
+#
+# api rate limiting is a problem so i used the commands below to bypass the api.
+#
+#autodlirssicommunity="$(curl -s https://api.github.com/repos/autodl-community/autodl-irssi/releases/latest | grep -P '"browser(.*)zip"' | cut -d\" -f4)"
+#autodltrackers="$(curl -s https://api.github.com/repos/autodl-community/autodl-trackers/releases/latest | grep -P '"browser(.*)zip"' | cut -d\" -f4)"
+#autodlrutorrent="$(curl -s https://api.github.com/repos/autodl-community/autodl-rutorrent/releases/latest | grep -P '"browser(.*)zip"' | cut -d\" -f4)"
 #
 autodlirssicommunityv="$(curl -sL https://github.com/autodl-community/autodl-irssi/releases/latest | sed -rn 's#(.*)<a href="/autodl-community/autodl-irssi/releases/tag/(.*)">(.*)</a>#\2#p')"
 autodltrackersv="$(curl -sL https://github.com/autodl-community/autodl-trackers/releases/latest | sed -rn 's#(.*)<a href="/autodl-community/autodl-trackers/releases/tag/(.*)">(.*)</a>#\2#p')"
@@ -216,13 +221,13 @@ then
                 suffix=""
 				appname=""
                 #
-                echo -e "This script will create a new rutorrent,rtorrent and (optionally) autodl instance using a suffix, for example:"
+                echo -e "This script will create a new unique rutorrent,rtorrent and (optionally) autodl instance using a suffix, for example:"
                 echo
                 echo -e "For example: ""\033[32m""rutorrent-1 ""\e[0m""\033[33m""autodl-1 and irssi-1 ""\e[0m""\033[36m""rtorrent-1 and ~/.rtorrent-1.rc""\e[0m"
                 echo
                 echo -e "\033[31m""The first thing we need to do is pick a suffix to use:""\e[0m"
                 echo
-                echo -e "To return to the menu type: ""\033[32m""none""\e[0m"
+                echo -e "To return to the menu type: ""\033[32m""back""\e[0m"
                 echo
                 #
                 while [[ -z "$suffix" ]]
@@ -231,7 +236,7 @@ then
                     echo
                 done
                 #
-                if [[ "$suffix" != "none" ]]
+                if [[ "$suffix" != "back" ]]
                 then
                     if [[ ! -f ~/.rtorrent-"$suffix".rc && ! -d ~/private/rtorrent-"$suffix" && ! -d "$wwwurl/rutorrent-$suffix" ]]
                     then
@@ -261,7 +266,10 @@ then
                         fi
                         #
                         appname="rtorrent-$suffix"
+                        #
                         cronjobadd
+                        #
+                        cronscript
                         #
                         passwordprotect
                         #
@@ -276,33 +284,38 @@ then
             "2")
                 functiontwo
                 #
-                if [[ "$suffix" != "none" ]]
+                if [[ "$suffix" != "back" ]]
                 then
-                    if [[ -d ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix" ]]
+                    if [[ -d "$wwwurl/rutorrent-$suffix" ]]
                     then
+                        prerequisites
+                        #
                         echo -e "Updating ruTorrent"
                         echo
-                        wget -qO ~/rutorrentgit.zip $rutorrentgit
-                        unzip -qo ~/rutorrentgit.zip
-                        rm -f ~/ruTorrent-master/.htaccess
-                        rm -rf ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/plugins/{cpuload,diskspace}
-                        cp -rf ~/ruTorrent-master/. ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"
-                        wget -qO ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/conf/config.php $rutorrentconf
-                        cd && rm -rf ruTorrent-master rutorrentgit.zip
-                        # cp -rf /opt/rutorrent/current/. ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"
+                        # Download the rutorrent github master repo to the ~/.userdocs/tmp directory.
+                        wget -qO ~/.userdocs/tmp/rutorrentgit.zip "$rutorrentgit"
+                        # Extract the rutorrentgit.zip in the ~/.userdocs/tmp directory
+                        unzip -qo ~/.userdocs/tmp/rutorrentgit.zip
                         #
-                        # Make sure rtorrent adder will work with nginx by creating this folder.
-                        mkdir -p ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/share/torrents
-                        # Download and install the Feral stats plugin
-                        wget -qO ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/plugins/feralstats.zip "$feralstats"
-                        unzip -qo ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/plugins/feralstats.zip -d ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/plugins/
-                        rm -f ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/plugins/feralstats.zip
+                        # Check to see if there is a .htaccess file present and delete it. Otherwise do nothing.
+                        [[ -f ~/.userdocs/tmp/ruTorrent-master/.htaccess ]] && rm -f ~/ruTorrent-master/.htaccess
+                        #
+                        # Check to see if there is a rutorrent-suffix directory is present and delete some plugins we don't need. Otherwise do nothing.
+                        [[ -d "$wwwurl/public_html/rutorrent-$suffix" ]] && rm -rf "$wwwurl/public_html/rutorrent-$suffix"/plugins/{cpuload,diskspace}
+                        #
+                        cp -rf ~/ruTorrent-master/. "$wwwurl/public_html/rutorrent-$suffix"
+                        #
+                        # Download the required rutorrent conf template file again.
+                        wget -qO "$wwwurl"/public_html/rutorrent-"$suffix"/conf/config.php "$rutorrentconf"
+                        #
+                        # Delete these files and folders if they exists otherwise do nothing.
+                        [[ -d ~/.userdocs/tmp/ruTorrent-master ]] && rm -rf ~/.userdocs/tmp/ruTorrent-master
+                        [[ -f ~/.userdocs/tmp/rutorrentgit.zip ]] && rm -rf ~/.userdocs/tmp/rutorrentgit.zip
+                        #
                         # Download and install the ratio colour plugin
                         wget -qO ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/plugins/ratiocolor.zip "$ratiocolor"
                         unzip -qo ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/plugins/ratiocolor.zip -d ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/plugins/
                         rm -f ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/plugins/ratiocolor.zip
-                        #
-                        rm -rf ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/plugins/{diskspace,cpuload}
                         #
                         echo -e "Editing the files: rutorrent"
                         echo
@@ -312,20 +325,6 @@ then
                         then
                             echo 'screen -fa -dmS rtorrent-'"$suffix"' rtorrent -n -o import=~/.rtorrent-'"$suffix"'.rc' >> ~/.userdocs/multirtru.restart.txt
                         fi
-                        ############################
-                        # Add to crontab
-                        tmpcron="$(mktemp)"
-                        if [ "$(crontab -l 2> /dev/null | grep -c 'screen -fa -dmS rtorrent-'"$suffix"' rtorrent -n -o import=~/.rtorrent-'"$suffix"'.rc')" == "0" ]; then
-                            echo "appending rtorrent-${suffix} to crontab."
-                            crontab -l 2> /dev/null > "$tmpcron"
-                            echo '@reboot screen -fa -dmS rtorrent-'"$suffix"' rtorrent -n -o import=~/.rtorrent-'"$suffix"'.rc' >> "$tmpcron"
-                            crontab "$tmpcron"
-                            rm "$tmpcron"
-                        else
-                            echo "This instance is already in your crontab."
-                        fi 
-                        ############################
-                        ############################
                     else 
                         echo -e "\033[31m""No matching rutorrent instances exist. Try again.""\e[0m"
                         echo
@@ -510,6 +509,11 @@ then
                         sed -i '/screen -dmS autodl-'"$suffix"' irssi --home=$HOME\/.irssi-'"$suffix"'\//d' ~/.userdocs/multirtru.restart.txt
                         sed -i '/^$/d' ~/.userdocs/multirtru.restart.txt
                     fi
+                    #
+                    appname="rtorrent-$suffix"
+                    cronjobremove
+                    appname="autodl-$suffix"
+                    cronjobremove
                     #
                     if [ "$(crontab -l 2> /dev/null | grep -c 'screen -dmS autodl-'"$suffix"' irssi --home=$HOME/.irssi-'"$suffix")" == "0" ]
                     then
