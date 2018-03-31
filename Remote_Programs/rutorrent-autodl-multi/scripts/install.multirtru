@@ -258,8 +258,6 @@ then
                             #
                             autodlstart
                             #
-                            appname="autodl-$suffix"
-                            cronjobadd
                         else
                             echo "This instance has been installed without autodl-irssi"
                             echo
