@@ -24,8 +24,8 @@ fi
 if [[ -z "$(screen -ls autodl-$suffix | sed -rn 's/[^\s](.*).autodl-'"$suffix"'(.*)/\1/p')" && ! -f "$HOME/.userdocs/tmp/autodl-$suffix.lock" && -d "$HOME/.autodl-$suffix" ]]; then
 	kill -9 "$(echo $(ps x | grep -w autodl-$suffix | grep -v grep | awk '{print $1}'))" > /dev/null 2>&1
 	screen -wipe > /dev/null 2>&1
-    screen -dmS "autodl-$suffix" && screen -S autodl-$suffix -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; irssi --home=$HOME/.irssi-$suffix/^M"
-	screen -S autodl-$suffix -p 0 -X stuff '/autodl update^M'
+    screen -dmS "autodl-$suffix" && screen -S "autodl-$suffix" -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; irssi --home=$HOME/.irssi-$suffix/^M"
+	screen -S "autodl-$suffix" -p 0 -X stuff '/autodl update^M'
 	echo -n "$(screen -ls autodl-$suffix | sed -rn 's/[^\s](.*).autodl-$suffix(.*)/\1/p')" > "$HOME/.userdocs/pids/autodl-$suffix.pid"
     echo "Restarted at: $(date +"%H:%M on the %d.%m.%y")" >> "$HOME/.userdocs/cronjobs/logs/autodl-$suffix.log" 2>&1
     exit
