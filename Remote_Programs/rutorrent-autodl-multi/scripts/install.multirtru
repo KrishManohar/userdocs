@@ -78,7 +78,7 @@ appname=""
 gitissue="https://github.com/userdocs/userdocs/issues/new"
 #
 # Please link to the cronscript module for this installer.
-cronscripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/modules/cronscripts/rutorrent-autodl-multi.sh"
+cronscripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/modules/cronscripts/rtorrent-autodl-multi.sh"
 #
 # Please link to the changelog file.
 changelogurl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/rutorrent-autodl-multi/changelog"
