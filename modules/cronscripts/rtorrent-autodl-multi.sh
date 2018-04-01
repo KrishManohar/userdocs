@@ -5,28 +5,45 @@
 #
 #
 # The suffix is set here to be used throughout this cronscript.
-suffix="SUFFIX"
+suffix="222aB"
 #
 # Please set the path to your www root here.
 wwwurl="$HOME/www/$(whoami).$(hostname -f)/public_html"
 #
-# The restart job for your custom rtorrentinstallation.
-if [[ -z "$(screen -ls rtorrent-$suffix | sed -rn 's/[^\s](.*).rtorrent-'"$suffix"'(.*)/\1/p')" && ! -f "$HOME/.userdocs/tmp/rtorrent-$suffix.lock" && -d "$HOME/private/rtorrent-$suffix" ]]; then
-	kill -9 "$(echo $(ps x | grep -w rtorrent-$suffix | grep -v grep | awk '{print $1}'))" > /dev/null 2>&1
+# The restart job for your custom rtorrent installation.
+#
+# Kill dead rtorrent screens as they might linger and cause later checks to give a false positive. Otherwise do nothing.
+[[ "$(screen -ls rtorrent-$suffix | sed -rn 's/[^\s](.*).rtorrent-'"$suffix"'[\t](.*)[\t](.*)/\3/p')" == '(Dead ???)' ]] && screen -wipe > /dev/null 2>&1
+# Check to see if all 3 required services are running. If not then kill the remaining, delete the lock file if present so the script can then restart the programs.
+if [[ "$(ps x | grep -Ecw "rtorrent-$suffix(\.rc)?$" | awk '{print $1}')" -ne '3' && -f "$HOME/private/rtorrent-$suffix/work/rtorrent.lock" ]]; then
+    kill -9 "$(echo $(ps x | grep -Ew "rtorrent-$suffix(\.rc)?$" | awk '{print $1}'))" > /dev/null 2>&1
+    [[ -f "$HOME/private/rtorrent-$suffix/work/rtorrent.lock" ]] && rm -f "$HOME/private/rtorrent-$suffix/work/rtorrent.lock"
+fi
+#
+if [[ "$(ps x | grep -Ecw "rtorrent-$suffix(\.rc)?$" | awk '{print $1}')" -ne '3' && ! -f "$HOME/private/rtorrent-$suffix/work/rtorrent.lock" && -d "$HOME/private/rtorrent-$suffix" ]]; then
+	kill -9 "$(echo $(ps x | grep -Ew "rtorrent-$suffix(\.rc)?$" | awk '{print $1}'))" > /dev/null 2>&1
 	screen -wipe > /dev/null 2>&1
-    screen -dmS "rtorrent-$suffix" && screen -S "rtorrent-$suffix" -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; rtorrent -n -o import=$HOME/.rtorrent-$suffix.rc^M"
-	echo -n "$(screen -ls rtorrent-$suffix | sed -rn 's/[^\s](.*).rtorrent-'"$suffix"'(.*)/\1/p')" > "$HOME/.userdocs/pids/rtorrent-$suffix.pid"
+    screen -dmS "rtorrent-$suffix" && screen -S "rtorrent-$suffix" -p 0 -X stuff "rtorrent -n -o import=$HOME/.rtorrent-$suffix.rc^M"
+	echo -n "$(echo $(ps x | grep -Ew "rtorrent$" | awk '{print $1}'))" > "$HOME/.userdocs/pids/rtorrent-$suffix.pid"
     echo "Restarted at: $(date +"%H:%M on the %d.%m.%y")" >> "$HOME/.userdocs/cronjobs/logs/rtorrent-$suffix.log" 2>&1
     exit
 fi
 #
 # The restart job for your custom autodl installation.
-if [[ -z "$(screen -ls autodl-$suffix | sed -rn 's/[^\s](.*).autodl-'"$suffix"'(.*)/\1/p')" && ! -f "$HOME/.userdocs/tmp/autodl-$suffix.lock" && -d "$HOME/.autodl-$suffix" ]]; then
-	kill -9 "$(echo $(ps x | grep -w autodl-$suffix | grep -v grep | awk '{print $1}'))" > /dev/null 2>&1
+#
+# Kill dead autodl screens as they might linger and cause later checks to give a false positive. Otherwise do nothing.
+[[ "$(screen -ls autodl-$suffix | sed -rn 's/[^\s](.*).autodl-'"$suffix"'[\t](.*)[\t](.*)/\3/p')" == '(Dead ???)' ]] && screen -wipe > /dev/null 2>&1
+# Check to see if all 2 required services are running. If not then kill the remaining so the script can then restart the programs.
+if [[ "$(ps x | grep -Ecw "(autodl$|irssi$)" | awk '{print $1}')" -ne '2' ]]; then
+    kill -9 "$(echo $(ps x | grep -Ew "(autodl$|irssi$)" | awk '{print $1}'))" > /dev/null 2>&1
+fi
+#
+if [[ "$(ps x | grep -Ecw "(autodl-$suffix$|irssi-$suffix/$)" | awk '{print $1}')" -ne '2' && ! -f "$HOME/.userdocs/tmp/autodl-$suffix.lock" && -d "$HOME/.autodl-$suffix" ]]; then
+	kill -9 "$(echo $(ps x | grep -Ew "(autodl-$suffix$|irssi-$suffix/$)" | awk '{print $1}'))" > /dev/null 2>&1
 	screen -wipe > /dev/null 2>&1
-    screen -dmS "autodl-$suffix" && screen -S "autodl-$suffix" -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; irssi --home=$HOME/.irssi-$suffix/^M"
+    screen -dmS "autodl-$suffix" && screen -S "autodl-$suffix" -p 0 -X stuff "irssi --home=$HOME/.irssi-$suffix/^M"
 	screen -S "autodl-$suffix" -p 0 -X stuff '/autodl update^M'
-	echo -n "$(screen -ls autodl-$suffix | sed -rn 's/[^\s](.*).autodl-$suffix(.*)/\1/p')" > "$HOME/.userdocs/pids/autodl-$suffix.pid"
+	"$(echo $(ps x | grep -Ew "(autodl-$suffix$|irssi-$suffix/$)" | awk '{print $1}'))" > "$HOME/.userdocs/pids/autodl-$suffix.pid"
     echo "Restarted at: $(date +"%H:%M on the %d.%m.%y")" >> "$HOME/.userdocs/cronjobs/logs/autodl-$suffix.log" 2>&1
     exit
 fi
