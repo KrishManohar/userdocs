@@ -36,7 +36,7 @@ if [[ "$(ps x | grep -Ecw "(autodl$|irssi$)" | awk '{print $1}')" -ne '2' ]]; th
     kill -9 "$(echo $(ps x | grep -Ew "(autodl$|irssi$)" | awk '{print $1}'))" > /dev/null 2>&1
 fi
 #
-if [[ "$(ps x | grep -Ecw "(autodl$|irssi$)" | awk '{print $1}')" -ne '2' && && -d "$HOME/.autodl" && && -d "$HOME/.irssi" ]]; then
+if [[ "$(ps x | grep -Ecw "(autodl$|irssi$)" | awk '{print $1}')" -ne '2' && -d "$HOME/.autodl" && -d "$HOME/.irssi" ]]; then
 	kill -9 "$(echo $(ps x | grep -Ew "(autodl$|irssi$)" | awk '{print $1}'))" > /dev/null 2>&1
 	screen -wipe > /dev/null 2>&1
     screen -dmS "autodl" && screen -S "autodl" -p 0 -X stuff "irssi^M"
