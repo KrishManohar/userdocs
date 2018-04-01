@@ -23,10 +23,10 @@ if [[ "$(ps x | grep -Ecw "rtorrent$" | awk '{print $1}')" -ne '3' ]]; then
 fi
 #
 if [[ "$(ps x | grep -Ecw "rtorrent$" | awk '{print $1}')" -ne '3' && ! -f "$HOME/private/rtorrent/work/rtorrent.lock" && -d "$HOME/private/rtorrent" ]]; then
-	kill -9 $(echo $(ps x | grep -Ew "rtorrent$" | awk '{print $1}')) > /dev/null 2>&1
-	screen -wipe > /dev/null 2>&1
+    kill -9 $(echo $(ps x | grep -Ew "rtorrent$" | awk '{print $1}')) > /dev/null 2>&1
+    screen -wipe > /dev/null 2>&1
     screen -dmS "rtorrent" && screen -S "rtorrent" -p 0 -X stuff "rtorrent^M"
-	echo -n "$(echo $(ps x | grep -Ew "rtorrent$" | awk '{print $1}'))" > "$HOME/.userdocs/pids/rtorrent.pid"
+    echo -n "$(echo $(ps x | grep -Ew "rtorrent$" | awk '{print $1}'))" > "$HOME/.userdocs/pids/rtorrent.pid"
     echo "Restarted at: $(date +"%H:%M on the %d.%m.%y")" >> "$HOME/.userdocs/cronjobs/logs/rtorrent.log" 2>&1
     exit
 fi
@@ -43,11 +43,11 @@ if [[ "$(ps x | grep -Ecw "(autodl$|irssi$)" | awk '{print $1}')" -ne '2' ]]; th
 fi
 #
 if [[ "$(ps x | grep -Ecw "(autodl$|irssi$)" | awk '{print $1}')" -ne '2' && -d "$HOME/.autodl" && -d "$HOME/.irssi" ]]; then
-	kill -9 $(echo $(ps x | grep -Ew "(autodl$|irssi$)" | awk '{print $1}')) > /dev/null 2>&1
-	screen -wipe > /dev/null 2>&1
+    kill -9 $(echo $(ps x | grep -Ew "(autodl$|irssi$)" | awk '{print $1}')) > /dev/null 2>&1
+    screen -wipe > /dev/null 2>&1
     screen -dmS "autodl" && screen -S "autodl" -p 0 -X stuff "irssi^M"
-	screen -S "autodl" -p 0 -X stuff '/autodl update^M'
-	echo -n "$(echo $(ps x | grep -Ew "(autodl$|irssi$)" | awk '{print $1}'))" > "$HOME/.userdocs/pids/autodl.pid"
+    screen -S "autodl" -p 0 -X stuff '/autodl update^M'
+    echo -n "$(echo $(ps x | grep -Ew "(autodl$|irssi$)" | awk '{print $1}'))" > "$HOME/.userdocs/pids/autodl.pid"
     echo "Restarted at: $(date +"%H:%M on the %d.%m.%y")" >> "$HOME/.userdocs/cronjobs/logs/autodl.log" 2>&1
     exit
 fi
