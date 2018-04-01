@@ -8,23 +8,40 @@
 # Please set the path to your www root here.
 wwwurl="$HOME/www/$(whoami).$(hostname -f)/public_html"
 #
-# The restart job for your custom rtorrentinstallation.
-if [[ -z "$(screen -ls rtorrent | sed -rn 's/[^\s](.*).rtorrent[\t](.*)/\1/p')" && ! -f "$HOME/.userdocs/tmp/rtorrent.lock" && -d "$HOME/private/rtorrent" ]]; then
-	kill -9 "$(echo $(ps x | grep -w 'rtorrent\s-*' | grep -v grep | awk '{print $1}'))" > /dev/null 2>&1
+# The restart job for your custom rtorrent installation.
+#
+# Kill dead rtorrent screens as they might linger and cause later checks to give a false positive. Otherwise do nothing.
+[[ "$(screen -ls rtorrent | sed -rn 's/[^\s](.*).rtorrent[\t](.*)[\t](.*)/\3/p')" == '(Dead ???)' ]] && screen -wipe > /dev/null 2>&1
+# Check to see if all 3 required services are running. If not then kill the remaining, delete the lock file if present so the script can then restart the programs.
+if [[ "$(ps x | grep -Ecw "rtorrent$" | awk '{print $1}')" -ne '3' && -f "$HOME/private/rtorrent/work/rtorrent.lock" ]]; then
+    kill -9 "$(echo $(ps x | grep -Ew "rtorrent$" | awk '{print $1}'))" > /dev/null 2>&1
+    [[ -f "$HOME/private/rtorrent/work/rtorrent.lock" ]] && rm -f "$HOME/private/rtorrent/work/rtorrent.lock"
+fi
+#
+if [[ "$(ps x | grep -Ecw "rtorrent$" | awk '{print $1}')" -ne '3' && ! -f "$HOME/private/rtorrent/work/rtorrent.lock" && -d "$HOME/private/rtorrent" ]]; then
+	kill -9 "$(echo $(ps x | grep -Ew "rtorrent$" | awk '{print $1}'))" > /dev/null 2>&1
 	screen -wipe > /dev/null 2>&1
     screen -dmS "rtorrent" && screen -S "rtorrent" -p 0 -X stuff "rtorrent^M"
-	echo -n "$(screen -ls rtorrent | sed -rn 's/[^\s](.*).rtorrent[\t](.*)/\1/p')" > "$HOME/.userdocs/pids/rtorrent.pid"
+	echo -n "$(echo $(ps x | grep -Ew "rtorrent$" | awk '{print $1}'))" > "$HOME/.userdocs/pids/rtorrent.pid"
     echo "Restarted at: $(date +"%H:%M on the %d.%m.%y")" >> "$HOME/.userdocs/cronjobs/logs/rtorrent.log" 2>&1
     exit
 fi
 #
 # The restart job for your custom autodl installation.
-if [[ -z "$(screen -ls autodl | sed -rn 's/[^\s](.*).autodl[\t](.*)/\1/p')" && ! -f "$HOME/.userdocs/tmp/autodl.lock" && -d "$HOME/.autodl" ]]; then
-	kill -9 "$(echo $(ps x | grep -w 'autodl$' | grep -v grep | awk '{print $1}'))" > /dev/null 2>&1
+#
+# Kill dead autodl screens as they might linger and cause later checks to give a false positive. Otherwise do nothing.
+[[ "$(screen -ls autodl | sed -rn 's/[^\s](.*).autodl[\t](.*)[\t](.*)/\3/p')" == '(Dead ???)' ]] && screen -wipe > /dev/null 2>&1
+# Check to see if all 2 required services are running. If not then kill the remaining so the script can then restart the programs.
+if [[ "$(ps x | grep -Ecw "(autodl$|irssi$)" | awk '{print $1}')" -ne '2' ]]; then
+    kill -9 "$(echo $(ps x | grep -Ew "(autodl$|irssi$)" | awk '{print $1}'))" > /dev/null 2>&1
+fi
+#
+if [[ "$(ps x | grep -Ecw "(autodl$|irssi$)" | awk '{print $1}')" -ne '2' && && -d "$HOME/.autodl" && && -d "$HOME/.irssi" ]]; then
+	kill -9 "$(echo $(ps x | grep -Ew "(autodl$|irssi$)" | awk '{print $1}'))" > /dev/null 2>&1
 	screen -wipe > /dev/null 2>&1
-    screen -dmS "autodl" && screen -S "autodl" -p 0 -X stuff "irssi/^M"
+    screen -dmS "autodl" && screen -S "autodl" -p 0 -X stuff "irssi^M"
 	screen -S "autodl" -p 0 -X stuff '/autodl update^M'
-	echo -n "$(screen -ls autodl | sed -rn 's/[^\s](.*).autodl[\t](.*)/\1/p')" > "$HOME/.userdocs/pids/autodl.pid"
+	echo -n "$(echo $(ps x | grep -Ew "(autodl$|irssi$)" | awk '{print $1}'))" > "$HOME/.userdocs/pids/autodl.pid"
     echo "Restarted at: $(date +"%H:%M on the %d.%m.%y")" >> "$HOME/.userdocs/cronjobs/logs/autodl.log" 2>&1
     exit
 fi
