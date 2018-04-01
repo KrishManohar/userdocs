@@ -5,7 +5,7 @@
 #
 #
 # The suffix is set here to be used throughout this cronscript.
-suffix="222aB"
+suffix=""
 #
 # Please set the path to your www root here.
 wwwurl="$HOME/www/$(whoami).$(hostname -f)/public_html"
@@ -23,10 +23,10 @@ if [[ "$(ps x | grep -Ecw "rtorrent-$suffix(\.rc)?$" | awk '{print $1}')" -ne '3
 fi
 #
 if [[ "$(ps x | grep -Ecw "rtorrent-$suffix(\.rc)?$" | awk '{print $1}')" -ne '3' && ! -f "$HOME/private/rtorrent-$suffix/work/rtorrent.lock" && -d "$HOME/private/rtorrent-$suffix" ]]; then
-	kill -9 $(echo $(ps x | grep -Ew "rtorrent-$suffix(\.rc)?$" | awk '{print $1}')) > /dev/null 2>&1
-	screen -wipe > /dev/null 2>&1
+    kill -9 $(echo $(ps x | grep -Ew "rtorrent-$suffix(\.rc)?$" | awk '{print $1}')) > /dev/null 2>&1
+    screen -wipe > /dev/null 2>&1
     screen -dmS "rtorrent-$suffix" && screen -S "rtorrent-$suffix" -p 0 -X stuff "rtorrent -n -o import=$HOME/.rtorrent-$suffix.rc^M"
-	echo -n "$(echo $(ps x | grep -Ew "rtorrent$" | awk '{print $1}'))" > "$HOME/.userdocs/pids/rtorrent-$suffix.pid"
+    echo -n "$(echo $(ps x | grep -Ew "rtorrent$" | awk '{print $1}'))" > "$HOME/.userdocs/pids/rtorrent-$suffix.pid"
     echo "Restarted at: $(date +"%H:%M on the %d.%m.%y")" >> "$HOME/.userdocs/cronjobs/logs/rtorrent-$suffix.log" 2>&1
     exit
 fi
@@ -43,11 +43,11 @@ if [[ "$(ps x | grep -Ecw "(autodl$|irssi$)" | awk '{print $1}')" -ne '2' ]]; th
 fi
 #
 if [[ "$(ps x | grep -Ecw "(autodl-$suffix$|irssi-$suffix/$)" | awk '{print $1}')" -ne '2' && ! -f "$HOME/.userdocs/tmp/autodl-$suffix.lock" && -d "$HOME/.autodl-$suffix" ]]; then
-	kill -9 $(echo $(ps x | grep -Ew "(autodl-$suffix$|irssi-$suffix/$)" | awk '{print $1}')) > /dev/null 2>&1
-	screen -wipe > /dev/null 2>&1
+    kill -9 $(echo $(ps x | grep -Ew "(autodl-$suffix$|irssi-$suffix/$)" | awk '{print $1}')) > /dev/null 2>&1
+    screen -wipe > /dev/null 2>&1
     screen -dmS "autodl-$suffix" && screen -S "autodl-$suffix" -p 0 -X stuff "irssi --home=$HOME/.irssi-$suffix/^M"
-	screen -S "autodl-$suffix" -p 0 -X stuff '/autodl update^M'
-	echo -n "$(echo $(ps x | grep -Ew "(autodl-$suffix$|irssi-$suffix/$)" | awk '{print $1}'))" > "$HOME/.userdocs/pids/autodl-$suffix.pid"
+    screen -S "autodl-$suffix" -p 0 -X stuff '/autodl update^M'
+    echo -n "$(echo $(ps x | grep -Ew "(autodl-$suffix$|irssi-$suffix/$)" | awk '{print $1}'))" > "$HOME/.userdocs/pids/autodl-$suffix.pid"
     echo "Restarted at: $(date +"%H:%M on the %d.%m.%y")" >> "$HOME/.userdocs/cronjobs/logs/autodl-$suffix.log" 2>&1
     exit
 fi
@@ -69,6 +69,10 @@ fi
 [[ "$autodlhome" == '.autodl' ]] && sed -i 's|return File::Spec->catfile(getHomeDir(), ".autodl");|return File::Spec->catfile(getHomeDir(), ".autodl-'"$suffix"'");|g' "$HOME/.irssi-$suffix/scripts/AutodlIrssi/Dirs.pm" && updated="1"
 #
 # This edit sets the path to the autodl.cfg that the rutorrent plugin will use and edit, required for a non standard installation.
-[[ "$(cat "$wwwurl/rutorrent-$suffix/plugins/autodl-irssi/getConf.php" | grep -wc "'/.autodl-$suffix/autodl.cfg'")" -eq "0" ]] && sed -i "s|'/.autodl/autodl.cfg'|'/.autodl-$suffix/autodl.cfg'|g" "$wwwurl/rutorrent-$suffix/plugins/autodl-irssi/getConf.php"
+if [[ -f "$wwwurl/rutorrent-$suffix/plugins/autodl-irssi/getConf.php" ]]; then
+    if [[ "$(cat "$wwwurl/rutorrent-$suffix/plugins/autodl-irssi/getConf.php" | grep -wc "'/.autodl-$suffix/autodl.cfg'")" -eq "0" ]]; then
+        sed -i "s|'/.autodl/autodl.cfg'|'/.autodl-$suffix/autodl.cfg'|g" "$wwwurl/rutorrent-$suffix/plugins/autodl-irssi/getConf.php"
+    fi
+fi
 #
 [[ "$updated" -eq "1" ]] && screen -S "autodl-$suffix" -p 0 -X stuff '/run autorun/autodl-irssi.pl^M' && updated="0"
