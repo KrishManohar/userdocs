@@ -32,11 +32,11 @@ fi
 #
 # The restart job for your custom autodl installation.
 #
-if [[ "$(ps -xU $(whoami) | grep -Ev 'screen (.*) autodl-$suffix' | grep -Ecw '(autodl-$suffix$|irssi-$suffix$)')" -ne '2' && -d "$HOME/.autodl-$suffix" && -d "$HOME/.irssi-$suffix" && ! -f "$HOME/.userdocs/tmp/autodl-$suffix.lock" ]]; then
+if [[ "$(ps -xU $(whoami) | grep -Ev "screen (.*) autodl-$suffix" | grep -Ecw "(autodl-$suffix$|irssi-$suffix/$)")" -ne '2' && -d "$HOME/.autodl-$suffix" && -d "$HOME/.irssi-$suffix" && ! -f "$HOME/.userdocs/tmp/autodl-$suffix.lock" ]]; then
     #
     touch "$HOME/.userdocs/tmp/autodl-$suffix.lock"
     #
-    kill -9 $(echo $(ps -xU $(whoami) | grep -Ew "(autodl-$suffix$|irssi-$suffix$)" | awk '{print $1}')) > /dev/null 2>&1
+    kill -9 $(echo $(ps -xU $(whoami) | grep -Ew "(autodl-$suffix$|irssi-$suffix/$)" | awk '{print $1}')) > /dev/null 2>&1
     #
     screen -wipe > /dev/null 2>&1
     #
@@ -44,7 +44,7 @@ if [[ "$(ps -xU $(whoami) | grep -Ev 'screen (.*) autodl-$suffix' | grep -Ecw '(
     #
     screen -S "autodl-$suffix" -p 0 -X stuff '/autodl update^M'
     #
-    echo -n "$(echo $(ps -xU $(whoami) | grep -Ev 'screen (.*) autodl' | grep -Ew '(autodl-$suffix$|irssi-$suffix$)' | awk '{print $1}'))" > "$HOME/.userdocs/pids/autodl-$suffix.pid"
+    echo -n "$(echo $(ps -xU $(whoami) | grep -Ev 'screen (.*) autodl' | grep -Ew "(autodl-$suffix$|irssi-$suffix/$)" | awk '{print $1}'))" > "$HOME/.userdocs/pids/autodl-$suffix.pid"
     echo "Restarted at: $(date +"%H:%M on the %d.%m.%y")" >> "$HOME/.userdocs/cronjobs/logs/autodl-$suffix.log" 2>&1
     #
     [[ -f "$HOME/.userdocs/tmp/autodl-$suffix.lock" ]] && rm -f "$HOME/.userdocs/tmp/autodl-$suffix.lock"
