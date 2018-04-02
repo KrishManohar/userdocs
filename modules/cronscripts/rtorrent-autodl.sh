@@ -11,7 +11,9 @@ if [[ "$(ps -xU $(whoami) | grep -Ev 'screen (.*) rtorrent' | grep -Ecw "rtorren
     #
     touch "$HOME/.userdocs/tmp/rtorrent.lock"
     #
-    kill -9 $(echo $(ps -xU $(whoami) | grep -Ew "rtorrent$" | awk '{print $1}')) > /dev/null 2>&1 && screen -wipe > /dev/null 2>&1
+    kill -9 $(echo $(ps -xU $(whoami) | grep -Ew "rtorrent$" | awk '{print $1}')) > /dev/null 2>&1
+    #
+    screen -wipe > /dev/null 2>&1
     #
     [[ -f "$HOME/private/rtorrent/work/rtorrent.lock" ]] && rm -f "$HOME/private/rtorrent/work/rtorrent.lock"
     #
@@ -30,8 +32,12 @@ if [[ "$(ps -xU $(whoami) | grep -Ev 'screen (.*) autodl' | grep -Ecw '(autodl$|
     #
     touch "$HOME/.userdocs/tmp/autodl.lock"
     #
-    kill -9 $(echo $(ps -xU $(whoami) | grep -Ew "(autodl$|irssi$)" | awk '{print $1}')) > /dev/null 2>&1 && screen -wipe > /dev/null 2>&1
+    kill -9 $(echo $(ps -xU $(whoami) | grep -Ew "(autodl$|irssi$)" | awk '{print $1}')) > /dev/null 2>&1
+    #
+    screen -wipe > /dev/null 2>&1
+    #
     screen -dmS "autodl" && screen -S "autodl" -p 0 -X stuff "irssi^M"
+    #
     screen -S "autodl" -p 0 -X stuff '/autodl update^M'
     #
     echo -n "$(echo $(ps -xU $(whoami) | grep -Ev 'screen (.*) autodl' | grep -Ew '(autodl$|irssi$)' | awk '{print $1}'))" > "$HOME/.userdocs/pids/autodl.pid"
