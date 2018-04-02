@@ -6,7 +6,7 @@
 wwwurl="$HOME/www/$(whoami).$(hostname -f)/public_html"
 #
 # The restart job for your custom rtorrent installation.
-if [[ "$(ps -xU $(whoami) | grep -Ev 'screen (.*) rtorrent' | grep -Ecw "rtorrent$" | awk '{print $1}')" -ne '3' && -d "$HOME/private/rtorrent" && ! -f "$HOME/.userdocs/tmp/rtorrent.lock" ]]; then
+if [[ "$(ps -xU $(whoami) | grep -Ev 'screen (.*) rtorrent' | grep -Ecw "rtorrent$")" -ne '3' && -d "$HOME/private/rtorrent" && ! -f "$HOME/.userdocs/tmp/rtorrent.lock" ]]; then
     #
     touch "$HOME/.userdocs/tmp/rtorrent.lock"
     #
@@ -16,7 +16,7 @@ if [[ "$(ps -xU $(whoami) | grep -Ev 'screen (.*) rtorrent' | grep -Ecw "rtorren
     #
     screen -dmS "rtorrent" && screen -S "rtorrent" -p 0 -X stuff "rtorrent^M"
     #
-    echo -n "$(echo $(ps -xU $(whoami) | grep -Ew "rtorrent$" | grep -Ev 'screen (.*) rtorrent' | awk '{print $1}'))" > "$HOME/.userdocs/pids/rtorrent.pid"
+    echo -n "$(echo $(ps -xU $(whoami) | grep -Ev 'screen (.*) rtorrent' | grep -Ew "rtorrent$" | awk '{print $1}'))" > "$HOME/.userdocs/pids/rtorrent.pid"
     echo "Restarted at: $(date +"%H:%M on the %d.%m.%y")" >> "$HOME/.userdocs/cronjobs/logs/rtorrent.log" 2>&1
     #
     [[ -f "$HOME/.userdocs/tmp/rtorrent.lock" ]] && rm -f "$HOME/.userdocs/tmp/rtorrent.lock"
@@ -26,7 +26,7 @@ fi
 #
 # The restart job for your custom autodl installation.
 #
-if [[ "$(ps -xU $(whoami) | grep -Ev 'screen (.*) autodl' | grep -Ecw '(autodl$|irssi$)' | awk '{print $1}')" -ne '2' && -d "$HOME/.autodl" && -d "$HOME/.irssi" && ! -f "$HOME/.userdocs/tmp/autodl.lock" ]]; then
+if [[ "$(ps -xU $(whoami) | grep -Ev 'screen (.*) autodl' | grep -Ecw '(autodl$|irssi$)')" -ne '2' && -d "$HOME/.autodl" && -d "$HOME/.irssi" && ! -f "$HOME/.userdocs/tmp/autodl.lock" ]]; then
     #
     touch "$HOME/.userdocs/tmp/autodl.lock"
     #
@@ -34,7 +34,7 @@ if [[ "$(ps -xU $(whoami) | grep -Ev 'screen (.*) autodl' | grep -Ecw '(autodl$|
     screen -dmS "autodl" && screen -S "autodl" -p 0 -X stuff "irssi^M"
     screen -S "autodl" -p 0 -X stuff '/autodl update^M'
     #
-    echo -n "$(echo $(ps -xU $(whoami) | grep -Ew "(autodl$|irssi$)" | awk '{print $1}'))" > "$HOME/.userdocs/pids/autodl.pid"
+    echo -n "$(echo $(ps -xU $(whoami) | grep -Ev 'screen (.*) autodl' | grep -Ew '(autodl$|irssi$)' | awk '{print $1}'))" > "$HOME/.userdocs/pids/autodl.pid"
     echo "Restarted at: $(date +"%H:%M on the %d.%m.%y")" >> "$HOME/.userdocs/cronjobs/logs/autodl.log" 2>&1
     #
     [[ -f "$HOME/.userdocs/tmp/autodl.lock" ]] && rm -f "$HOME/.userdocs/tmp/autodl.lock"
