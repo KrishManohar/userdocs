@@ -6,6 +6,7 @@
 wwwurl="$HOME/www/$(whoami).$(hostname -f)/public_html"
 #
 # The restart job for your custom rtorrent installation.
+#
 if [[ "$(ps -xU $(whoami) | grep -Ev 'screen (.*) rtorrent' | grep -Ecw "rtorrent$")" -ne '3' && -d "$HOME/private/rtorrent" && ! -f "$HOME/.userdocs/tmp/rtorrent.lock" ]]; then
     #
     touch "$HOME/.userdocs/tmp/rtorrent.lock"
@@ -21,7 +22,6 @@ if [[ "$(ps -xU $(whoami) | grep -Ev 'screen (.*) rtorrent' | grep -Ecw "rtorren
     #
     [[ -f "$HOME/.userdocs/tmp/rtorrent.lock" ]] && rm -f "$HOME/.userdocs/tmp/rtorrent.lock"
     #
-    exit
 fi
 #
 # The restart job for your custom autodl installation.
@@ -39,7 +39,6 @@ if [[ "$(ps -xU $(whoami) | grep -Ev 'screen (.*) autodl' | grep -Ecw '(autodl$|
     #
     [[ -f "$HOME/.userdocs/tmp/autodl.lock" ]] && rm -f "$HOME/.userdocs/tmp/autodl.lock"
     #
-    exit
 fi
 #
 # Part 2: A cron based auto-patcher for an installation of autodl to a custom instance using the userdocs script.
