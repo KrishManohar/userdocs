@@ -70,7 +70,7 @@ installautodl () {
     unzip -qo ~/autodl-trackers.zip -d ~/.irssi-"$suffix"/scripts/AutodlIrssi/trackers/
     cp -f ~/.irssi-"$suffix"/scripts/autodl-irssi.pl ~/.irssi-"$suffix"/scripts/autorun/
     rm -f ~/autodl-{irssi,trackers}.zip ~/.irssi-"$suffix"/scripts/{README*,CONTRIBUTING.md,autodl-irssi.pl}
-    echo -e "[options]\ngui-server-port = $appport\ngui-server-password = $autodlpass\nrt-address = $HOME/private/rtorrent-$suffix/.socket\nupload-type = watchdir\nupload-watch-dir = $HOME/private/rtorrent-$suffix/watch/" > ~/.autodl-"$suffix"/autodl.cfg
+    echo -e "[options]\ngui-server-port = $appport\ngui-server-password = $autodlpass\nrt-address = $HOME/private/rtorrent-$suffix/.socket\nupload-type = watchdir\nupload-watch-dir = $HOME/private/rtorrent-$suffix/watch/\nupdate-check = auto" > ~/.autodl-"$suffix"/autodl.cfg
 }
 #
 installautodlrutorrent () {
