@@ -1,5 +1,7 @@
 #!/bin/bash
 #
+# https://git.io/vxiab
+#
 # Part 1: A cron based restarter for a custom instance of rtorrent and autodl.
 #
 # Please set the path to your www root here.
