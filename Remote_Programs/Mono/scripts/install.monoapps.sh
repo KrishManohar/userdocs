@@ -313,6 +313,7 @@ genericproxypass () {
     then
         wget -qO ~/.apache2/conf.d/$appname.conf "$genericproxyapache"
         sed -i "s|generic|$appname|g" ~/.apache2/conf.d/$appname.conf
+        sed -i 's|HOME|'"$HOME"'|g' ~/.apache2/conf.d/$appname.conf
         #
         [[ "$appname" = "sonarr" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $apppaths)"'|g' ~/.apache2/conf.d/$appname.conf
         [[ "$appname" = "radarr" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $apppaths)"'|g' ~/.apache2/conf.d/$appname.conf
