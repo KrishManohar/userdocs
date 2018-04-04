@@ -154,7 +154,7 @@ then
 #### User Script Starts ####
 ############################
 #
-[[ -n "$appname" ]] && source <(curl -sL "https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/$appname/install.$appname.sh") || echo "No appname specified so no script was loaded"; exit
+[[ -n "$appname" ]] && source <(curl -sL "https://raw.githubusercontent.com/userdocs/userdocs/master/modules/$appname/install.sh") || echo "No appname specified so no script was loaded"; exit
 #
 ############################
 ##### User Script End  #####
