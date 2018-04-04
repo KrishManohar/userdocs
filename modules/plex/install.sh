@@ -12,7 +12,7 @@ do
     echo
 done
 #
-echo 'You can check the latest version here: https://www.plex.tv/downloads/'
+echo -e "\033[33m""You can check the latest version here:""\e[0m" 'https://www.plex.tv/downloads/'
 echo
 #
 read -ep 'What plex version would you like to install (non plex pass): ' -i '1.12.1.4885-1046ba85f' plexversion
@@ -62,7 +62,7 @@ if [[ "$confirm" =~ ^[Qq]$ ]]; then
 fi
 #
 if [[ "$confirm" =~ ^[^YyQqNn].*?$ ]]; then
-    echo "A wild kitten walked over the keyboard, i will quit this script to be safe."
+    echo -e "\033[31m""A wild kitten walked over the keyboard, i will quit this script to be safe.""\e[0m"
     echo
     exit
 fi
