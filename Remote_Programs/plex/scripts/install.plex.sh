@@ -1,5 +1,7 @@
 #!/bin/bash
 #
+# bash <(curl -sL https://git.io/vxMTz)
+#
 ############################
 ##### Basic Info Start #####
 ############################
