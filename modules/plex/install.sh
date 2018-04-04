@@ -13,13 +13,16 @@ do
 done
 #
 echo 'You can check the latest version here: https://www.plex.tv/downloads/'
+echo
 #
 read -ep 'What plex version would you like to install (non plex pass): ' -i '1.12.1.4885-1046ba85f' plexversion
-#
-echo "Your username is: $username"
-echo "Your password is: $password"
 echo
-read -ep "Are these details correct, [y]es [n]o to reload this script and start again or [q]uit." confirm
+#
+echo -e "\033[33m""Your username is:""\e[0m" "$username"
+echo
+echo -e "\033[33m""Your password is:""\e[0m" "$password"
+echo
+read -ep "Are these details correct, [y]es [n]o to reload this script and start again or [q]uit: " confirm
 echo
 #
 if [[ "$confirm" =~ ^[Yy]$ ]]; then
@@ -40,7 +43,9 @@ if [[ "$confirm" =~ ^[Yy]$ ]]; then
     #
     while [ ! -f ~/private/plex.url ]; do printf '\rInstalling plex, please wait (May take up to 10min)...'; sleep 2; done
     echo
-    echo "Please visit your plex installation on this url: $(cat ~/private/plex.url)"
+    echo -e "\033[33m""Please visit your plex installation on this url:""\e[0m" 
+    echo
+    [[ -f ~/private/plex.url ]] && echo -e "$(cat ~/private/plex.url)"
     echo
     exit
 fi
