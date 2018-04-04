@@ -73,7 +73,7 @@ gitissue="https://github.com/userdocs/userdocs/issues/new"
 cronscripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/modules/cronscripts/rtorrent-autodl-multi.sh"
 #
 # Please link to the changelog file.
-changelogurl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/rutorrent-autodl-multi/changelog"
+changelogurl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/$appname/changelog"
 #
 # Please set the path to your www root here.
 wwwurl="$HOME/www/$(whoami).$(hostname -f)/public_html"
@@ -154,7 +154,7 @@ then
 #### User Script Starts ####
 ############################
 #
- #
+source <(curl -sL "https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/$appname/install.$appname.sh")
 #
 ############################
 ##### User Script End  #####
