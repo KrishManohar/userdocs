@@ -63,20 +63,20 @@ appport="$(shuf -i 10001-32001 -n 1)"
 # This wil take the previously generated port and test it to make sure it is not in use, generating it again until it has selected an open port.
 while [[ "$(ss -ln | grep -co ''"$appport"'')" -ge "1" ]]; do appport="$(shuf -i 10001-32001 -n 1)"; done
 #
-# If you use this script for a single app installation you can set this here. Otherwise leave blank and you will need to set this per installation in a function or before a function is used.
-appname=""
-#
 # Please use the relevant github repository for bug reporting.
 gitissue="https://github.com/userdocs/userdocs/issues/new"
 #
+# Please set the path to your www root here.
+wwwurl="$HOME/www/$(whoami).$(hostname -f)/public_html"
+#
+# If you use this script for a single app installation you can set this here. Otherwise leave blank and you will need to set this per installation in a function or before a function is used.
+appname=""
+#
 # Please link to the cronscript module for this installer.
-cronscripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/modules/cronscripts/rtorrent-autodl-multi.sh"
+cronscripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/modules/cronscripts/$appname.sh"
 #
 # Please link to the changelog file.
 changelogurl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/$appname/changelog"
-#
-# Please set the path to your www root here.
-wwwurl="$HOME/www/$(whoami).$(hostname -f)/public_html"
 #
 ############################
 ## Custom Variables Start ##
@@ -154,7 +154,7 @@ then
 #### User Script Starts ####
 ############################
 #
-source <(curl -sL "https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/$appname/install.$appname.sh")
+[[ -n "$appname" ]] && source <(curl -sL "https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/$appname/install.$appname.sh") || echo "No appname specified so no script was loaded"; exit
 #
 ############################
 ##### User Script End  #####
