@@ -37,7 +37,7 @@
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.4.3"
+scriptversion="1.4.4"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.rtorrentmulti"
@@ -87,7 +87,7 @@ updaterenabled="1"
 ## Custom Variables Start ##
 ############################
 #
-source <(curl -sL "https://raw.githubusercontent.com/userdocs/userdocs/master/$appname/variables.sh")
+source <(curl -sL "https://raw.githubusercontent.com/userdocs/userdocs/master/modules/$appname/variables.sh")
 #
 ############################
 ### Custom Variables End ###
