@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# bash <(curl -sL https://git.io/vxyJw)
+# bash <(curl -sL https://git.io/vxykE)
 #
 ############################
 ##### Basic Info Start #####
@@ -49,13 +49,13 @@ scriptauthor="userdocs"
 contributors="None credited"
 #
 # Set the http://git.io/ shortened URL for the raw github URL here:
-gitiourl="https://git.io/vxyJw"
+gitiourl="https://git.io/vxykE"
 #
 # Don't edit: This is the bash command shown when using the info option.
 gitiocommand="wget -qO ~/$scriptname $gitiourl && bash ~/$scriptname"
 #
 # This is the raw github url of the script to use with the built in updater.
-scripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/rutorrent-autodl-multi/scripts/install.rtorrentmulti.sh"
+scripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/rtorrent-multi/scripts/install.rtorrentmulti.sh"
 #
 # This will generate a 20 character random password for use with your applications.
 apppass="$(< /dev/urandom tr -dc '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' | head -c20; echo;)"
