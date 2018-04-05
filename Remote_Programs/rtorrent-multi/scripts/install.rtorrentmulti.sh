@@ -40,7 +40,7 @@
 scriptversion="1.4.3"
 #
 # Script name goes here. Please prefix with install.
-scriptname="install.multirtru"
+scriptname="install.rtorrentmulti"
 #
 # Author name goes here.
 scriptauthor="userdocs"
@@ -55,7 +55,7 @@ gitiourl="https://git.io/vxyJw"
 gitiocommand="wget -qO ~/$scriptname $gitiourl && bash ~/$scriptname"
 #
 # This is the raw github url of the script to use with the built in updater.
-scripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/rutorrent-autodl-multi/scripts/install.multirtru.sh"
+scripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/rutorrent-autodl-multi/scripts/install.rtorrentmulti.sh"
 #
 # This will generate a 20 character random password for use with your applications.
 apppass="$(< /dev/urandom tr -dc '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' | head -c20; echo;)"
@@ -72,7 +72,7 @@ gitissue="https://github.com/userdocs/userdocs/issues/new"
 wwwurl="$HOME/www/$(whoami).$(hostname -f)/public_html"
 #
 # If you use this script for a single app installation you can set this here. Otherwise leave blank and you will need to set this per installation in a function or before a function is used.
-appname="rtorrent-rutorrent-autodl-multi"
+appname="rtorrent-multi"
 #
 # Please link to the cronscript module for this installer.
 cronscripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/modules/cronscripts/$appname.sh"
@@ -80,52 +80,18 @@ cronscripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/module
 # Please link to the changelog file.
 changelogurl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/$appname/changelog"
 #
+# Disables the built in script updater permanently by setting this variable to 0.
+updaterenabled="1"
+#
 ############################
 ## Custom Variables Start ##
 ############################
 #
-option1="Install a custom instance."
-option2="Update a custom instance"
-option3="Remove a custom instance"
-option4="Fix autodl on a custom instance"
-option5="Quit the script"
-#
-# The link to the github repository for rutorrent.
-giturl="https://github.com/Novik/ruTorrent.git"
-#
-# autodl configuration passwords are created using this variable.
-autodlpass=$(< /dev/urandom tr -dc '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' | head -c20; echo;)
-#
-# Some basic plugins urls. Use the github repo.
-ratiocolor="https://github.com/Gyran/rutorrent-ratiocolor/archive/master.zip"
-#
-# rtorrent.rc template
-confurl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/rtorrent/conf/.rtorrent.rc"
-#
-rutorrentgit="https://github.com/Novik/ruTorrent/archive/master.zip"
-rutorrentmaster="https://github.com/Novik/ruTorrent.git"
-rutorrentconf="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/rutorrent/conf/config.php"
-#
-# api rate limiting is a problem so i used the commands below to bypass the api.
-#
-#autodlirssicommunity="$(curl -s https://api.github.com/repos/autodl-community/autodl-irssi/releases/latest | grep -P '"browser(.*)zip"' | cut -d\" -f4)"
-#autodltrackers="$(curl -s https://api.github.com/repos/autodl-community/autodl-trackers/releases/latest | grep -P '"browser(.*)zip"' | cut -d\" -f4)"
-#autodlrutorrent="$(curl -s https://api.github.com/repos/autodl-community/autodl-rutorrent/releases/latest | grep -P '"browser(.*)zip"' | cut -d\" -f4)"
-#
-autodlirssicommunityv="$(curl -sL https://github.com/autodl-community/autodl-irssi/releases/latest | sed -rn 's#(.*)<a href="/autodl-community/autodl-irssi/releases/tag/(.*)">(.*)</a>#\2#p')"
-autodltrackersv="$(curl -sL https://github.com/autodl-community/autodl-trackers/releases/latest | sed -rn 's#(.*)<a href="/autodl-community/autodl-trackers/releases/tag/(.*)">(.*)</a>#\2#p')"
-autodlrutorrentv="$(curl -sL https://github.com/autodl-community/autodl-rutorrent/releases/latest | sed -rn 's#(.*)<a href="/autodl-community/autodl-rutorrent/releases/tag/(.*)">(.*)</a>#\2#p')"
-#
-autodlirssicommunity="https://github.com/autodl-community/autodl-irssi/releases/download/$autodlirssicommunityv/autodl-irssi-v$autodlirssicommunityv.zip"
-autodltrackers="https://github.com/autodl-community/autodl-trackers/releases/download/$autodltrackersv/autodl-trackers-$autodltrackersv.zip"
-autodlrutorrent="https://github.com/autodl-community/autodl-rutorrent/releases/download/$autodlrutorrentv/autodl-rutorrent-$autodlrutorrentv.zip"
+source <(curl -sL "https://raw.githubusercontent.com/userdocs/userdocs/master/$appname/variables.sh")
 #
 ############################
 ### Custom Variables End ###
 ############################
-#
-# Disables the built in script updater permanently by setting this variable to 0.
-updaterenabled="1"
 #
 ############################
 ####### Variable End #######
