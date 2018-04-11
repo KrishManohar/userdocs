@@ -15,7 +15,7 @@ done
 echo -e "\033[33m""You can check the latest version here:""\e[0m" 'https://www.plex.tv/downloads/'
 echo
 #
-read -ep 'What plex version would you like to install (non plex pass): ' -i '1.12.1.4885-1046ba85f' plexversion
+read -ep 'What plex version would you like to install (non plex pass): ' -i "$plexversion" plexversion
 echo
 #
 echo -e "\033[33m""Your username is:""\e[0m" "$username"

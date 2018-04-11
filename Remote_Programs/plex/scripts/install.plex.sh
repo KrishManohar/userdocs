@@ -84,7 +84,7 @@ changelogurl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_
 ## Custom Variables Start ##
 ############################
 #
- #
+plexversion="1.12.2.4929-29f6d1796"
 #
 ############################
 ### Custom Variables End ###
