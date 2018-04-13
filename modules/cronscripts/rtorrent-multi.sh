@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Part 1: A cron based restarter for a custom instance of rtorrent and autodl.
 # Part 2: A cron based auto-patcher for an installation of autodl to a custom instance using the userdocs script.
