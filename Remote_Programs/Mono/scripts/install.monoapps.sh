@@ -1,16 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 ############################
 ##### Basic Info Start #####
 ############################
 #
-# Script Author: userdocs
-#
-# Script Contributors: 
-#
-# Bash Command for easy reference:
-#
-# wget -qO ~/install.monoapps https://git.io/vzyZ4 && bash ~/install.monoapps
+# bash <(curl -sL https://git.io/vzyZ4)
 #
 # The MIT License (MIT)
 #
@@ -80,7 +74,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.1.3"
+scriptversion="1.1.4"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
@@ -122,8 +116,8 @@ cmakeurl="https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.tar.gz"
 sqlite3url="https://www.sqlite.org/$(date +"%Y")/$(curl -s https://www.sqlite.org/download.html | egrep -om 1 'sqlite-autoconf-(.*).tar.gz')"
 sqlite3v="$(curl -s https://www.sqlite.org/download.html | egrep -om 1 'sqlite-autoconf-(.*).tar.gz' | sed -rn 's/sqlite-autoconf-(.*).tar.gz/\1/p')"
 #
-libtoolurl="http://ftpmirror.gnu.org/libtool/$(curl -s http://ftp.heanet.ie/mirrors/gnu/libtool/ | egrep -o 'libtool-[^"]*\.tar.xz' | sort -V | tail -1)"
-libtoolv="$(curl -s http://ftp.heanet.ie/mirrors/gnu/libtool/ | egrep -o 'libtool-[^"]*\.tar.xz' | sort -V | tail -1 | sed -rn 's/libtool-(.*).tar.xz/\1/p')"
+libtoolurl="http://ftp.gnu.org/gnu/libtool/$(curl -s ftp://ftp.gnu.org/gnu/libtool/ | egrep -o 'libtool-[^"]*\.tar.xz' | sort -V | tail -1)"
+libtoolv="$(curl -s ftp://ftp.gnu.org/gnu/libtool/ | egrep -o 'libtool-[^"]*\.tar.xz' | sort -V | tail -1 | sed -rn 's/libtool-(.*).tar.xz/\1/p')"
 #
 monovfull="$(curl -s http://www.mono-project.com/download/stable/ | sed -rn 's#(.*)<h5>The latest Stable Mono release is: <strong>(.*) Stable \((.*)\)</strong></h5>#\3#p')"
 monourl="https://download.mono-project.com/sources/mono/mono-$monovfull.tar.bz2"
