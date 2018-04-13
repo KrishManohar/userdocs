@@ -4,13 +4,7 @@
 ##### Basic Info Start #####
 ############################
 #
-# Script Author: userdocs
-#
-# Script Contributors: 
-#
-# Bash Command for easy reference:
-#
-# wget -qO ~/install.rtorrentmulti https://git.io/vxhzr && bash ~/install.rtorrentmulti
+# bash <(curl -sL https://git.io/vxhzr)
 #
 # The MIT License (MIT)
 #
