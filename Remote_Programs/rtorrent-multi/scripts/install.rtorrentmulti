@@ -10,7 +10,7 @@
 #
 # Bash Command for easy reference:
 #
-# wget -qO ~/install.multirtru https://git.io/vx2qU && bash ~/install.multirtru
+# wget -qO ~/install.rtorrentmulti https://git.io/vxhzr && bash ~/install.rtorrentmulti
 #
 # The MIT License (MIT)
 #
@@ -55,7 +55,7 @@ scriptauthor="userdocs"
 contributors="None credited"
 #
 # Set the http://git.io/ shortened URL for the raw github URL here:
-gitiourl="https://git.io/vx2qU"
+gitiourl="https://git.io/vxhzr"
 #
 # Don't edit: This is the bash command shown when using the info option.
 gitiocommand="wget -qO ~/$scriptname $gitiourl && bash ~/$scriptname"
