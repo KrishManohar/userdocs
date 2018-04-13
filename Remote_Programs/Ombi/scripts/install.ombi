@@ -1,11 +1,11 @@
-~~~bash
-
+#!/usr/bin/env bash
+#
 [[ $(dpkg -s libunwind8) ]] && echo 'OK' || echo 'Not OK'
-
+#
 # If 'Not OK' open a ticket and ask for this dependency to use withOmbi V3: 
 # apt-get install libunwind8 
 # Or follow these steps below.
-
+#
 # Install a required dependency locally if you can't wait.
 # Only do this if you are installing libunwind8 locally. Otherwise skip this section
 wget -qO ~/libunwind8_1.1-4.1_amd64.deb http://ftp.uk.debian.org/debian/pool/main/libu/libunwind/libunwind8_1.1-4.1_amd64.deb
@@ -13,28 +13,24 @@ dpkg -x ~/libunwind8_1.1-4.1_amd64.deb ~/tmp
 mkdir -p ~/lib && cp -rf ~/tmp/usr/lib/x86_64-linux-gnu/* ~/lib
 cp -rf ~/tmp/usr/lib/x86_64-linux-gnu/. ~/lib
 [[ $(cat ~/.bashrc | grep -cow '^export LD_LIBRARY_PATH="$HOME/lib"$') -eq 0 ]] && echo 'export LD_LIBRARY_PATH="$HOME/lib"' >> ~/.bashrc && source ~/.bashrc || :
-
+#
 # Environment variables you *may* need to set.
-
+#
 [[ $(cat ~/.bashrc | grep -cow '^export LC_ALL=en_US.UTF-8"$') -eq 0 ]] && echo 'export LC_ALL=en_US.UTF-8' >> ~/.bashrc && source ~/.bashrc || :
 [[ $(cat ~/.bashrc | grep -cow '^export LANG=en_US.UTF-8"$') -eq 0 ]] && echo 'export LANG=en_US.UTF-8' >> ~/.bashrc && source ~/.bashrc || :
 [[ $(cat ~/.bashrc | grep -cow '^export LANGUAGE=en_US.UTF-8"$') -eq 0 ]] && echo 'export LANGUAGE=en_US.UTF-8' >> ~/.bashrc && source ~/.bashrc || :
-
+#
 # Download ombi
-
+#
 wget -qO ~/ombi.linux.tar.gz https://github.com/tidusjar/Ombi/releases/download/v3.0.3111/linux.tar.gz
 mkdir -p ~/.ombi && tar xf ~/ombi.linux.tar.gz -C ~/.ombi
-
+#
 # Tidy Up.
-
+#
 rm -rf ~/libunwind8_1.1-4.1_amd64.deb ~/tmp ~/ombi.linux.tar.gz
-
-# 
-
+#
 cd ~/.ombi
-
+#
 # You'll probably want to change this port.
-
+#
 ./Ombi --host http://*:23456
-~~~
-
