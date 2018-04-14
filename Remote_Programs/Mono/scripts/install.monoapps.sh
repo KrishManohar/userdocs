@@ -74,7 +74,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.1.5"
+scriptversion="1.1.6"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
@@ -100,7 +100,7 @@ apppass="$(< /dev/urandom tr -dc '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij
 appport="$(shuf -i 10001-32001 -n 1)"
 #
 # This will take the previously generated port and test it to make sure it is not in use, generating it again until it has selected an open port.
-while [[ "$(ss -ln | grep -co ''"$appport"'')" -ge "1" ]]; do appport="$(shuf -i 10001-32001 -n 1)"; done
+[[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$appport"'')" -ge "1" ]]; do appport="$(shuf -i 10001-32001 -n 1)"; done
 #
 appname=""
 #
