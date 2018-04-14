@@ -74,7 +74,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.1.4"
+scriptversion="1.1.5"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
@@ -113,36 +113,36 @@ gitissue="https://github.com/userdocs/userdocs/issues/new"
 #
 cmakeurl="https://cmake.org/files/v3.11/cmake-3.11.0-Linux-x86_64.tar.gz"
 #
-sqlite3url="https://www.sqlite.org/$(date +"%Y")/$(curl -s https://www.sqlite.org/download.html | egrep -om 1 'sqlite-autoconf-(.*).tar.gz')"
-sqlite3v="$(curl -s https://www.sqlite.org/download.html | egrep -om 1 'sqlite-autoconf-(.*).tar.gz' | sed -rn 's/sqlite-autoconf-(.*).tar.gz/\1/p')"
+sqlite3url="https://www.sqlite.org/$(date +"%Y")/$(curl -sN https://www.sqlite.org/download.html | egrep -om 1 'sqlite-autoconf-(.*).tar.gz')"
+sqlite3v="$(curl -sN https://www.sqlite.org/download.html | egrep -om 1 'sqlite-autoconf-(.*).tar.gz' | sed -rn 's/sqlite-autoconf-(.*).tar.gz/\1/p')"
 #
-libtoolurl="http://ftp.gnu.org/gnu/libtool/$(curl -s http://ftp.gnu.org/gnu/libtool/ | egrep -o 'libtool-[^"]*\.tar.xz' | sort -V | tail -1)"
-libtoolv="$(curl -s http://ftp.gnu.org/gnu/libtool/ | egrep -o 'libtool-[^"]*\.tar.xz' | sort -V | tail -1 | sed -rn 's/libtool-(.*).tar.xz/\1/p')"
+libtoolurl="http://ftp.gnu.org/gnu/libtool/$(curl -sN http://ftp.gnu.org/gnu/libtool/ | egrep -o 'libtool-[^"]*\.tar.xz' | sort -V | tail -1)"
+libtoolv="$(curl -sN http://ftp.gnu.org/gnu/libtool/ | egrep -o 'libtool-[^"]*\.tar.xz' | sort -V | tail -1 | sed -rn 's/libtool-(.*).tar.xz/\1/p')"
 #
-monovfull="$(curl -s http://www.mono-project.com/download/stable/ | sed -rn 's#(.*)<h5>The latest Stable Mono release is: <strong>(.*) Stable \((.*)\)</strong></h5>#\3#p')"
+monovfull="$(curl -sN http://www.mono-project.com/download/stable/ | sed -rn 's#(.*)<h5>The latest Stable Mono release is: <strong>(.*) Stable \((.*)\)</strong></h5>#\3#p')"
 monourl="https://download.mono-project.com/sources/mono/mono-$monovfull.tar.bz2"
 #
 genericproxyapache="https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/proxypass/apache/generic.conf"
 genericproxynginx="https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/proxypass/nginx/generic.conf"
 #
 sonarrurl="http://update.sonarr.tv/v2/master/mono/NzbDrone.master.tar.gz"
-sonarrv="$(curl -s https://github.com/Sonarr/Sonarr/releases | grep -o '/Sonarr/Sonarr/archive/.*\.zip' | sort -V | tail -1 | sed -rn 's|/Sonarr/Sonarr/archive/v(.*).zip|\1|p')"
+sonarrv="$(curl -sN https://github.com/Sonarr/Sonarr/releases | grep -o '/Sonarr/Sonarr/archive/.*\.zip' | sort -V | tail -1 | sed -rn 's|/Sonarr/Sonarr/archive/v(.*).zip|\1|p')"
 sonarrconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Sonarr/configs/config.xml"
 while [[ "$(ss -ln | grep -co ''"$sonarrappport"'')" -ge "1" ]]; do sonarrappport="$(shuf -i 10001-32001 -n 1)"; done
 #
-radarrv="$(curl -s https://github.com/Radarr/Radarr/releases | grep -o '/Radarr/Radarr/archive/.*\.zip' | sort -V | tail -1 | sed -rn 's|/Radarr/Radarr/archive/v(.*).zip|\1|p')"
+radarrv="$(curl -sN https://github.com/Radarr/Radarr/releases | grep -o '/Radarr/Radarr/archive/.*\.zip' | sort -V | tail -1 | sed -rn 's|/Radarr/Radarr/archive/v(.*).zip|\1|p')"
 radarrurl="https://github.com/Radarr/Radarr/releases/download/v$radarrv/Radarr.develop.$radarrv.linux.tar.gz"
 radarrconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Radarr/configs/config.xml"
 [[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$radarrappport"'')" -ge "1" ]]; do radarrappport="$(shuf -i 10001-32001 -n 1)"; done
 #
-jacketturl="$(curl -sL https://api.github.com/repos/Jackett/Jackett/releases/latest | grep -P 'browser(.*)Jackett.Binaries.Mono.tar.gz' | cut -d\" -f4)"
-jackettv="$(curl -sL https://api.github.com/repos/Jackett/Jackett/releases/latest | sed -rn 's/(.*)"tag_name": "v(.*)",/\2/p')"
+jacketturl="$(curl -sNL https://api.github.com/repos/Jackett/Jackett/releases/latest | grep -P 'browser(.*)Jackett.Binaries.Mono.tar.gz' | cut -d\" -f4)"
+jackettv="$(curl -sNL https://api.github.com/repos/Jackett/Jackett/releases/latest | sed -rn 's/(.*)"tag_name": "v(.*)",/\2/p')"
 jacketconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Jackett/configs/ServerConfig.json"
 jackettappport="$(shuf -i 10001-32001 -n 1)"
 [[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$jackettappport"'')" -ge "1" ]]; do jackettappport="$(shuf -i 10001-32001 -n 1)"; done
 #
-embyurl="$(curl -sL https://api.github.com/repos/MediaBrowser/Emby/releases/latest | grep -P 'browser(.*)Emby.Mono.zip' | cut -d\" -f4)"
-embyv="$(curl -sL https://api.github.com/repos/MediaBrowser/Emby/releases/latest | sed -rn 's/(.*)"tag_name": "(.*)",/\2/p')"
+embyurl="$(curl -sNL https://api.github.com/repos/MediaBrowser/Emby/releases/latest | grep -P 'browser(.*)Emby.Mono.zip' | cut -d\" -f4)"
+embyv="$(curl -sNL https://api.github.com/repos/MediaBrowser/Emby/releases/latest | sed -rn 's/(.*)"tag_name": "(.*)",/\2/p')"
 embyconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Emby/configs/system.xml"
 embyappporthttp="$(shuf -i 10001-32001 -n 1)"
 [[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$embyappporthttp"'')" -ge "1" ]]; do embyappporthttp="$(shuf -i 10001-32001 -n 1)"; done
