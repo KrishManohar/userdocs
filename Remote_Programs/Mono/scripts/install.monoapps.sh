@@ -128,7 +128,7 @@ genericproxynginx="https://raw.githubusercontent.com/userdocs/userdocs/master/0_
 sonarrurl="http://update.sonarr.tv/v2/master/mono/NzbDrone.master.tar.gz"
 sonarrv="$(curl -sN https://github.com/Sonarr/Sonarr/releases | grep -o '/Sonarr/Sonarr/archive/.*\.zip' | sort -V | tail -1 | sed -rn 's|/Sonarr/Sonarr/archive/v(.*).zip|\1|p')"
 sonarrconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Sonarr/configs/config.xml"
-while [[ "$(ss -ln | grep -co ''"$sonarrappport"'')" -ge "1" ]]; do sonarrappport="$(shuf -i 10001-32001 -n 1)"; done
+[[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$sonarrappport"'')" -ge "1" ]]; do sonarrappport="$(shuf -i 10001-32001 -n 1)"; done
 #
 radarrv="$(curl -sN https://github.com/Radarr/Radarr/releases | grep -o '/Radarr/Radarr/archive/.*\.zip' | sort -V | tail -1 | sed -rn 's|/Radarr/Radarr/archive/v(.*).zip|\1|p')"
 radarrurl="https://github.com/Radarr/Radarr/releases/download/v$radarrv/Radarr.develop.$radarrv.linux.tar.gz"
