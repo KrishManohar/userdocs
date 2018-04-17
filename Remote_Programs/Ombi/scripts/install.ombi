@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-[[ $(dpkg -s libunwind8) ]] && echo 'OK' || echo 'Not OK'
+[[ $(dpkg -s libunwind8 2> /dev/null) ]] && echo 'OK' || echo 'Not OK'
 #
 # If 'Not OK' open a ticket and ask for this dependency to use withOmbi V3: 
 # apt-get install libunwind8 
@@ -22,7 +22,7 @@ cp -rf ~/tmp/usr/lib/x86_64-linux-gnu/. ~/lib
 #
 # Download ombi
 #
-wget -qO ~/ombi.linux.tar.gz https://github.com/tidusjar/Ombi/releases/download/v3.0.3111/linux.tar.gz
+wget -qO ~/ombi.linux.tar.gz "$(curl -sL https://git.io/vpUqb | grep '/linux.tar.gz' | cut -d\" -f4)"
 mkdir -p ~/.ombi && tar xf ~/ombi.linux.tar.gz -C ~/.ombi
 #
 # Tidy Up.
@@ -33,4 +33,4 @@ cd ~/.ombi
 #
 # You'll probably want to change this port.
 #
-./Ombi --host http://*:23456 --baseurl "/$(whoami)/ombi"
+./Ombi --host http://*:23456 --baseurl /$(whoami)/ombi
