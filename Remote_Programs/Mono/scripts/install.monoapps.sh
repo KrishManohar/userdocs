@@ -74,7 +74,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.1.6"
+scriptversion="1.1.7"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
@@ -135,6 +135,11 @@ radarrurl="https://github.com/Radarr/Radarr/releases/download/v$radarrv/Radarr.d
 radarrconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Radarr/configs/config.xml"
 [[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$radarrappport"'')" -ge "1" ]]; do radarrappport="$(shuf -i 10001-32001 -n 1)"; done
 #
+lidarrv="0.3.0.400"
+lidarrurl="https://ci.appveyor.com/api/buildjobs/u5lcl82gu2jwt6i5/artifacts/Lidarr.develop.0.3.0.400-ofrpsodc.linux.tar.gz"
+lidarrconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Lidarr/configs/config.xml"
+[[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$lidarrappport"'')" -ge "1" ]]; do lidarrappport="$(shuf -i 10001-32001 -n 1)"; done
+#
 jacketturl="$(curl -sNL https://api.github.com/repos/Jackett/Jackett/releases/latest | grep -P 'browser(.*)Jackett.Binaries.Mono.tar.gz' | cut -d\" -f4)"
 jackettv="$(curl -sNL https://api.github.com/repos/Jackett/Jackett/releases/latest | sed -rn 's/(.*)"tag_name": "v(.*)",/\2/p')"
 jacketconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Jackett/configs/ServerConfig.json"
@@ -169,9 +174,10 @@ showMenu () {
     echo "1) Install or update mono"
     echo "2) Install or update Sonarr"
     echo "3) Install or update Radarr"
-    echo "4) Install or update Jackett"
-    echo "5) Install or update Emby"
-    echo "6) Exit"
+    echo "4) Install or update Lidarr"
+    echo "5) Install or update Jackett"
+    echo "6) Install or update Emby"
+    echo "7) Exit"
     #
     echo
 }
@@ -215,11 +221,13 @@ cronscript () {
     #
     [[ "$appname" = "sonarr" ]] && sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/$appname.cronjob
     [[ "$appname" = "radarr" ]] && sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/$appname.cronjob
+    [[ "$appname" = "lidarr" ]] && sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/$appname.cronjob
     [[ "$appname" = "jackett"  ]] && sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/$appname.cronjob
     [[ "$appname" = "emby" ]] && sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/$appname.cronjob
     #
     [[ "$appname" = "sonarr" ]] && sed -i 's|PATH|~/.sonarr/NzbDrone.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
     [[ "$appname" = "radarr" ]] && sed -i 's|PATH|~/.radarr/Radarr.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
+    [[ "$appname" = "lidarr" ]] && sed -i 's|PATH|~/.lidarr/Lidarr.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
     [[ "$appname" = "jackett"  ]] && sed -i 's|PATH|~/.jackett/JackettConsole.exe -c libcurl|g' ~/.userdocs/cronjobs/$appname.cronjob
     [[ "$appname" = "emby" ]] && sed -i 's|PATH|~/.emby/MediaBrowser.Server.Mono.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
     #
@@ -298,6 +306,7 @@ sqlite3setup () {
 programpaths () {
     [[ "$appname" = "sonarr" ]] && apppaths="$HOME/.config/NzbDrone/config.xml"
     [[ "$appname" = "radarr" ]] && apppaths="$HOME/.config/Radarr/config.xml"
+    [[ "$appname" = "lidarr" ]] && apppaths="$HOME/.config/Lidarr/config.xml"
     [[ "$appname" = "jackett" ]] && apppaths="$HOME/.config/Jackett/ServerConfig.json"
     [[ "$appname" = "emby" ]] && apppaths="$HOME/.emby/ProgramData-Server/config/system.xml"
 }
@@ -311,11 +320,13 @@ genericproxypass () {
         #
         [[ "$appname" = "sonarr" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $apppaths)"'|g' ~/.apache2/conf.d/$appname.conf
         [[ "$appname" = "radarr" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $apppaths)"'|g' ~/.apache2/conf.d/$appname.conf
+        [[ "$appname" = "lidarr" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $apppaths)"'|g' ~/.apache2/conf.d/$appname.conf
         [[ "$appname" = "jackett" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)"Port": (.*),|\2|p' $apppaths)"'|g' ~/.apache2/conf.d/$appname.conf
         [[ "$appname" = "emby" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<PublicPort>(.*)</PublicPort>|\2|p' $apppaths)"'|g' ~/.apache2/conf.d/$appname.conf
         #
         [[ "$appname" = "sonarr" && ! -f "$apppaths" ]] && proxyport="$sonarrappport"; sed -i 's|PORT|'"$proxyport"'|g' ~/.apache2/conf.d/$appname.conf
         [[ "$appname" = "radarr" && ! -f "$apppaths" ]] && proxyport="$radarrappport"; sed -i 's|PORT|'"$proxyport"'|g' ~/.apache2/conf.d/$appname.conf
+        [[ "$appname" = "liddarr" && ! -f "$apppaths" ]] && proxyport="$lidarrappport"; sed -i 's|PORT|'"$proxyport"'|g' ~/.apache2/conf.d/$appname.conf
         [[ "$appname" = "jackett" && ! -f "$apppaths" ]] && proxyport="$jackettappport"; sed -i 's|PORT|'"$proxyport"'|g' ~/.apache2/conf.d/$appname.conf
         [[ "$appname" = "emby" && ! -f "$apppaths" ]] && proxyport="$embyappporthttp"; sed -i 's|PORT|'"$proxyport"'|g' ~/.apache2/conf.d/$appname.conf
         #
@@ -327,7 +338,7 @@ genericproxypass () {
             mkdir -p ~/.nginx/proxy
             wget -qO ~/.nginx/conf.d/000-default-server.d/"$appname".conf "$genericproxynginx"
             #
-            if [[ "$appname" =~ ^(sonarr|radarr)$ ]]
+            if [[ "$appname" =~ ^(sonarr|radarr|lidarr)$ ]]
             then
                 sed -i 's|# rewrite /(.*) /username/$1 break;|rewrite /(.*) /username/$1 break;|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
             else
@@ -340,11 +351,13 @@ genericproxypass () {
             #
             [[ "$appname" = "sonarr" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $apppaths)"'|g' ~/.nginx/conf.d/000-default-server.d/$appname.conf
             [[ "$appname" = "radarr" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $apppaths)"'|g' ~/.nginx/conf.d/000-default-server.d/$appname.conf
+            [[ "$appname" = "lidarr" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $apppaths)"'|g' ~/.nginx/conf.d/000-default-server.d/$appname.conf
             [[ "$appname" = "jackett" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)"Port": (.*),|\2|p' $apppaths)"'|g' ~/.nginx/conf.d/000-default-server.d/$appname.conf
             [[ "$appname" = "emby" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<PublicPort>(.*)</PublicPort>|\2|p' $apppaths)"'|g' ~/.nginx/conf.d/000-default-server.d/$appname.conf
             #
             [[ "$appname" = "sonarr" && ! -f "$apppaths" ]] && proxyport="$sonarrappport"; sed -i 's|PORT|'"$proxyport"'|g' ~/.nginx/conf.d/000-default-server.d/$appname.conf
             [[ "$appname" = "radarr" && ! -f "$apppaths" ]] && proxyport="$radarrappport"; sed -i 's|PORT|'"$proxyport"'|g' ~/.nginx/conf.d/000-default-server.d/$appname.conf
+            [[ "$appname" = "lidarr" && ! -f "$apppaths" ]] && proxyport="$lidarrappport"; sed -i 's|PORT|'"$proxyport"'|g' ~/.nginx/conf.d/000-default-server.d/$appname.conf
             [[ "$appname" = "jackett" && ! -f "$apppaths" ]] && proxyport="$jackettappport"; sed -i 's|PORT|'"$proxyport"'|g' ~/.nginx/conf.d/000-default-server.d/$appname.conf
             [[ "$appname" = "emby" && ! -f "$apppaths" ]] && proxyport="$embyappporthttp"; sed -i 's|PORT|'"$proxyport"'|g' ~/.nginx/conf.d/000-default-server.d/$appname.conf
             #
@@ -359,11 +372,13 @@ generichosturl () {
     then
         [[ "$appname" = "sonarr" && -f "$apppaths" ]] && echo -e "\033[32m""https://$(hostname -f)/$(whoami)/$appname/settings/general""\e[0m"
         [[ "$appname" = "radarr" && -f "$apppaths" ]] && echo -e "\033[32m""https://$(hostname -f)/$(whoami)/$appname/settings/general""\e[0m"
+        [[ "$appname" = "lidarr" && -f "$apppaths" ]] && echo -e "\033[32m""https://$(hostname -f)/$(whoami)/$appname/settings/general""\e[0m"
         [[ "$appname" = "jackett" && -f "$apppaths" ]] && echo -e "\033[32m""https://$(hostname -f)/$(whoami)/$appname/""\e[0m"
         [[ "$appname" = "emby" && -f "$apppaths" ]] && echo -e "\033[32m""https://$(hostname -f)/$(whoami)/$appname/""\e[0m"
     else
         [[ "$appname" = "sonarr" && -f "$apppaths" ]] && echo -e "\033[32m""http://$(hostname -f):$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $apppaths)/$(whoami)/$appname/settings/general""\e[0m"
         [[ "$appname" = "radarr" && -f "$apppaths" ]] && echo -e "\033[32m""http://$(hostname -f):$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $apppaths)/$(whoami)/$appname/settings/general""\e[0m"
+        [[ "$appname" = "lidarr" && -f "$apppaths" ]] && echo -e "\033[32m""http://$(hostname -f):$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $apppaths)/$(whoami)/$appname/settings/general""\e[0m"
         [[ "$appname" = "jackett" && -f "$apppaths" ]] && echo -e "\033[32m""http://$(hostname -f):$(sed -rn 's|(.*)"Port": (.*),|\2|p' $apppaths)/$(whoami)/$appname/admin/dashboard""\e[0m"
         [[ "$appname" = "emby" && -f "$apppaths" ]] && echo -e "\033[32m""http://$(hostname -f):$(sed -rn 's|(.*)<PublicPort>(.*)</PublicPort>|\2|p' $apppaths)/""\e[0m"
     fi    
@@ -379,6 +394,7 @@ genericrestart () {
     then
         [[ "$appname" = "sonarr" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; ~/bin/mono --debug $HOME/.$appname/NzbDrone.exe -c libcurl^M"
         [[ "$appname" = "radarr" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; ~/bin/mono --debug $HOME/.$appname/Radarr.exe -c libcurl^M"
+        [[ "$appname" = "lidarr" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; ~/bin/mono --debug $HOME/.$appname/Lidarr.exe -c libcurl^M"
         [[ "$appname" = "jackett" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; ~/bin/mono --debug $HOME/.$appname/JackettConsole.exe -c libcurl^M"
         [[ "$appname" = "emby" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; ~/bin/mono --debug $HOME/.$appname/MediaBrowser.Server.Mono.exe -c libcurl^M"
         echo "${appname^} was restarted"
@@ -397,7 +413,7 @@ genericremove () {
         #
         if [[ "$appname" = "sonarr" ]]
         then
-            rm -rf ~/."$appname" 
+            [[ -d ~/."$appname" ]] && rm -rf ~/."$appname"
             rm -rf ~/.config/NzbDrone
             rm -rf ~/.userdocs/versions/"$appname".version
             rm -rf ~/.userdocs/cronjobs/"$appname".cronjob
@@ -410,7 +426,20 @@ genericremove () {
         fi
         if [[ "$appname" = "radarr" ]]
         then
-            rm -rf ~/."$appname" 
+            [[ -d ~/."$appname" ]] && rm -rf ~/."$appname"
+            rm -rf ~/.config/${appname^}
+            rm -rf ~/.userdocs/versions/$appname.version
+            rm -rf ~/.userdocs/cronjobs/$appname.cronjob
+            rm -rf ~/.userdocs/logins/$appname.login
+            rm -rf ~/.userdocs/pids/$appname.pids
+            rm -rf ~/.userdocs/logs/$appname.log
+            #
+            rm -rf ~/.apache2/conf.d/$appname.conf
+            rm -rf ~/.nginx/conf.d/000-default-server.d/$appname.conf
+        fi
+        if [[ "$appname" = "lidarr" ]]
+        then
+            [[ -d ~/."$appname" ]] && rm -rf ~/."$appname"
             rm -rf ~/.config/${appname^}
             rm -rf ~/.userdocs/versions/$appname.version
             rm -rf ~/.userdocs/cronjobs/$appname.cronjob
@@ -423,7 +452,7 @@ genericremove () {
         fi
         if [[ "$appname" = "jackett" ]]
         then
-            rm -rf ~/."$appname"
+            [[ -d ~/."$appname" ]] && rm -rf ~/."$appname"
             rm -rf ~/.config/Jackett
             rm -rf ~/.userdocs/versions/"$appname".version
             rm -rf ~/.userdocs/cronjobs/"$appname".cronjob
@@ -436,7 +465,7 @@ genericremove () {
         fi
         if [[ "$appname" = "emby" ]]
         then
-            rm -rf ~/."$appname"
+            [[ -d ~/."$appname" ]] && rm -rf ~/."$appname"
             #
             rm -rf ~/.userdocs/versions/"$appname".version
             rm -rf ~/.userdocs/cronjobs/"$appname".cronjob
@@ -832,6 +861,72 @@ do
         "4")
             prerequisites
             #
+            appname="lidarr"
+            #
+            programpaths
+            #
+            [[ -f ~/.$appname/${appname^}.exe ]] && radarrcheck1="ON" || radarrcheck1="NO"
+            [[ -f ~/.userdocs/versions/$appname.version ]] && radarrcheck2="ON" || radarrcheck2="NO"
+            [[ "$(cat ~/.userdocs/versions/$appname.version 2> /dev/null)" = "$lidarrv" ]] && radarrcheck3="ON" || radarrcheck3="NO"
+            #
+            if [[ "$radarrcheck1" != 'ON' || "$radarrcheck2" != 'ON' || "$radarrcheck3" != 'ON' ]] 
+            then
+                [[ -f ~/.$appname/${appname^}.exe ]] && echo "Updating ${appname^}"; echo || echo "Installing ${appname^}"
+                #
+                wget -qO ~/.userdocs/tmp/${appname^}.tar.gz "$lidarrurl"
+                tar xf ~/.userdocs/tmp/${appname^}.tar.gz -C ~/.userdocs/tmp/
+                cp -rf ~/.userdocs/tmp/${appname^}/. ~/.$appname
+                rm -rf ~/.userdocs/tmp/${appname^}{,.tar.gz}
+                #
+                if [[ ! -f "$apppaths" ]]
+                then
+                    mkdir -p ~/.config/${appname^} >> ~/.userdocs/logs/$appname.log 2>&1
+                    wget -qO "$apppaths" "$lidarrconfig"
+                    sed -i 's|<Port>8686</Port>|<Port>'"$lidarrappport"'</Port>|g' "$apppaths"
+                    sed -i 's|<UrlBase></UrlBase>|<UrlBase>/'"$(whoami)"'/'"$appname"'</UrlBase>|g' "$apppaths"
+                fi
+                #
+                cronjobadd
+                echo
+                #
+                cronscript
+                #
+                genericproxypass
+                #
+                genericrestart
+                echo
+                #
+                generichosturl
+                echo
+                #
+                echo -n "$lidarrv" > ~/.userdocs/versions/$appname.version
+                #
+                sleep 2
+            else
+                #
+                cronjobadd
+                #
+                cronscript
+                #
+                genericproxypass
+                #
+                genericrestart
+                echo
+                #
+                generichosturl
+                echo
+                #
+                echo "${appname^} is already and installed and the latest version"; echo
+                #
+                genericremove
+                echo
+                #
+                sleep 2
+            fi
+            ;;
+        "5")
+            prerequisites
+            #
             appname="jackett"
             #
             programpaths
@@ -896,7 +991,7 @@ do
                 sleep 2
             fi
             ;;
-        "5")
+        "6")
             prerequisites
             #
             sqlite3setup
@@ -968,7 +1063,7 @@ do
                 sleep 2
             fi
             ;;
-        "6")
+        "7")
             echo "You chose to quit the script."
             echo
             #
