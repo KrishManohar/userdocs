@@ -1,0 +1,11 @@
+<Config>
+  <LogLevel>Info</LogLevel>
+  <Port>8686</Port>
+  <UrlBase></UrlBase>
+  <BindAddress>*</BindAddress>
+  <SslPort>6868</SslPort>
+  <EnableSsl>False</EnableSsl>
+  <ApiKey></ApiKey>
+  <AuthenticationMethod>None</AuthenticationMethod>
+  <LaunchBrowser>False</LaunchBrowser>
+</Config>
