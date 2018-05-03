@@ -49,6 +49,7 @@
 if [[ ! -z "$1" && "$1" = 'changelog' ]]
 then
     echo
+	echo 'v1.1.8 - added lidarr'
 	echo 'v1.1.2 - unique port variables for sonarr and radarr'
 	echo 'v1.1.1 - Debian Stretch fixes.'
 	echo 'v1.1.0 - Stable and functional release.'
@@ -74,7 +75,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.1.7"
+scriptversion="1.1.8"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
@@ -135,11 +136,6 @@ radarrurl="https://github.com/Radarr/Radarr/releases/download/v$radarrv/Radarr.d
 radarrconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Radarr/configs/config.xml"
 [[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$radarrappport"'')" -ge "1" ]]; do radarrappport="$(shuf -i 10001-32001 -n 1)"; done
 #
-lidarrv="0.3.0.400"
-lidarrurl="https://ci.appveyor.com/api/buildjobs/u5lcl82gu2jwt6i5/artifacts/Lidarr.develop.0.3.0.400-ofrpsodc.linux.tar.gz"
-lidarrconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Lidarr/configs/config.xml"
-[[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$lidarrappport"'')" -ge "1" ]]; do lidarrappport="$(shuf -i 10001-32001 -n 1)"; done
-#
 jacketturl="$(curl -sNL https://api.github.com/repos/Jackett/Jackett/releases/latest | grep -P 'browser(.*)Jackett.Binaries.Mono.tar.gz' | cut -d\" -f4)"
 jackettv="$(curl -sNL https://api.github.com/repos/Jackett/Jackett/releases/latest | sed -rn 's/(.*)"tag_name": "v(.*)",/\2/p')"
 jacketconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Jackett/configs/ServerConfig.json"
@@ -153,6 +149,13 @@ embyappporthttp="$(shuf -i 10001-32001 -n 1)"
 [[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$embyappporthttp"'')" -ge "1" ]]; do embyappporthttp="$(shuf -i 10001-32001 -n 1)"; done
 embyappporthttps="$(shuf -i 10001-32001 -n 1)"
 [[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$embyappporthttps"'')" -ge "1" ]]; do embyappporthttps="$(shuf -i 10001-32001 -n 1)"; done
+#
+# Gets the latest appveyor develop build. The best method currently to stay up to date.
+lidarrv="$(curl -sL https://ci.appveyor.com/api/projects/lidarr/lidarr | grep -oP '"version":"(.*?)",' | cut -d\" -f4)"
+lidarrbid="$(curl -sL https://ci.appveyor.com/api/projects/lidarr/lidarr | grep -oP '"jobId":"(.*?)",' | cut -d\" -f4)"
+lidarrurl="https://ci.appveyor.com/api/buildjobs/$lidarrbid/artifacts/Lidarr.develop.$lidarrv.linux.tar.gz"
+lidarrconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Lidarr/configs/config.xml"
+[[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$lidarrappport"'')" -ge "1" ]]; do lidarrappport="$(shuf -i 10001-32001 -n 1)"; done
 #
 ############################
 ### Custom Variables End ###
