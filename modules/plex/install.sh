@@ -1,5 +1,10 @@
 echo "Welcome to the Feral install plex script."
 echo
+if [[ -d ~/private/plex ]]; then
+    read -ep "Do you want to update to $plexversion: " plexupdate
+    echo
+fi
+#
 while [[ -z "$username" ]]
 do
     read -ep "Enter your plex account username: " username
