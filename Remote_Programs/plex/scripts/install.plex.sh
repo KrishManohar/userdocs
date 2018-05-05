@@ -84,7 +84,8 @@ changelogurl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_
 ## Custom Variables Start ##
 ############################
 #
-plexversion="1.12.2.4929-29f6d1796"
+plexversion="$(curl -sL https://plex.tv/api/downloads/1.json | grep -oP '"version":"(.*)"' | cut -d\" -f4)"
+plexamd64url="$(curl -sL https://plex.tv/api/downloads/1.json | grep -woP '"ubuntu","url":"(.*)_amd64.deb"' | cut -d\" -f6)"
 #
 ############################
 ### Custom Variables End ###
