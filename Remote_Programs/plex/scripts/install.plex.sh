@@ -37,7 +37,7 @@
 ############################
 #
 # Script Version number is set here.
-scriptversion="0.0.2"
+scriptversion="0.0.3"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.plex"
