@@ -32,7 +32,7 @@ if [[ "$plexupdate" =~ ^[Yy]$ ]]; then
     while [[ "$(ps -xU $(whoami) | grep -Ev 'screen (.*) plex' | grep -Ecw "/bin/sh usr/lib/plexmediaserver/start.sh$")" -eq "0" ]]
     do
         countdown="$(( $time-$(($(date +%-M) * 60 + $(date +%-S))) ))"
-        printf '\rsomeapp will restart in approximately: %dm:%ds ' $(($countdown%3600/60)) $(($countdown%60))
+        printf '\rPlex will restart in approximately: %dm:%ds ' $(($countdown%3600/60)) $(($countdown%60))
     done
     echo -e '\n'
     #
