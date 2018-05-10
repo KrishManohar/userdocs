@@ -1,7 +1,7 @@
 echo "Welcome to the Feral install plex script."
 echo
 if [[ -d ~/private/plex ]]; then
-    read -ep "Do you want to update to $plexversion: " plexupdate
+    read -ep "Do you want to update to: " -i "$plexversion" plexupdate
     echo
 fi
 if [[ "$plexupdate" =~ ^[Yy]$ ]]; then
