@@ -16,9 +16,9 @@ cp -rf ~/tmp/usr/lib/x86_64-linux-gnu/. ~/lib
 #
 # Environment variables you *may* need to set.
 #
-[[ $(cat ~/.bashrc | grep -cow '^export LC_ALL=en_US.UTF-8"$') -eq 0 ]] && echo 'export LC_ALL=en_US.UTF-8' >> ~/.bashrc && source ~/.bashrc || :
-[[ $(cat ~/.bashrc | grep -cow '^export LANG=en_US.UTF-8"$') -eq 0 ]] && echo 'export LANG=en_US.UTF-8' >> ~/.bashrc && source ~/.bashrc || :
-[[ $(cat ~/.bashrc | grep -cow '^export LANGUAGE=en_US.UTF-8"$') -eq 0 ]] && echo 'export LANGUAGE=en_US.UTF-8' >> ~/.bashrc && source ~/.bashrc || :
+[[ $(grep -cow '^export LC_ALL=en_US.UTF-8$' ~/.bashrc) -eq 0 ]] && echo 'export LC_ALL=en_US.UTF-8' >> ~/.bashrc && source ~/.bashrc || :
+[[ $(grep -cow '^export LANG=en_US.UTF-8$' ~/.bashrc) -eq 0 ]] && echo 'export LANG=en_US.UTF-8' >> ~/.bashrc && source ~/.bashrc || :
+[[ $(grep -cow '^export LANGUAGE=en_US.UTF-8$' ~/.bashrc) -eq 0 ]] && echo 'export LANGUAGE=en_US.UTF-8' >> ~/.bashrc && source ~/.bashrc || :
 #
 # Download ombi
 #
