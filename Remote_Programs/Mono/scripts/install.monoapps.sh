@@ -75,7 +75,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.1.8"
+scriptversion="1.1.9"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
@@ -231,7 +231,7 @@ cronscript () {
     [[ "$appname" = "sonarr" ]] && sed -i 's|PATH|~/.sonarr/NzbDrone.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
     [[ "$appname" = "radarr" ]] && sed -i 's|PATH|~/.radarr/Radarr.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
     [[ "$appname" = "lidarr" ]] && sed -i 's|PATH|~/.lidarr/Lidarr.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
-    [[ "$appname" = "jackett"  ]] && sed -i 's|PATH|~/.jackett/JackettConsole.exe -c libcurl|g' ~/.userdocs/cronjobs/$appname.cronjob
+    [[ "$appname" = "jackett"  ]] && sed -i 's|PATH|~/.jackett/JackettConsole.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
     [[ "$appname" = "emby" ]] && sed -i 's|PATH|~/.emby/MediaBrowser.Server.Mono.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
     #
 }
@@ -395,11 +395,11 @@ genericrestart () {
     #
     if [[ -z "$(screen -ls $appname | sed -rn 's/[^\s](.*).'"$appname"'(.*)/\1/p')" ]]
     then
-        [[ "$appname" = "sonarr" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; ~/bin/mono --debug $HOME/.$appname/NzbDrone.exe -c libcurl^M"
-        [[ "$appname" = "radarr" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; ~/bin/mono --debug $HOME/.$appname/Radarr.exe -c libcurl^M"
-        [[ "$appname" = "lidarr" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; ~/bin/mono --debug $HOME/.$appname/Lidarr.exe -c libcurl^M"
-        [[ "$appname" = "jackett" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; ~/bin/mono --debug $HOME/.$appname/JackettConsole.exe -c libcurl^M"
-        [[ "$appname" = "emby" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; ~/bin/mono --debug $HOME/.$appname/MediaBrowser.Server.Mono.exe -c libcurl^M"
+        [[ "$appname" = "sonarr" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; ~/bin/mono --debug $HOME/.$appname/NzbDrone.exe^M"
+        [[ "$appname" = "radarr" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; ~/bin/mono --debug $HOME/.$appname/Radarr.exe^M"
+        [[ "$appname" = "lidarr" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; ~/bin/mono --debug $HOME/.$appname/Lidarr.exe^M"
+        [[ "$appname" = "jackett" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; ~/bin/mono --debug $HOME/.$appname/JackettConsole.exe^M"
+        [[ "$appname" = "emby" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; ~/bin/mono --debug $HOME/.$appname/MediaBrowser.Server.Mono.exe^M"
         echo "${appname^} was restarted"
     fi
 }
@@ -422,7 +422,7 @@ genericremove () {
             rm -rf ~/.userdocs/cronjobs/"$appname".cronjob
             rm -rf ~/.userdocs/logins/"$appname".login
             rm -rf ~/.userdocs/pids/"$appname".pids
-            rm -rf ~/.userdocs/logs/$appname.log
+            rm -rf ~/.userdocs/logs/"$appname".log
             #
             rm -rf ~/.apache2/conf.d/"$appname".conf
             rm -rf ~/.nginx/conf.d/000-default-server.d/"$appname".conf
@@ -431,37 +431,37 @@ genericremove () {
         then
             [[ -d ~/."$appname" ]] && rm -rf ~/."$appname"
             rm -rf ~/.config/${appname^}
-            rm -rf ~/.userdocs/versions/$appname.version
-            rm -rf ~/.userdocs/cronjobs/$appname.cronjob
-            rm -rf ~/.userdocs/logins/$appname.login
-            rm -rf ~/.userdocs/pids/$appname.pids
-            rm -rf ~/.userdocs/logs/$appname.log
+            rm -rf ~/.userdocs/versions/"$appname".version
+            rm -rf ~/.userdocs/cronjobs/"$appname".cronjob
+            rm -rf ~/.userdocs/logins/"$appname".login
+            rm -rf ~/.userdocs/pids/"$appname".pids
+            rm -rf ~/.userdocs/logs/"$appname".log
             #
-            rm -rf ~/.apache2/conf.d/$appname.conf
-            rm -rf ~/.nginx/conf.d/000-default-server.d/$appname.conf
+            rm -rf ~/.apache2/conf.d/"$appname".conf
+            rm -rf ~/.nginx/conf.d/000-default-server.d/"$appname".conf
         fi
         if [[ "$appname" = "lidarr" ]]
         then
             [[ -d ~/."$appname" ]] && rm -rf ~/."$appname"
             rm -rf ~/.config/${appname^}
-            rm -rf ~/.userdocs/versions/$appname.version
-            rm -rf ~/.userdocs/cronjobs/$appname.cronjob
-            rm -rf ~/.userdocs/logins/$appname.login
-            rm -rf ~/.userdocs/pids/$appname.pids
-            rm -rf ~/.userdocs/logs/$appname.log
-            #
-            rm -rf ~/.apache2/conf.d/$appname.conf
-            rm -rf ~/.nginx/conf.d/000-default-server.d/$appname.conf
-        fi
-        if [[ "$appname" = "jackett" ]]
-        then
-            [[ -d ~/."$appname" ]] && rm -rf ~/."$appname"
-            rm -rf ~/.config/Jackett
             rm -rf ~/.userdocs/versions/"$appname".version
             rm -rf ~/.userdocs/cronjobs/"$appname".cronjob
             rm -rf ~/.userdocs/logins/"$appname".login
             rm -rf ~/.userdocs/pids/"$appname".pids
-            rm -rf ~/.userdocs/logs/$appname.log
+            rm -rf ~/.userdocs/logs/"$appname".log
+            #
+            rm -rf ~/.apache2/conf.d/"$appname".conf
+            rm -rf ~/.nginx/conf.d/000-default-server.d/"$appname".conf
+        fi
+        if [[ "$appname" = "jackett" ]]
+        then
+            [[ -d ~/."$appname" ]] && rm -rf ~/."$appname"
+            rm -rf ~/.config/${appname^}
+            rm -rf ~/.userdocs/versions/"$appname".version
+            rm -rf ~/.userdocs/cronjobs/"$appname".cronjob
+            rm -rf ~/.userdocs/logins/"$appname".login
+            rm -rf ~/.userdocs/pids/"$appname".pids
+            rm -rf ~/.userdocs/logs/"$appname".log
             #
             rm -rf ~/.apache2/conf.d/"$appname".conf
             rm -rf ~/.nginx/conf.d/000-default-server.d/"$appname".conf
@@ -469,12 +469,11 @@ genericremove () {
         if [[ "$appname" = "emby" ]]
         then
             [[ -d ~/."$appname" ]] && rm -rf ~/."$appname"
-            #
             rm -rf ~/.userdocs/versions/"$appname".version
             rm -rf ~/.userdocs/cronjobs/"$appname".cronjob
             rm -rf ~/.userdocs/logins/"$appname".login
             rm -rf ~/.userdocs/pids/"$appname".pids
-            rm -rf ~/.userdocs/logs/$appname.log
+            rm -rf ~/.userdocs/logs/"$appname".log
             #
             sed -i '/^export PATH=~\/bin:$PATH$/d' ~/.bashrc
             sed -i '/^export LD_LIBRARY_PATH=~\/lib:$LD_LIBRARY_PATH$/d' ~/.bashrc
