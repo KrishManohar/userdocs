@@ -37,7 +37,7 @@
 ############################
 #
 # Script Version number is set here.
-scriptversion="0.0.3"
+scriptversion="0.0.5"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.plex"
@@ -84,8 +84,11 @@ changelogurl="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_
 ## Custom Variables Start ##
 ############################
 #
-plexversion="$(curl -sL https://plex.tv/api/downloads/1.json | grep -oP '"version":"(.*)"' | cut -d\" -f4)"
-plexamd64url="$(curl -sL https://plex.tv/api/downloads/1.json | grep -woP '"ubuntu","url":"(.*)_amd64.deb"' | cut -d\" -f6)"
+#plexversion="$(curl -sL https://plex.tv/api/downloads/1.json | grep -oP '"version":"(.*)"' | cut -d\" -f4)"
+#plexamd64url="$(curl -sL https://plex.tv/api/downloads/1.json | grep -woP '"ubuntu","url":"(.*)_amd64.deb"' | cut -d\" -f6)"
+plextoken=""
+plexversion="$(wget --header "X-Plex-Token:"$plextoken"" "https://plex.tv/api/downloads/1.json?channel=plexpass" -qO - | grep  -woP '"version":"(.*?)"' | cut -d\" -f4 | head -1)"
+plexamd64url="https://plex.tv/downloads/latest/1?channel=16&build=linux-ubuntu-x86_64&distro=ubuntu&X-Plex-Token=$plextoken"
 #
 ############################
 ### Custom Variables End ###
