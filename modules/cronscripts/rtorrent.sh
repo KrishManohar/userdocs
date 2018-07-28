@@ -63,8 +63,8 @@ if [[ "$(ps -xU $(whoami) | grep -Ev 'screen (.*) autodl' | grep -Ecw '(autodl$|
     # Wipe away dead matching screen processes so as not to provide false positives to the main check.
     screen -wipe > /dev/null 2>&1
     #
-    # Create the new screen process in the background and then send it a command.
-    screen -dmS "autodl" && screen -S "autodl" -p 0 -X stuff "irssi^M"
+    # Create the new screen process and log this screen to a file. Then start it in the background and then send it a command.
+    screen -L ~/.userdocs/logs/autodlscreen.log -dmS "autodl" && screen -S "autodl" -p 0 -X stuff "irssi^M"
     #
     # Tell Autodl to update itself by sending a command to the matching screen process.
     screen -S "autodl" -p 0 -X stuff '/autodl update^M'
@@ -95,5 +95,54 @@ fi
 #
 # If Autodl is patched updated is set to 1. If it is 1 this command will send a reload command to the matching autodl screen so the patch takes effect and then reset this variable.
 [[ "$updated" -eq "1" ]] && screen -S "autodl" -p 0 -X stuff '/run autorun/autodl-irssi.pl^M' && updated="0"
+#
+##
+### Part 3: A checker to see if there is a port conflict. If there is then change the port and password then reload Autodl.
+##
+#
+# The Autodl screen is logged to a file which we can search for issues: ~/.userdocs/logs/autodlscreen.log
+# For example, if the port is in use and cannot be used Autodl will give this error below we are grepping for and if the result is 1 then it triggers this section.
+if [[ $(grep -c 'GUI server disabled. Got error: Could not bind to port' ~/.userdocs/logs/autodlscreen.log) -ge '1' ]]; then
+    # This will generate a 20 character random password.
+    apppass="$(< /dev/urandom tr -dc '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' | head -c20; echo;)"
+    # This will generate a random port for the script between the range 10001 to 32001.
+    appport="$(shuf -i 10001-32001 -n 1)"
+    # This wil take the previously generated port and test it to make sure it is not in use, generating it again until it has selected an open port.
+    while [[ "$(ss -ln | grep -co ''"$appport"'')" -ge "1" ]]; do appport="$(shuf -i 10001-32001 -n 1)"; done
+    #
+    # Check to see the autodl config exists.
+    if [[ -f ~/.autodl/autodl.cfg ]]
+    then
+        #
+        # Check to see if config file is empty.
+        if [[ "$(tr -d "\r\n" < ~/.autodl/autodl.cfg | wc -c)" -eq 0 ]]
+        then
+            #
+            # If config file is empty then populate it.
+            echo -e "[options]\ngui-server-port = $appport\ngui-server-password = $apppass" > ~/.autodl/autodl.cfg
+        else
+            #
+            # Sed command to update the port variable in an existing config.
+            sed -ri 's|(.*)gui-server-port =(.*)|gui-server-port = '"$appport"'|g' ~/.autodl/autodl.cfg
+            #
+            # Sed command to update the password variable in an exisiting config.
+            sed -ri 's|(.*)gui-server-password =(.*)|gui-server-password = '"$apppass"'|g' ~/.autodl/autodl.cfg
+        fi
+    else
+        echo -e "[options]\ngui-server-port = $appport\ngui-server-password = $apppass" > ~/.autodl/autodl.cfg
+    fi
+    #
+    # Uses echo to make the config file for the rutorrent plugun to work with autodl using the variables port and pass
+    echo -ne '<?php\n$autodlPort = '"$appport"';\n$autodlPassword = "'"$apppass"'";\n?>' > ~/www/"$(whoami)"."$(hostname -f)"/public_html/rutorrent/plugins/autodl-irssi/conf.php
+    #
+    # Reload Autodl.
+    screen -S "autodl" -p 0 -X stuff '/clear^M'
+    rm -f > ~/.userdocs/logs/autodlscreen.log
+    screen -S "autodl" -p 0 -X stuff '/script load autorun/autodl-irssi.pl^M'
+    #
+    # Echo the time and date this cronjob was run to the ~/.userdocs/cronjobs/logs/rtorrent.log
+    echo "Port conflict fixed at: $(date +"%H:%M on the %d.%m.%y")" >> "$HOME/.userdocs/cronjobs/logs/autodl.log" 2>&1
+    #
+fi
 #
 exit
