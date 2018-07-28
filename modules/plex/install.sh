@@ -15,7 +15,6 @@ if [[ "$plexupdate" =~ ^[Yy]$ ]]; then
     pkill -9 -fu "$(whoami)" 'plexmediaserver' > /dev/null 2>&1
     pkill -9 -fu "$(whoami)" 'EAE Service' > /dev/null 2>&1
     #
-    #
     if [[ "$(date +%-M)" -le '4' ]] && [[ "$(date +%-M)" -ge '0' ]]; then time="$(( 5 * 60 ))"; fi
     if [[ "$(date +%-M)" -le '9' ]] && [[ "$(date +%-M)" -ge '5' ]]; then time="$(( 10 * 60 ))"; fi
     if [[ "$(date +%-M)" -le '14' ]] && [[ "$(date +%-M)" -ge '10' ]]; then time="$(( 15 * 60 ))"; fi
