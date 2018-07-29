@@ -75,7 +75,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.1.9"
+scriptversion="1.1.10"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
@@ -723,9 +723,14 @@ do
                 rm -rf ~/.userdocs/tmp/mono{-*,.tar.bz2}
                 #
                 echo -n "$monovfull" > ~/.userdocs/versions/mono.version
+                ~/bin/cert-sync --quiet --user /etc/ssl/certs/ca-certificates.crt
 				cd ~
             else
-                echo "Mono is already and installed and the latest version"; echo
+                ~/bin/cert-sync --quiet --user /etc/ssl/certs/ca-certificates.crt
+                echo "Mono is already and installed and the latest version"
+                echo
+                echo "The ssl certificates have been synced. Restart your apps if required"
+                echo
             fi
             ;;
         "2")
