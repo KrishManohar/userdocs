@@ -723,10 +723,17 @@ do
                 rm -rf ~/.userdocs/tmp/mono{-*,.tar.bz2}
                 #
                 echo -n "$monovfull" > ~/.userdocs/versions/mono.version
-                ~/bin/cert-sync --quiet --user /etc/ssl/certs/ca-certificates.crt
+                #
+                wget -qO ~/.userdocs/tmp/cacert.pem https://curl.haxx.se/ca/cacert.pem
+                ~/bin/cert-sync --quiet --user ~/.userdocs/tmp/cacert.pem
+                rm ~/.userdocs/tmp/cacert.pem
+                #
 				cd ~
             else
-                ~/bin/cert-sync --quiet --user /etc/ssl/certs/ca-certificates.crt
+                wget -qO ~/.userdocs/tmp/cacert.pem https://curl.haxx.se/ca/cacert.pem
+                ~/bin/cert-sync --quiet --user ~/.userdocs/tmp/cacert.pem
+                rm ~/.userdocs/tmp/cacert.pem
+                #
                 echo "Mono is already and installed and the latest version"
                 echo
                 echo "The ssl certificates have been synced. Restart your apps if required"
