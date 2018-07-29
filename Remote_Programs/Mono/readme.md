@@ -9,7 +9,7 @@ Running and option again post installation will update and offer the option to r
 Mono - Will always use the latest mono stable release.
 Sonarr - Will always use the latest stable release
 Radarr - Will always use the latest stable release
-Lidarr - Will always use the latest appveyor build until an official release if present
+Lidarr - Will always use the latest appveyor build until an official release is present
 Jackett - Will always use the latest stable release
 Emby - Will always use the latest stable release
 
