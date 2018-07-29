@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 #
-# Part 1: A cron based restarter for a custom instance of rtorrent and autodl.
-#
-# Part 2: A cron based auto-patcher for an installation of autodl to a custom instance using the userdocs script.
 #
 # The suffix is set here to be used throughout this cronscript.
 suffix="SUFFIX"
@@ -31,17 +28,19 @@ if [[ "$(ps -xU $(whoami) | grep -Ev "screen (.*) rtorrent-$suffix" | grep -Ecw 
     # Kill the matching processes pid's and then kill command below will provide.
     kill -9 $(echo $(ps -xU $(whoami) | grep -Ew "rtorrent-$suffix(\.rc)?$" | awk '{print $1}')) > /dev/null 2>&1
     #
-    # Remove the rtorrent lock file if present since we know the required processes are not running and this file only will prevent a restart.
+    # Wipe away dead matching screen processes so as not to provide false positives to the main check.
     screen -wipe > /dev/null 2>&1
     #
-    # Create the new screen process in the background and then send it a command.
+    # Remove the rtorrent lock file if present since we know the required processes are not running and this file only will prevent a restart.
     [[ -f "$HOME/private/rtorrent/work/rtorrent-$suffix.lock" ]] && rm -f "$HOME/private/rtorrent/work/rtorrent-$suffix.lock"
     #
-    # Echo the 3 pids of the running processes to a file ~/.userdocs/pids/rtorrent-SUFFIX.pid
+    # Create the new screen process in the background and then send it a command.
     screen -dmS "rtorrent-$suffix" && screen -S "rtorrent-$suffix" -p 0 -X stuff "rtorrent -n -o import=$HOME/.rtorrent-$suffix.rc^M"
     #
-    # Echo the time and date this cronjob was run to the ~/.userdocs/cronjobs/logs/rtorrent-SUFFIX.log
+    # Echo the 3 pids of the running processes to a file ~/.userdocs/pids/rtorrent-SUFFIX.pid
     echo -n "$(echo $(ps -xU $(whoami) | grep -Ev "screen (.*) rtorrent-$suffix" | grep -Ew "rtorrent-$suffix(\.rc)?$" | awk '{print $1}'))" > "$HOME/.userdocs/pids/rtorrent-$suffix.pid"
+    #
+    # Echo the time and date this cronjob was run to the ~/.userdocs/cronjobs/logs/rtorrent.log/rtorrent-SUFFIX.log
     echo "Restarted at: $(date +"%H:%M on the %d.%m.%y")" >> "$HOME/.userdocs/cronjobs/logs/rtorrent-$suffix.log" 2>&1
     #
     # Remove the lock file this cron job created so that the job can run again if required.
@@ -65,7 +64,7 @@ if [[ "$(ps -xU $(whoami) | grep -Ev "screen (.*) autodl-$suffix" | grep -Ecw "(
     screen -wipe > /dev/null 2>&1
     #
     # Create the new screen process in the background and then send it a command.
-    screen -dmS "autodl-$suffix" && screen -S "autodl-$suffix" -p 0 -X stuff "irssi --home=$HOME/.irssi-$suffix/^M"
+    screen -L "$HOME/.userdocs/logs/autodlscreen-$suffix.log" -dmS "autodl-$suffix" && screen -S "autodl-$suffix" -p 0 -X stuff "irssi --home=$HOME/.irssi-$suffix/^M"
     #
     # Tell Autodl to update itself by sending a command to the matching screen process.
     screen -S "autodl-$suffix" -p 0 -X stuff '/autodl update^M'
@@ -109,3 +108,54 @@ fi
 #
 # If Autodl is patched updated is set to 1. If it is 1 this command will send a reload command to the matching autodl screen so the patch takes effect and then reset this variable.
 [[ "$updated" -eq "1" ]] && screen -S "autodl-$suffix" -p 0 -X stuff '/run autorun/autodl-irssi.pl^M' && updated="0"
+#
+##
+### Part 3: A checker to see if there is a port conflict. If there is then change the port and password then reload Autodl.
+##
+#
+# The Autodl screen is logged to a file which we can search for issues: ~/.userdocs/logs/autodlscreen.log
+# For example, if the port is in use and cannot be used Autodl will give this error below we are grepping for and if the result is 1 then it triggers this section.
+if [[ $(grep -c 'GUI server disabled. Got error: Could not bind to port' ~/.userdocs/logs/autodlscreen-$suffix.log) -ge '1' ]]; then
+    # This will generate a 20 character random password.
+    apppass="$(< /dev/urandom tr -dc '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' | head -c20; echo;)"
+    # This will generate a random port for the script between the range 10001 to 32001.
+    appport="$(shuf -i 10001-32001 -n 1)"
+    # This wil take the previously generated port and test it to make sure it is not in use, generating it again until it has selected an open port.
+    while [[ "$(ss -ln | grep -co ''"$appport"'')" -ge "1" ]]; do appport="$(shuf -i 10001-32001 -n 1)"; done
+    #
+    # Check to see the autodl config exists.
+    if [[ -f "$HOME/.autodl-$suffix/autodl.cfg" ]]
+    then
+        #
+        # Check to see if config file is empty.
+        if [[ "$(tr -d "\r\n" < ~/.autodl-$suffix/autodl.cfg | wc -c)" -eq 0 ]]
+        then
+            #
+            # If config file is empty then populate it.
+            echo -e "[options]\ngui-server-port = $appport\ngui-server-password = $apppass" > "$HOME/.autodl-$suffix/autodl.cfg"
+        else
+            #
+            # Sed command to update the port variable in an existing config.
+            sed -ri 's|(.*)gui-server-port =(.*)|gui-server-port = '"$appport"'|g' "$HOME/.autodl-$suffix/autodl.cfg"
+            #
+            # Sed command to update the password variable in an exisiting config.
+            sed -ri 's|(.*)gui-server-password =(.*)|gui-server-password = '"$apppass"'|g' "$HOME/.autodl-$suffix/autodl.cfg"
+        fi
+    else
+        echo -e "[options]\ngui-server-port = $appport\ngui-server-password = $apppass" > "$HOME/.autodl-$suffix/autodl.cfg"
+    fi
+    #
+    # Uses echo to make the config file for the rutorrent plugun to work with autodl using the variables port and pass
+    echo -ne '<?php\n$autodlPort = '"$appport"';\n$autodlPassword = "'"$apppass"'";\n?>' > "$HOME/www/$(whoami).$(hostname -f)/public_html/rutorrent/plugins/autodl-irssi/conf.php"
+    #
+    # Reload Autodl.
+    screen -S "autodl-$suffix" -p 0 -X stuff '/clear^M'
+    rm -f > "$HOME/.userdocs/logs/autodlscreen-$suffix.log"
+    screen -S "autodl-$suffix" -p 0 -X stuff '/script load autorun/autodl-irssi.pl^M'
+    #
+    # Echo the time and date this cronjob was run to the ~/.userdocs/cronjobs/logs/rtorrent.log
+    echo "Port conflict fixed at: $(date +"%H:%M on the %d.%m.%y")" >> "$HOME/.userdocs/cronjobs/logs/autodl-$suffix.log" 2>&1
+    #
+fi
+#
+exit
