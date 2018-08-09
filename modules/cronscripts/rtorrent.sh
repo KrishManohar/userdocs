@@ -110,7 +110,7 @@ fi
 [[ "$autodlfix" = '127.0.0.1' ]] && sed -i "s|'127.0.0.1';|'10.0.0.1';|g" "$HOME/.irssi/scripts/AutodlIrssi/GuiServer.pm" && updated="1"
 #
 # Autodl Rutorrent host patch to change 127.0.0.1 to 10.0.0.1 if the previous checks return 127.0.0.1. Otherwise do nothing.
-[[ "$rutorrentfix" = '127.0.0.1' ]] && sed -i 's|if (!socket_connect($socket, "127.0.0.1", $autodlPort))|if (!socket_connect($socket, "10.0.0.1", $autodlPort))|g' "$wwwurl/rutorrent/plugins/autodl-irssi/getConf.php"
+[[ "$rutorrentfix" = '127.0.0.1' ]] && sed -i 's|if (!@socket_connect($socket, "127.0.0.1", $autodlPort))|if (!@socket_connect($socket, "10.0.0.1", $autodlPort))|g' "$wwwurl/rutorrent/plugins/autodl-irssi/getConf.php"
 #
 # If Autodl is patched updated is set to 1. If it is 1 this command will send a reload command to the matching autodl screen so the patch takes effect and then reset this variable.
 [[ "$updated" -eq "1" ]] && screen -S "autodl" -p 0 -X stuff '/run autorun/autodl-irssi.pl^M' && updated="0"
