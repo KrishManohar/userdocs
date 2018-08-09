@@ -85,7 +85,7 @@ autodlfix () {
     # This edit sets the Autoldl local listening address required for Feral Hosting only
     sed -i "s|use constant LISTEN_ADDRESS => '127.0.0.1';|use constant LISTEN_ADDRESS => '10.0.0.1';|g" "$HOME/.irssi-$suffix/scripts/AutodlIrssi/GuiServer.pm"
     # This edit sets the Autoldl local listening address required for Feral Hosting only
-    sed -i 's|if (!@socket_connect($socket, "127.0.0.1", $autodlPort))|if (!socket_connect($socket, "10.0.0.1", $autodlPort))|g' "$wwwurl/rutorrent-$suffix/plugins/autodl-irssi/getConf.php"
+    sed -i 's|if (!@socket_connect($socket, "127.0.0.1", $autodlPort))|if (!@socket_connect($socket, "10.0.0.1", $autodlPort))|g' "$wwwurl/rutorrent-$suffix/plugins/autodl-irssi/getConf.php"
     # This edit set the Autodl home directory, required for a non standard installation.
     sed -i 's|return File::Spec->catfile(getHomeDir(), ".autodl");|return File::Spec->catfile(getHomeDir(), ".autodl-'"$suffix"'");|g' "$HOME/.irssi-$suffix/scripts/AutodlIrssi/Dirs.pm"
     # This edit sets the path to the autodl.cfg that the rutorrent plugin will use and edit, required for a non standard installation.
