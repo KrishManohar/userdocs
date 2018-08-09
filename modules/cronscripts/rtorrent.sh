@@ -2,7 +2,7 @@
 #
 # Install command: curl -sL https://git.io/vxyKo --create-dir -o ~/.userdocs/cronjobs/rtorrent.cronjob
 #
-# Crontab command: * * * * * bash -l ~/.userdocs/cronjobs/rtorrent.cronjob >> ~/.userdocs/cronjobs/logs/rtorrent.log 2>&1
+# Crontab command: */2 * * * * bash -l ~/.userdocs/cronjobs/rtorrent.cronjob >> ~/.userdocs/cronjobs/logs/rtorrent.log 2>&1
 #
 # Please set the path to your www root here.
 wwwurl="$HOME/www/$(whoami).$(hostname -f)/public_html"
@@ -15,18 +15,28 @@ mkdir -p ~/.userdocs/{versions,cronjobs/logs,logins,logs,pids,tmp}
 #
 ##
 ###
-#### Part 1: A cron based restarter for the default instance of rtorrent installed via the manager and or Autodl installed via the Feral Wiki.
+#### Part 1.1: A cron based restarter for the default instance of rtorrent installed via the manager and or Autodl installed via the Feral Wiki.
 ###
-## The below if section is the restart job for your default rtorrent installation. This will only manage the default installation.
+##
 #
-# This is our check to see if the 3 required processes ares running. This match is very specific and will only match the default installation processes and not other instances. Otherwise do nothing.
-if [[ "$(ps -xU $(whoami) | grep -Ev 'screen (.*) rtorrent' | grep -Ecw "rtorrent$")" -ne '3' && -d "$HOME/private/rtorrent" && ! -f "$HOME/.userdocs/tmp/rtorrent.lock" ]]; then
+# This check will see if rtorrent is running. If not then it will remove the cronjob lock file and kill and wipe all related screens.
+if [[ "$(ps -xU $(whoami) | grep -Ecw "rtorrent$")" -eq '0' ]]; then
+    rm -f "$HOME/.userdocs/tmp/rtorrent.lock"
+    kill -9 $(screen -ls | grep -Ew "rtorrent\s" | awk '{print $1}' | cut -d \. -f 1) > /dev/null 2>&1
+    screen -wipe
+fi
+#
+# The below if section is the restart job for your default rtorrent installation. This will only manage the default installation.
+#
+# This is our check to see if the 2 required processes ares running. This match is very specific and will only match the default installation processes and not other instances. Otherwise do nothing.
+if [[ "$(ps -xU $(whoami) | grep -Ecw "rtorrent$")" -ne '2' && -d "$HOME/private/rtorrent" && ! -f "$HOME/.userdocs/tmp/rtorrent.lock" ]]; then
     #
     # Create this file so that the cronjob will skipped if it is restarting the processes and attempts to run again.
     touch "$HOME/.userdocs/tmp/rtorrent.lock"
     #
     # Kill the matching processes pid's and then kill command below will provide.
     kill -9 $(echo $(ps -xU $(whoami) | grep -Ew "rtorrent$" | awk '{print $1}')) > /dev/null 2>&1
+    kill -9 $(screen -ls | grep -Ew "rtorrent\s" | awk '{print $1}' | cut -d \. -f 1) > /dev/null 2>&1
     #
     # Wipe away dead matching screen processes so as not to provide false positives to the main check.
     screen -wipe > /dev/null 2>&1
@@ -38,7 +48,7 @@ if [[ "$(ps -xU $(whoami) | grep -Ev 'screen (.*) rtorrent' | grep -Ecw "rtorren
     screen -dmS "rtorrent" && screen -S "rtorrent" -p 0 -X stuff "rtorrent^M"
     #
     # Echo the 3 pids of the running processes to a file ~/.userdocs/pids/rtorrent.pid
-    echo -n "$(echo $(ps -xU $(whoami) | grep -Ev 'screen (.*) rtorrent' | grep -Ew "rtorrent$" | awk '{print $1}'))" > "$HOME/.userdocs/pids/rtorrent.pid"
+    echo -n $(ps -xU $(whoami) | grep -Ew "rtorrent$" | awk '{print $1}') $(screen -ls | grep -Ew "rtorrent\s" | awk '{print $1}' | cut -d \. -f 1) > "$HOME/.userdocs/pids/rtorrent.pid"
     #
     # Echo the time and date this cronjob was run to the ~/.userdocs/cronjobs/logs/rtorrent.log
     echo "Restarted at: $(date +"%H:%M on the %d.%m.%y")" >> "$HOME/.userdocs/cronjobs/logs/rtorrent.log" 2>&1
@@ -49,16 +59,25 @@ if [[ "$(ps -xU $(whoami) | grep -Ev 'screen (.*) rtorrent' | grep -Ecw "rtorren
 fi
 #
 ##
-### The restart job for your autodl installation. This will only manage the default installation.
+### Part 1.2: The restart job for your autodl installation. This will only manage the default installation.
 ##
+#
+# This check will see if irssi is running. If not then it will remove the cronjob lock file and kill and wipe all related screens.
+if [[ "$(ps -xU $(whoami) | grep -Ecw 'irssi$')" -eq '0' ]]; then
+    rm -f "$HOME/.userdocs/tmp/autodl.lock"
+    kill -9 "$(screen -ls | grep -Ew "autodl\s" | awk '{print $1}' | cut -d \. -f 1)" > /dev/null 2>&1
+    screen -wipe
+fi
+#
 # This is our check to see if the 3 required processes ares running. This match is very specific and will only match the default installation processes and not other instances. Otherwise do nothing.
-if [[ "$(ps -xU $(whoami) | grep -Ev 'screen (.*) autodl' | grep -Ecw '(autodl$|irssi$)')" -ne '2' && -d "$HOME/.autodl" && -d "$HOME/.irssi" && ! -f "$HOME/.userdocs/tmp/autodl.lock" ]]; then
+if [[ "$(ps -xU $(whoami) | grep -Ecw 'irssi$')" -ne '1' && -d "$HOME/.autodl" && -d "$HOME/.irssi" && ! -f "$HOME/.userdocs/tmp/autodl.lock" ]]; then
     #
     # Create this file so that the cronjob will skipped if it is restarting the processes and attempts to run again.
     touch "$HOME/.userdocs/tmp/autodl.lock"
     #
     # Kill the matching processes pid's and then kill command below will provide.
-    kill -9 $(echo $(ps -xU $(whoami) | grep -Ew "(autodl$|irssi$)" | awk '{print $1}')) > /dev/null 2>&1
+    kill -9 $(echo $(ps -xU $(whoami) | grep -Ew "irssi$" | awk '{print $1}')) > /dev/null 2>&1
+    kill -9 $(screen -ls | grep -Ew "autodl\s" | awk '{print $1}' | cut -d \. -f 1) > /dev/null 2>&1
     #
     # Wipe away dead matching screen processes so as not to provide false positives to the main check.
     screen -wipe > /dev/null 2>&1
@@ -70,7 +89,7 @@ if [[ "$(ps -xU $(whoami) | grep -Ev 'screen (.*) autodl' | grep -Ecw '(autodl$|
     screen -S "autodl" -p 0 -X stuff '/autodl update^M'
     #
     # Echo the 2 pids of the running processes to a file ~/.userdocs/pids/autodl.pid
-    echo -n "$(echo $(ps -xU $(whoami) | grep -Ev 'screen (.*) autodl' | grep -Ew '(autodl$|irssi$)' | awk '{print $1}'))" > "$HOME/.userdocs/pids/autodl.pid"
+    echo -n $(ps -xU $(whoami) | grep -Ew 'irssi$' | awk '{print $1}') $(screen -ls | grep -Ew "autodl\s" | awk '{print $1}' | cut -d \. -f 1) > "$HOME/.userdocs/pids/autodl.pid"
     #
     # Echo the time and date this cronjob was run to the ~/.userdocs/cronjobs/logs/autodl.log
     echo "Restarted at: $(date +"%H:%M on the %d.%m.%y")" >> "$HOME/.userdocs/cronjobs/logs/autodl.log" 2>&1
