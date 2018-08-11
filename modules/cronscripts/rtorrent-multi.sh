@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 #
+# Part 1: A cron based restarter for a custom instance of rtorrent and autodl.
+#
+# Part 2: A cron based auto-patcher for an installation of autodl to a custom instance using the userdocs script.
 #
 # The suffix is set here to be used throughout this cronscript.
 suffix="SUFFIX"
@@ -15,32 +18,42 @@ mkdir -p ~/.userdocs/{versions,cronjobs/logs,logins,logs,pids,tmp}
 #
 ##
 ###
-#### Part 1: A cron based restarter for custom instance of rtorrent installed via the manager and or Autodl installed via this script.
+#### Part 1.1: A cron based restarter for custom instance of rtorrent installed via the manager and or Autodl installed via this script.
 ###
-## The below if section is the restart job for your custom rtorrent installation. This will only manage you custom installation.
+##
 #
-# This is our check to see if the 3 required processes ares running. This match is very specific and will only match the default installation processes and not other instances. Otherwise do nothing.
-if [[ "$(ps -xU $(whoami) | grep -Ev "screen (.*) rtorrent-$suffix" | grep -Ecw "rtorrent-$suffix(\.rc)?$" | awk '{print $1}')" -ne '3' && -d "$HOME/private/rtorrent-$suffix" && ! -f "$HOME/.userdocs/tmp/rtorrent-$suffix.lock" ]]; then
+# This check will see if rtorrent is running. If not then it will remove the cronjob lock file and kill and wipe all related screens.
+if [[ "$(ps -xU $(whoami) | grep -Ecw "rtorrent-$suffix(\.rc)?$")" -eq '0' ]]; then
+    kill -9 $(ps -xU $(whoami) | grep -Ew "rtorrent-$suffix(\.rc)?$" | awk '{print $1}') $(screen -ls | grep -Ew "rtorrent-$suffix" | awk '{print $1}' | cut -d \. -f 1) > /dev/null 2>&1
+    screen -wipe
+    [[ -f "$HOME/private/rtorrent-$suffix/work/rtorrent.lock" ]] && rm -f "$HOME/private/rtorrent-$suffix/work/rtorrent.lock"
+    rm -f "$HOME/.userdocs/tmp/rtorrent-$suffix.lock"
+fi
+#
+# The below if section is the restart job for your custom rtorrent installation. This will only manage your custom installation.
+#
+# This is our check to see if the 2 required processes ares running. This match is very specific and will only match the default installation processes and not other instances. Otherwise do nothing.
+if [[ "$(ps -xU $(whoami) | grep -Ecw "rtorrent-$suffix(\.rc)?$" | awk '{print $1}')" -ne '2' && -d "$HOME/private/rtorrent-$suffix" && ! -f "$HOME/.userdocs/tmp/rtorrent-$suffix.lock" ]]; then
     #
     # Create this file so that the cronjob will skipped if it is restarting the processes and attempts to run again.
-    touch "$HOME/.userdocs/tmp/rtorrent.lock-$suffix"
+    touch "$HOME/.userdocs/tmp/rtorrent-$suffix.lock"
     #
     # Kill the matching processes pid's and then kill command below will provide.
-    kill -9 $(echo $(ps -xU $(whoami) | grep -Ew "rtorrent-$suffix(\.rc)?$" | awk '{print $1}')) > /dev/null 2>&1
+    kill -9 $(ps -xU $(whoami) | grep -Ew "rtorrent-$suffix(\.rc)?$" | awk '{print $1}') $(screen -ls | grep -Ew "rtorrent-$suffix" | awk '{print $1}' | cut -d \. -f 1) > /dev/null 2>&1
     #
     # Wipe away dead matching screen processes so as not to provide false positives to the main check.
     screen -wipe > /dev/null 2>&1
     #
-    # Remove the rtorrent lock file if present since we know the required processes are not running and this file only will prevent a restart.
-    [[ -f "$HOME/private/rtorrent/work/rtorrent-$suffix.lock" ]] && rm -f "$HOME/private/rtorrent/work/rtorrent-$suffix.lock"
+    # Remove the rtorrent-$suffix lock file if present since we know the required processes are not running and this file only will prevent a restart.
+    [[ -f "$HOME/private/rtorrent-$suffix/work/rtorrent.lock" ]] && rm -f "$HOME/private/rtorrent-$suffix/work/rtorrent.lock"
     #
     # Create the new screen process in the background and then send it a command.
     screen -dmS "rtorrent-$suffix" && screen -S "rtorrent-$suffix" -p 0 -X stuff "rtorrent -n -o import=$HOME/.rtorrent-$suffix.rc^M"
     #
-    # Echo the 3 pids of the running processes to a file ~/.userdocs/pids/rtorrent-SUFFIX.pid
-    echo -n "$(echo $(ps -xU $(whoami) | grep -Ev "screen (.*) rtorrent-$suffix" | grep -Ew "rtorrent-$suffix(\.rc)?$" | awk '{print $1}'))" > "$HOME/.userdocs/pids/rtorrent-$suffix.pid"
+    # Echo the pids of the running processes to a file ~/.userdocs/pids/rtorrent-SUFFIX.pid
+    echo -n $(ps -xU $(whoami) | grep -Ew "rtorrent-$suffix(\.rc)?$" | awk '{print $1}') $(screen -ls | grep -Ew "rtorrent-$suffix" | awk '{print $1}' | cut -d \. -f 1) > "$HOME/.userdocs/pids/rtorrent-$suffix.pid"
     #
-    # Echo the time and date this cronjob was run to the ~/.userdocs/cronjobs/logs/rtorrent.log/rtorrent-SUFFIX.log
+    # Echo the time and date this cronjob was run to the ~/.userdocs/cronjobs/logs/rtorrent-SUFFIX.log
     echo "Restarted at: $(date +"%H:%M on the %d.%m.%y")" >> "$HOME/.userdocs/cronjobs/logs/rtorrent-$suffix.log" 2>&1
     #
     # Remove the lock file this cron job created so that the job can run again if required.
@@ -49,28 +62,36 @@ if [[ "$(ps -xU $(whoami) | grep -Ev "screen (.*) rtorrent-$suffix" | grep -Ecw 
 fi
 #
 ##
-### The restart job for your autodl installation. This will only manage your custom installation.
+### Part 1.2: The restart job for your autodl installation. This will only manage your custom installation.
 ##
-# This is our check to see if the 3 required processes ares running. This match is very specific and will only match custom installation processes and not other instances. Otherwise do nothing.
-if [[ "$(ps -xU $(whoami) | grep -Ev "screen (.*) autodl-$suffix" | grep -Ecw "(autodl-$suffix$|irssi-$suffix/$)")" -ne '2' && -d "$HOME/.autodl-$suffix" && -d "$HOME/.irssi-$suffix" && ! -f "$HOME/.userdocs/tmp/autodl-$suffix.lock" ]]; then
+#
+# This check will see if irssi is running. If not then it will remove the cronjob lock file and kill and wipe all related screens.
+if [[ "$(ps -xU $(whoami) | grep -Ecw 'irssi-$suffix$')" -eq '0' ]]; then
+    rm -f "$HOME/.userdocs/tmp/autodl-$suffix.lock"
+    kill -9 $(ps -xU $(whoami) | grep -Ew "irssi-$suffix/$" | awk '{print $1}') $(screen -ls | grep -Ew "autodl-$suffix" | awk '{print $1}' | cut -d \. -f 1) > /dev/null 2>&1
+    screen -wipe
+fi
+#
+# This is our check to see if the 3 required processes ares running. This match is very specific and will only match your custom installation processes and not other instances. Otherwise do nothing.
+if [[ "$(ps -xU $(whoami) | grep -Ecw "irssi-$suffix/$")" -ne '1' && -d "$HOME/.autodl-$suffix" && -d "$HOME/.irssi-$suffix" && ! -f "$HOME/.userdocs/tmp/autodl-$suffix.lock" ]]; then
     #
     # Create this file so that the cronjob will skipped if it is restarting the processes and attempts to run again.
     touch "$HOME/.userdocs/tmp/autodl-$suffix.lock"
     #
     # Kill the matching processes pid's and then kill command below will provide.
-    kill -9 $(echo $(ps -xU $(whoami) | grep -Ew "(autodl-$suffix$|irssi-$suffix/$)" | awk '{print $1}')) > /dev/null 2>&1
+    kill -9 $(ps -xU $(whoami) | grep -Ew "irssi-$suffix/$" | awk '{print $1}') $(screen -ls | grep -Ew "autodl-$suffix" | awk '{print $1}' | cut -d \. -f 1) > /dev/null 2>&1
     #
     # Wipe away dead matching screen processes so as not to provide false positives to the main check.
     screen -wipe > /dev/null 2>&1
     #
-    # Create the new screen process in the background and then send it a command.
+    # Create the new screen process and log this screen to a file. Then start it in the background and then send it a command.
     screen -L "$HOME/.userdocs/logs/autodlscreen-$suffix.log" -dmS "autodl-$suffix" && screen -S "autodl-$suffix" -p 0 -X stuff "irssi --home=$HOME/.irssi-$suffix/^M"
     #
     # Tell Autodl to update itself by sending a command to the matching screen process.
     screen -S "autodl-$suffix" -p 0 -X stuff '/autodl update^M'
     #
     # Echo the 2 pids of the running processes to a file ~/.userdocs/pids/autodl-SUFFIX.pid
-    echo -n "$(echo $(ps -xU $(whoami) | grep -Ev 'screen (.*) autodl' | grep -Ew "(autodl-$suffix$|irssi-$suffix/$)" | awk '{print $1}'))" > "$HOME/.userdocs/pids/autodl-$suffix.pid"
+    echo $(screen -ls | grep -Ew "autodl-$suffix" | awk '{print $1}' | cut -d \. -f 1) $(ps -xU $(whoami) | grep -Ew "irssi-$suffix/$" | awk '{print $1}') > "$HOME/.userdocs/pids/autodl-$suffix.pid"
     #
     # Echo the time and date this cronjob was run to the ~/.userdocs/cronjobs/logs/autodl-SUFFIX.log
     echo "Restarted at: $(date +"%H:%M on the %d.%m.%y")" >> "$HOME/.userdocs/cronjobs/logs/autodl-$suffix.log" 2>&1
@@ -91,7 +112,7 @@ fi
 [[ "$autodlfix" = '127.0.0.1' ]] && sed -i "s|'127.0.0.1';|'10.0.0.1';|g" "$HOME/.irssi-$suffix/scripts/AutodlIrssi/GuiServer.pm" && updated="1"
 #
 # Autodl Rutorrent host patch to change 127.0.0.1 to 10.0.0.1 if the previous checks return 127.0.0.1. Otherwise do nothing.
-[[ "$rutorrentfix" = '127.0.0.1' ]] && sed -i 's|if (!socket_connect($socket, "127.0.0.1", $autodlPort))|if (!socket_connect($socket, "10.0.0.1", $autodlPort))|g' "$wwwurl/rutorrent-$suffix/plugins/autodl-irssi/getConf.php"
+[[ "$rutorrentfix" = '127.0.0.1' ]] && sed -i 's|if (!@socket_connect($socket, "127.0.0.1", $autodlPort))|if (!@socket_connect($socket, "10.0.0.1", $autodlPort))|g' "$wwwurl/rutorrent-$suffix/plugins/autodl-irssi/getConf.php"
 #
 # Check to see what the hard coded home directory is set to.
 [[ -f "$HOME/.irssi-$suffix/scripts/AutodlIrssi/Dirs.pm" ]] && autodlhome="$(sed -n 's#\(.*\)return File::Spec->catfile(getHomeDir(), "\(.*\)");#\2#p' "$HOME/.irssi-$suffix/scripts/AutodlIrssi/Dirs.pm")"
@@ -113,7 +134,7 @@ fi
 ### Part 3: A checker to see if there is a port conflict. If there is then change the port and password then reload Autodl.
 ##
 #
-# The Autodl screen is logged to a file which we can search for issues: ~/.userdocs/logs/autodlscreen.log
+# The Autodl screen is logged to a file which we can search for issues: ~/.userdocs/logs/autodlscreen-SUFFIX.log
 # For example, if the port is in use and cannot be used Autodl will give this error below we are grepping for and if the result is 1 then it triggers this section.
 if [[ $(grep -c 'GUI server disabled. Got error: Could not bind to port' ~/.userdocs/logs/autodlscreen-$suffix.log) -ge '1' ]]; then
     # This will generate a 20 character random password.
