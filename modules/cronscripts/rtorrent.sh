@@ -4,6 +4,9 @@
 #
 # Crontab command: */2 * * * * bash -l ~/.userdocs/cronjobs/rtorrent.cronjob >> ~/.userdocs/cronjobs/logs/rtorrent.log 2>&1
 #
+#
+#
+#
 # Please set the path to your www root here.
 wwwurl="$HOME/www/$(whoami).$(hostname -f)/public_html"
 #
@@ -21,9 +24,10 @@ mkdir -p ~/.userdocs/{versions,cronjobs/logs,logins,logs,pids,tmp}
 #
 # This check will see if rtorrent is running. If not then it will remove the cronjob lock file and kill and wipe all related screens.
 if [[ "$(ps -xU $(whoami) | grep -Ecw "rtorrent$")" -eq '0' ]]; then
-    rm -f "$HOME/.userdocs/tmp/rtorrent.lock"
-    kill -9 $(screen -ls | grep -Ew "rtorrent\s" | awk '{print $1}' | cut -d \. -f 1) > /dev/null 2>&1
+    kill -9 $(ps -xU $(whoami) | grep -Ew "rtorrent$" | awk '{print $1}') $(screen -ls | grep -Ew "rtorrent\s" | awk '{print $1}' | cut -d \. -f 1) > /dev/null 2>&1
     screen -wipe
+    [[ -f "$HOME/private/rtorrent/work/rtorrent.lock" ]] && rm -f "$HOME/private/rtorrent/work/rtorrent.lock"
+    rm -f "$HOME/.userdocs/tmp/rtorrent-$suffix"
 fi
 #
 # The below if section is the restart job for your default rtorrent installation. This will only manage the default installation.
@@ -35,8 +39,7 @@ if [[ "$(ps -xU $(whoami) | grep -Ecw "rtorrent$")" -ne '2' && -d "$HOME/private
     touch "$HOME/.userdocs/tmp/rtorrent.lock"
     #
     # Kill the matching processes pid's and then kill command below will provide.
-    kill -9 $(echo $(ps -xU $(whoami) | grep -Ew "rtorrent$" | awk '{print $1}')) > /dev/null 2>&1
-    kill -9 $(screen -ls | grep -Ew "rtorrent\s" | awk '{print $1}' | cut -d \. -f 1) > /dev/null 2>&1
+    kill -9 $(ps -xU $(whoami) | grep -Ew "rtorrent$" | awk '{print $1}') $(screen -ls | grep -Ew "rtorrent\s" | awk '{print $1}' | cut -d \. -f 1) > /dev/null 2>&1
     #
     # Wipe away dead matching screen processes so as not to provide false positives to the main check.
     screen -wipe > /dev/null 2>&1
@@ -47,7 +50,7 @@ if [[ "$(ps -xU $(whoami) | grep -Ecw "rtorrent$")" -ne '2' && -d "$HOME/private
     # Create the new screen process in the background and then send it a command.
     screen -dmS "rtorrent" && screen -S "rtorrent" -p 0 -X stuff "rtorrent^M"
     #
-    # Echo the 3 pids of the running processes to a file ~/.userdocs/pids/rtorrent.pid
+    # Echo the pids of the running processes to a file ~/.userdocs/pids/rtorrent.pid
     echo -n $(ps -xU $(whoami) | grep -Ew "rtorrent$" | awk '{print $1}') $(screen -ls | grep -Ew "rtorrent\s" | awk '{print $1}' | cut -d \. -f 1) > "$HOME/.userdocs/pids/rtorrent.pid"
     #
     # Echo the time and date this cronjob was run to the ~/.userdocs/cronjobs/logs/rtorrent.log
@@ -65,7 +68,7 @@ fi
 # This check will see if irssi is running. If not then it will remove the cronjob lock file and kill and wipe all related screens.
 if [[ "$(ps -xU $(whoami) | grep -Ecw 'irssi$')" -eq '0' ]]; then
     rm -f "$HOME/.userdocs/tmp/autodl.lock"
-    kill -9 "$(screen -ls | grep -Ew "autodl\s" | awk '{print $1}' | cut -d \. -f 1)" > /dev/null 2>&1
+    kill -9 $(ps -xU $(whoami) | grep -Ew "irssi$" | awk '{print $1}') $(screen -ls | grep -Ew "autodl\s" | awk '{print $1}' | cut -d \. -f 1) > /dev/null 2>&1
     screen -wipe
 fi
 #
@@ -76,8 +79,7 @@ if [[ "$(ps -xU $(whoami) | grep -Ecw 'irssi$')" -ne '1' && -d "$HOME/.autodl" &
     touch "$HOME/.userdocs/tmp/autodl.lock"
     #
     # Kill the matching processes pid's and then kill command below will provide.
-    kill -9 $(echo $(ps -xU $(whoami) | grep -Ew "irssi$" | awk '{print $1}')) > /dev/null 2>&1
-    kill -9 $(screen -ls | grep -Ew "autodl\s" | awk '{print $1}' | cut -d \. -f 1) > /dev/null 2>&1
+    kill -9 $(ps -xU $(whoami) | grep -Ew "irssi$" | awk '{print $1}') $(screen -ls | grep -Ew "autodl\s" | awk '{print $1}' | cut -d \. -f 1) > /dev/null 2>&1
     #
     # Wipe away dead matching screen processes so as not to provide false positives to the main check.
     screen -wipe > /dev/null 2>&1
@@ -112,6 +114,19 @@ fi
 # Autodl Rutorrent host patch to change 127.0.0.1 to 10.0.0.1 if the previous checks return 127.0.0.1. Otherwise do nothing.
 [[ "$rutorrentfix" = '127.0.0.1' ]] && sed -i 's|if (!@socket_connect($socket, "127.0.0.1", $autodlPort))|if (!@socket_connect($socket, "10.0.0.1", $autodlPort))|g' "$wwwurl/rutorrent/plugins/autodl-irssi/getConf.php"
 #
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
 # If Autodl is patched updated is set to 1. If it is 1 this command will send a reload command to the matching autodl screen so the patch takes effect and then reset this variable.
 [[ "$updated" -eq "1" ]] && screen -S "autodl" -p 0 -X stuff '/run autorun/autodl-irssi.pl^M' && updated="0"
 #
@@ -121,7 +136,7 @@ fi
 #
 # The Autodl screen is logged to a file which we can search for issues: ~/.userdocs/logs/autodlscreen.log
 # For example, if the port is in use and cannot be used Autodl will give this error below we are grepping for and if the result is 1 then it triggers this section.
-if [[ $(grep -c 'GUI server disabled. Got error: Could not bind to port' ~/.userdocs/logs/autodlscreen.log) -ge '1' ]]; then
+if [[ $(grep -c 'GUI server disabled. Got error: Could not bind to port' $HOME/.userdocs/logs/autodlscreen.log) -ge '1' ]]; then
     # This will generate a 20 character random password.
     apppass="$(< /dev/urandom tr -dc '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' | head -c20; echo;)"
     # This will generate a random port for the script between the range 10001 to 32001.
