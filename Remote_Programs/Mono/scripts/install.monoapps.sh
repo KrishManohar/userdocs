@@ -75,7 +75,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.1.10"
+scriptversion="1.1.11"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
@@ -120,7 +120,7 @@ sqlite3v="$(curl -sN https://www.sqlite.org/download.html | egrep -om 1 'sqlite-
 libtoolurl="http://ftp.gnu.org/gnu/libtool/$(curl -sN http://ftp.gnu.org/gnu/libtool/ | egrep -o 'libtool-[^"]*\.tar.xz' | sort -V | tail -1)"
 libtoolv="$(curl -sN http://ftp.gnu.org/gnu/libtool/ | egrep -o 'libtool-[^"]*\.tar.xz' | sort -V | tail -1 | sed -rn 's/libtool-(.*).tar.xz/\1/p')"
 #
-monovfull="$(curl -sN http://www.mono-project.com/download/stable/ | sed -rn 's#(.*)<h5>The latest Stable Mono release is: <strong>(.*) Stable \((.*)\)</strong></h5>#\3#p')"
+monovfull="$(curl -sN https://www.mono-project.com/download/stable/ | sed -rn 's#(.*)<h5>The latest Stable Mono release is: <strong>(.*) Stable \((.*)\)</strong></h5>#\3#p')"
 monourl="https://download.mono-project.com/sources/mono/mono-$monovfull.tar.bz2"
 #
 genericproxyapache="https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/proxypass/apache/generic.conf"
