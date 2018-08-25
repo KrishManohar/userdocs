@@ -25,7 +25,7 @@ mkdir -p ~/.userdocs/{versions,cronjobs/logs,logins,logs,pids,tmp}
 # This check will see if rtorrent is running. If not then it will remove the cronjob lock file and kill and wipe all related screens.
 if [[ "$(ps -xU $(whoami) | grep -Ecw "rtorrent$")" -eq '0' ]]; then
     kill -9 $(ps -xU $(whoami) | grep -Ew "rtorrent$" | awk '{print $1}') $(screen -ls | grep -Ew "rtorrent\s" | awk '{print $1}' | cut -d \. -f 1) > /dev/null 2>&1
-    screen -wipe
+    screen -wipe > /dev/null 2>&1
     [[ -f "$HOME/private/rtorrent/work/rtorrent.lock" ]] && rm -f "$HOME/private/rtorrent/work/rtorrent.lock"
     rm -f "$HOME/.userdocs/tmp/rtorrent-$suffix"
 fi
@@ -69,7 +69,7 @@ fi
 if [[ "$(ps -xU $(whoami) | grep -Ecw 'irssi$')" -eq '0' ]]; then
     rm -f "$HOME/.userdocs/tmp/autodl.lock"
     kill -9 $(ps -xU $(whoami) | grep -Ew "irssi$" | awk '{print $1}') $(screen -ls | grep -Ew "autodl\s" | awk '{print $1}' | cut -d \. -f 1) > /dev/null 2>&1
-    screen -wipe
+    screen -wipe > /dev/null 2>&1
 fi
 #
 # This is our check to see if the 3 required processes ares running. This match is very specific and will only match the default installation processes and not other instances. Otherwise do nothing.
