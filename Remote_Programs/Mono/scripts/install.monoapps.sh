@@ -49,6 +49,7 @@
 if [[ ! -z "$1" && "$1" = 'changelog' ]]
 then
     echo
+    echo 'v1.1.12 - jacket proxypass method updated'
 	echo 'v1.1.8 - added lidarr'
 	echo 'v1.1.2 - unique port variables for sonarr and radarr'
 	echo 'v1.1.1 - Debian Stretch fixes.'
@@ -75,7 +76,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.1.11"
+scriptversion="1.1.12"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
@@ -142,8 +143,8 @@ jacketconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_
 jackettappport="$(shuf -i 10001-32001 -n 1)"
 [[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$jackettappport"'')" -ge "1" ]]; do jackettappport="$(shuf -i 10001-32001 -n 1)"; done
 #
-embyurl="$(curl -sNL https://api.github.com/repos/MediaBrowser/Emby/releases/latest | grep -P 'browser(.*)Emby.Mono.zip' | cut -d\" -f4)"
-embyv="$(curl -sNL https://api.github.com/repos/MediaBrowser/Emby/releases/latest | sed -rn 's/(.*)"tag_name": "(.*)",/\2/p')"
+embyurl="$(curl -sNL https://api.github.com/repos/MediaBrowser/Emby.Releases/releases/latest | grep -P 'browser(.*)embyserver-mono(.*)\.zip' | cut -d\" -f4)"
+embyv="$(curl -sNL https://api.github.com/repos/MediaBrowser/Emby.Releases/releases/latest | sed -rn 's/(.*)"tag_name": "(.*)",/\2/p')"
 embyconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Emby/configs/system.xml"
 embyappporthttp="$(shuf -i 10001-32001 -n 1)"
 [[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$embyappporthttp"'')" -ge "1" ]]; do embyappporthttp="$(shuf -i 10001-32001 -n 1)"; done
@@ -341,7 +342,7 @@ genericproxypass () {
             mkdir -p ~/.nginx/proxy
             wget -qO ~/.nginx/conf.d/000-default-server.d/"$appname".conf "$genericproxynginx"
             #
-            if [[ "$appname" =~ ^(sonarr|radarr|lidarr)$ ]]
+            if [[ "$appname" =~ ^(sonarr|radarr|lidarr|jackett)$ ]]
             then
                 sed -i 's|# rewrite /(.*) /username/$1 break;|rewrite /(.*) /username/$1 break;|g' ~/.nginx/conf.d/000-default-server.d/"$appname".conf
             else
