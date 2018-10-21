@@ -2,7 +2,7 @@
   <LogLevel>Info</LogLevel>
   <Port>8686</Port>
   <UrlBase></UrlBase>
-  <BindAddress>*</BindAddress>
+  <BindAddress>10.0.0.1</BindAddress>
   <SslPort>6868</SslPort>
   <EnableSsl>False</EnableSsl>
   <ApiKey></ApiKey>
