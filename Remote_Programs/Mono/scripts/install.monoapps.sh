@@ -76,7 +76,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.1.12"
+scriptversion="1.1.13"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
@@ -967,7 +967,10 @@ do
                     wget -qO ~/.config/Jackett/ServerConfig.json "$jacketconfig"
                     sed -i 's|"Port": PORT,|"Port": '"$jackettappport"',|g' ~/.config/Jackett/ServerConfig.json
                     sed -i 's|"BasePathOverride": PATH,|"BasePathOverride": "/'"$(whoami)"'/jackett",|g' ~/.config/Jackett/ServerConfig.json
+                    echo '{ "urls": "http://10.0.0.1:'"$jackettappport"'" }' > ~/.config/Jackett/appsettings.json
                 fi
+                #
+                echo '{ "urls": "http://10.0.0.1:'$(sed -rn 's/(.*)"Port": (.*),/\2/p' ~/.config/Jackett/ServerConfig.json)'" }' > ~/.config/Jackett/appsettings.json
                 #
                 cronjobadd
                 #
