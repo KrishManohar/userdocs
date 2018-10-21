@@ -1,26 +1,24 @@
 <?xml version="1.0"?>
-<ServerConfiguration xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<ServerConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <EnableDebugLevelLogging>false</EnableDebugLevelLogging>
   <EnableAutoUpdate>true</EnableAutoUpdate>
-  <SystemUpdateLevel>Release</SystemUpdateLevel>
   <LogFileRetentionDays>3</LogFileRetentionDays>
   <RunAtStartup>false</RunAtStartup>
   <IsStartupWizardCompleted>false</IsStartupWizardCompleted>
-  <EnableCustomPathSubFolders>false</EnableCustomPathSubFolders>
-  <EnableUPnP>true</EnableUPnP>
+  <EnableUPnP>false</EnableUPnP>
   <PublicPort>8096</PublicPort>
   <PublicHttpsPort>8920</PublicHttpsPort>
   <HttpServerPortNumber>8096</HttpServerPortNumber>
   <HttpsPortNumber>8920</HttpsPortNumber>
   <EnableHttps>false</EnableHttps>
-  <EnableInternetProviders>true</EnableInternetProviders>
+  <EnableNormalizedItemByNameIds>false</EnableNormalizedItemByNameIds>
   <IsPortAuthorized>true</IsPortAuthorized>
-  <SeasonZeroDisplayName>Specials</SeasonZeroDisplayName>
-  <SaveLocalMeta>false</SaveLocalMeta>
-  <EnableLocalizedGuids>false</EnableLocalizedGuids>
-  <DisableStartupScan>true</DisableStartupScan>
-  <EnableUserViews>false</EnableUserViews>
-  <EnableLibraryMetadataSubFolder>false</EnableLibraryMetadataSubFolder>
+  <AutoRunWebApp>true</AutoRunWebApp>
+  <EnableRemoteAccess>true</EnableRemoteAccess>
+  <CameraUploadUpgraded>false</CameraUploadUpgraded>
+  <CollectionsUpgraded>false</CollectionsUpgraded>
+  <EnableCaseSensitiveItemIds>true</EnableCaseSensitiveItemIds>
+  <DisableLiveTvChannelUserDataName>false</DisableLiveTvChannelUserDataName>
   <PreferredMetadataLanguage>en</PreferredMetadataLanguage>
   <MetadataCountryCode>US</MetadataCountryCode>
   <SortReplaceCharacters>
@@ -44,22 +42,12 @@
   <MinResumePct>5</MinResumePct>
   <MaxResumePct>90</MaxResumePct>
   <MinResumeDurationSeconds>300</MinResumeDurationSeconds>
-  <RealtimeLibraryMonitorDelay>40</RealtimeLibraryMonitorDelay>
+  <LibraryMonitorDelay>60</LibraryMonitorDelay>
   <EnableDashboardResponseCaching>true</EnableDashboardResponseCaching>
-  <EnableDashboardResourceMinification>true</EnableDashboardResourceMinification>
-  <MergeMetadataAndImagesByName>false</MergeMetadataAndImagesByName>
-  <EnableStandaloneMetadata>false</EnableStandaloneMetadata>
   <ImageSavingConvention>Compatible</ImageSavingConvention>
   <MetadataOptions>
     <MetadataOptions>
       <ItemType>Book</ItemType>
-      <ImageOptions>
-        <ImageOption>
-          <Type>Backdrop</Type>
-          <Limit>1</Limit>
-          <MinWidth>1280</MinWidth>
-        </ImageOption>
-      </ImageOptions>
       <DisabledMetadataSavers />
       <LocalMetadataReaderOrder />
       <DisabledMetadataFetchers />
@@ -69,43 +57,6 @@
     </MetadataOptions>
     <MetadataOptions>
       <ItemType>Movie</ItemType>
-      <ImageOptions>
-        <ImageOption>
-          <Type>Backdrop</Type>
-          <Limit>1</Limit>
-          <MinWidth>1280</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Art</Type>
-          <Limit>0</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Disc</Type>
-          <Limit>0</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Primary</Type>
-          <Limit>1</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Banner</Type>
-          <Limit>0</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Thumb</Type>
-          <Limit>1</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Logo</Type>
-          <Limit>1</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-      </ImageOptions>
       <DisabledMetadataSavers />
       <LocalMetadataReaderOrder />
       <DisabledMetadataFetchers />
@@ -115,43 +66,6 @@
     </MetadataOptions>
     <MetadataOptions>
       <ItemType>MusicVideo</ItemType>
-      <ImageOptions>
-        <ImageOption>
-          <Type>Backdrop</Type>
-          <Limit>1</Limit>
-          <MinWidth>1280</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Art</Type>
-          <Limit>0</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Disc</Type>
-          <Limit>0</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Primary</Type>
-          <Limit>1</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Banner</Type>
-          <Limit>0</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Thumb</Type>
-          <Limit>1</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Logo</Type>
-          <Limit>1</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-      </ImageOptions>
       <DisabledMetadataSavers />
       <LocalMetadataReaderOrder />
       <DisabledMetadataFetchers />
@@ -161,38 +75,6 @@
     </MetadataOptions>
     <MetadataOptions>
       <ItemType>Series</ItemType>
-      <ImageOptions>
-        <ImageOption>
-          <Type>Backdrop</Type>
-          <Limit>1</Limit>
-          <MinWidth>1280</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Art</Type>
-          <Limit>0</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Primary</Type>
-          <Limit>1</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Banner</Type>
-          <Limit>1</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Thumb</Type>
-          <Limit>1</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Logo</Type>
-          <Limit>1</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-      </ImageOptions>
       <DisabledMetadataSavers />
       <LocalMetadataReaderOrder />
       <DisabledMetadataFetchers />
@@ -202,18 +84,6 @@
     </MetadataOptions>
     <MetadataOptions>
       <ItemType>MusicAlbum</ItemType>
-      <ImageOptions>
-        <ImageOption>
-          <Type>Backdrop</Type>
-          <Limit>0</Limit>
-          <MinWidth>1280</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Disc</Type>
-          <Limit>0</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-      </ImageOptions>
       <DisabledMetadataSavers />
       <LocalMetadataReaderOrder />
       <DisabledMetadataFetchers />
@@ -223,28 +93,6 @@
     </MetadataOptions>
     <MetadataOptions>
       <ItemType>MusicArtist</ItemType>
-      <ImageOptions>
-        <ImageOption>
-          <Type>Backdrop</Type>
-          <Limit>1</Limit>
-          <MinWidth>1280</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Banner</Type>
-          <Limit>0</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Art</Type>
-          <Limit>0</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Logo</Type>
-          <Limit>0</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-      </ImageOptions>
       <DisabledMetadataSavers />
       <LocalMetadataReaderOrder />
       <DisabledMetadataFetchers />
@@ -254,43 +102,6 @@
     </MetadataOptions>
     <MetadataOptions>
       <ItemType>BoxSet</ItemType>
-      <ImageOptions>
-        <ImageOption>
-          <Type>Backdrop</Type>
-          <Limit>1</Limit>
-          <MinWidth>1280</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Primary</Type>
-          <Limit>1</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Thumb</Type>
-          <Limit>1</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Logo</Type>
-          <Limit>1</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Art</Type>
-          <Limit>0</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Disc</Type>
-          <Limit>0</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Banner</Type>
-          <Limit>0</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-      </ImageOptions>
       <DisabledMetadataSavers />
       <LocalMetadataReaderOrder />
       <DisabledMetadataFetchers />
@@ -300,28 +111,6 @@
     </MetadataOptions>
     <MetadataOptions>
       <ItemType>Season</ItemType>
-      <ImageOptions>
-        <ImageOption>
-          <Type>Backdrop</Type>
-          <Limit>0</Limit>
-          <MinWidth>1280</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Primary</Type>
-          <Limit>1</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Banner</Type>
-          <Limit>0</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Thumb</Type>
-          <Limit>0</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-      </ImageOptions>
       <DisabledMetadataSavers />
       <LocalMetadataReaderOrder />
       <DisabledMetadataFetchers>
@@ -333,55 +122,41 @@
     </MetadataOptions>
     <MetadataOptions>
       <ItemType>Episode</ItemType>
-      <ImageOptions>
-        <ImageOption>
-          <Type>Backdrop</Type>
-          <Limit>0</Limit>
-          <MinWidth>1280</MinWidth>
-        </ImageOption>
-        <ImageOption>
-          <Type>Primary</Type>
-          <Limit>1</Limit>
-          <MinWidth>0</MinWidth>
-        </ImageOption>
-      </ImageOptions>
       <DisabledMetadataSavers />
       <LocalMetadataReaderOrder />
       <DisabledMetadataFetchers />
       <MetadataFetcherOrder />
       <DisabledImageFetchers>
+        <string>The Open Movie Database</string>
         <string>TheMovieDb</string>
       </DisabledImageFetchers>
       <ImageFetcherOrder />
     </MetadataOptions>
   </MetadataOptions>
   <EnableAutomaticRestart>true</EnableAutomaticRestart>
-  <PathSubstitutions />
+  <SkipDeserializationForBasicTypes>false</SkipDeserializationForBasicTypes>
   <UICulture>en-us</UICulture>
-  <PeopleMetadataOptions>
-    <DownloadActorMetadata>true</DownloadActorMetadata>
-    <DownloadDirectorMetadata>true</DownloadDirectorMetadata>
-    <DownloadProducerMetadata>false</DownloadProducerMetadata>
-    <DownloadWriterMetadata>false</DownloadWriterMetadata>
-    <DownloadComposerMetadata>false</DownloadComposerMetadata>
-    <DownloadOtherPeopleMetadata>false</DownloadOtherPeopleMetadata>
-    <DownloadGuestStarMetadata>false</DownloadGuestStarMetadata>
-  </PeopleMetadataOptions>
-  <FindInternetTrailers>true</FindInternetTrailers>
-  <InsecureApps9>
-    <string>Windows Phone</string>
-  </InsecureApps9>
   <SaveMetadataHidden>false</SaveMetadataHidden>
   <ContentTypes />
-  <EnableAudioArchiveFiles>false</EnableAudioArchiveFiles>
-  <EnableVideoArchiveFiles>false</EnableVideoArchiveFiles>
   <RemoteClientBitrateLimit>0</RemoteClientBitrateLimit>
-  <DenyIFrameEmbedding>true</DenyIFrameEmbedding>
-  <EnableLibraryMonitor>Auto</EnableLibraryMonitor>
-  <SharingExpirationDays>30</SharingExpirationDays>
-  <DisableXmlSavers>false</DisableXmlSavers>
-  <EnableWindowsShortcuts>false</EnableWindowsShortcuts>
-  <EnableVideoFrameByFrameAnalysis>false</EnableVideoFrameByFrameAnalysis>
-  <EnableDateLastRefresh>false</EnableDateLastRefresh>
-  <Migrations />
+  <SchemaVersion>0</SchemaVersion>
+  <EnableAnonymousUsageReporting>true</EnableAnonymousUsageReporting>
+  <EnableFolderView>false</EnableFolderView>
+  <EnableGroupingIntoCollections>false</EnableGroupingIntoCollections>
+  <DisplaySpecialsWithinSeasons>true</DisplaySpecialsWithinSeasons>
+  <LocalNetworkSubnets />
+  <LocalNetworkAddresses>
+    <string>10.0.0.1</string>
+  </LocalNetworkAddresses>
+  <CodecsUsed />
+  <EnableExternalContentInSuggestions>true</EnableExternalContentInSuggestions>
+  <RequireHttps>false</RequireHttps>
+  <IsBehindProxy>false</IsBehindProxy>
+  <EnableNewOmdbSupport>false</EnableNewOmdbSupport>
+  <RemoteIPFilter />
+  <IsRemoteIPFilterBlacklist>false</IsRemoteIPFilterBlacklist>
+  <ImageExtractionTimeoutMs>0</ImageExtractionTimeoutMs>
+  <PathSubstitutions />
+  <EnableSimpleArtistDetection>true</EnableSimpleArtistDetection>
+  <UninstalledPlugins />
 </ServerConfiguration>
