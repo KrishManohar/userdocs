@@ -76,7 +76,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.1.13"
+scriptversion="1.1.15"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
@@ -143,7 +143,7 @@ jacketconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_
 jackettappport="$(shuf -i 10001-32001 -n 1)"
 [[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]] && while [[ "$(ss -ln | grep -co ''"$jackettappport"'')" -ge "1" ]]; do jackettappport="$(shuf -i 10001-32001 -n 1)"; done
 #
-embyurl="$(curl -sNL https://api.github.com/repos/MediaBrowser/Emby.Releases/releases/latest | grep -P 'browser(.*)embyserver-mono(.*)\.zip' | cut -d\" -f4)"
+embyurl="$(curl -sNL https://api.github.com/repos/MediaBrowser/Emby.Releases/releases/latest | grep -P 'browser(.*)emby-server-deb(.*)amd64\.deb' | cut -d\" -f4)"
 embyv="$(curl -sNL https://api.github.com/repos/MediaBrowser/Emby.Releases/releases/latest | sed -rn 's/(.*)"tag_name": "(.*)",/\2/p')"
 embyconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Emby/configs/system.xml"
 embyappporthttp="$(shuf -i 10001-32001 -n 1)"
@@ -233,7 +233,7 @@ cronscript () {
     [[ "$appname" = "radarr" ]] && sed -i 's|PATH|~/.radarr/Radarr.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
     [[ "$appname" = "lidarr" ]] && sed -i 's|PATH|~/.lidarr/Lidarr.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
     [[ "$appname" = "jackett"  ]] && sed -i 's|PATH|~/.jackett/JackettConsole.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
-    [[ "$appname" = "emby" ]] && sed -i 's|PATH|~/.emby/MediaBrowser.Server.Mono.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
+    [[ "$appname" = "emby" ]] && sed -i 's|PATH|~/.emby/bin/./emby-server|g' ~/.userdocs/cronjobs/$appname.cronjob
     #
 }
 #
@@ -312,7 +312,7 @@ programpaths () {
     [[ "$appname" = "radarr" ]] && apppaths="$HOME/.config/Radarr/config.xml"
     [[ "$appname" = "lidarr" ]] && apppaths="$HOME/.config/Lidarr/config.xml"
     [[ "$appname" = "jackett" ]] && apppaths="$HOME/.config/Jackett/ServerConfig.json"
-    [[ "$appname" = "emby" ]] && apppaths="$HOME/.emby/ProgramData-Server/config/system.xml"
+    [[ "$appname" = "emby" ]] && apppaths="$HOME/.config/emby-server/config/system.xml"
 }
 #
 genericproxypass () {
@@ -400,7 +400,7 @@ genericrestart () {
         [[ "$appname" = "radarr" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; ~/bin/mono --debug $HOME/.$appname/Radarr.exe^M"
         [[ "$appname" = "lidarr" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; ~/bin/mono --debug $HOME/.$appname/Lidarr.exe^M"
         [[ "$appname" = "jackett" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; ~/bin/mono --debug $HOME/.$appname/JackettConsole.exe^M"
-        [[ "$appname" = "emby" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; ~/bin/mono --debug $HOME/.$appname/MediaBrowser.Server.Mono.exe^M"
+        [[ "$appname" = "emby" ]] && screen -dmS $appname && screen -S $appname -p 0 -X stuff "cd export TMPDIR=$HOME/.userdocs/tmp; $HOME/.$appname/bin/./emby-server^M"
         echo "${appname^} was restarted"
     fi
 }
@@ -470,6 +470,7 @@ genericremove () {
         if [[ "$appname" = "emby" ]]
         then
             [[ -d ~/."$appname" ]] && rm -rf ~/."$appname"
+			rm -rf ~/.config/emby-server
             rm -rf ~/.userdocs/versions/"$appname".version
             rm -rf ~/.userdocs/cronjobs/"$appname".cronjob
             rm -rf ~/.userdocs/logins/"$appname".login
@@ -1018,33 +1019,40 @@ do
             #
             programpaths
             #
-            [[ -f ~/.emby/MediaBrowser.Server.Mono.exe ]] && embycheck1="ON" || embycheck1="NO"
+            [[ -f ~/.emby/bin/emby-server ]] && embycheck1="ON" || embycheck1="NO"
             [[ -f ~/.userdocs/versions/emby.version ]] && embycheck2="ON" || embycheck2="NO"
             [[ "$(cat ~/.userdocs/versions/emby.version 2> /dev/null)" = "$embyv" ]] && embycheck3="ON" || embycheck3="NO"
             #
             if [[ "$embycheck1" != 'ON' || "$embycheck2" != 'ON' || "$embycheck3" != 'ON' ]] 
             then
-                [[ -f ~/.emby/ProgramData-Server/config/system.xml ]] && echo "Updating Emby"; echo || echo "Installing Emby"
+                [[ -f ~/.emby/config/system.xml ]] && echo "Updating Emby"; echo || echo "Installing Emby"
                 #
-                wget -qO ~/.userdocs/tmp/emby.zip $embyurl
-                unzip -qo ~/.userdocs/tmp/emby.zip -d ~/.emby
-                rm -f ~/.userdocs/tmp/emby.zip
+                wget -qO ~/.userdocs/tmp/emby.deb "$embyurl"
+				dpkg -x ~/.userdocs/tmp/emby.deb ~/.userdocs/tmp/embytmp
+				rm -rf ~/.userdocs/tmp/embytmp/{etc,usr}
+				mkdir -p ~/.emby
+				cp -rf ~/.userdocs/tmp/embytmp/opt/emby-server/. ~/.emby
+                rm -f ~/.userdocs/tmp/emby.deb
+				rm -rf ~/.userdocs/tmp/embytmp
                 #
-                if [[ ! -f ~/.emby/ProgramData-Server/config/system.xml ]]
+				sed 's#APP_DIR=/opt/emby-server#APP_DIR=$HOME/.emby#g' -i ~/.emby/bin/emby-server
+				sed 's#/var/lib/emby#$HOME/.config/emby#g' -i ~/.emby/bin/emby-server
+				#
+                if [[ ! -f ~/.emby/config/system.xml ]]
                 then
-                    mkdir -p ~/.emby/ProgramData-Server/config
-                    wget -qO ~/.emby/ProgramData-Server/config/system.xml "$embyconfig"
-                    sed -i 's|<PublicPort>8096</PublicPort>|<PublicPort>'"$embyappporthttp"'</PublicPort>|g' ~/.emby/ProgramData-Server/config/system.xml
-                    sed -i 's|<PublicHttpsPort>8920</PublicHttpsPort>|<PublicHttpsPort>'"$embyappporthttps"'</PublicHttpsPort>|g' ~/.emby/ProgramData-Server/config/system.xml
-                    sed -i 's|<HttpServerPortNumber>8096</HttpServerPortNumber>|<HttpServerPortNumber>'"$embyappporthttp"'</HttpServerPortNumber>|g' ~/.emby/ProgramData-Server/config/system.xml
-                    sed -i 's|<HttpsPortNumber>8920</HttpsPortNumber>|<HttpsPortNumber>'"$embyappporthttps"'</HttpsPortNumber>|g' ~/.emby/ProgramData-Server/config/system.xml
+                    mkdir -p ~/.config/emby-server/config
+                    wget -qO ~/.config/emby-server/config/system.xml "$embyconfig"
+                    sed -i 's|<PublicPort>8096</PublicPort>|<PublicPort>'"$embyappporthttp"'</PublicPort>|g' ~/.config/emby-server/config/system.xml
+                    sed -i 's|<PublicHttpsPort>8920</PublicHttpsPort>|<PublicHttpsPort>'"$embyappporthttps"'</PublicHttpsPort>|g' ~/.config/emby-server/config/system.xml
+                    sed -i 's|<HttpServerPortNumber>8096</HttpServerPortNumber>|<HttpServerPortNumber>'"$embyappporthttp"'</HttpServerPortNumber>|g' ~/.config/emby-server/config/system.xml
+                    sed -i 's|<HttpsPortNumber>8920</HttpsPortNumber>|<HttpsPortNumber>'"$embyappporthttps"'</HttpsPortNumber>|g' ~/.config/emby-server/config/system.xml
                 fi
                 #
                 cronjobadd
                 #
                 cronscript
                 #
-                embyexportenv
+                # embyexportenv
                 #
                 genericproxypass
                 #
@@ -1063,7 +1071,7 @@ do
                 #
                 cronscript
                 #
-                embyexportenv
+                # embyexportenv
                 #
                 genericproxypass
                 #
