@@ -76,7 +76,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.1.15"
+scriptversion="1.1.16"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
@@ -221,19 +221,23 @@ cronjobremove () {
 cronscript () {
     wget -qO ~/.userdocs/cronjobs/"$appname".cronjob "https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/Bash_Scripts/cronscript.sh"
 	#
-	sed -i 's|# screen command|screen -dmS APPNAME \&\& screen -S APPNAME -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; $HOME/bin/mono --debug PATH^M"|g' ~/.userdocs/cronjobs/$appname.cronjob
+	if [[ "$appname" =~ (emby|ombi) ]]; then
+		sed -i 's|# screen command|screen -dmS APPNAME \&\& screen -S APPNAME -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; PATH^M"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+	else
+		sed -i 's|# screen command|screen -dmS APPNAME \&\& screen -S APPNAME -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; $HOME/bin/mono --debug PATH^M"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+	fi
     #
-    [[ "$appname" = "sonarr" ]] && sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/$appname.cronjob
-    [[ "$appname" = "radarr" ]] && sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/$appname.cronjob
-    [[ "$appname" = "lidarr" ]] && sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/$appname.cronjob
-    [[ "$appname" = "jackett"  ]] && sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/$appname.cronjob
-    [[ "$appname" = "emby" ]] && sed -i 's|APPNAME|'"$appname"'|g' ~/.userdocs/cronjobs/$appname.cronjob
+    [[ "$appname" = "sonarr" ]] && sed -i 's|APPNAME|'"$appname"'|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "radarr" ]] && sed -i 's|APPNAME|'"$appname"'|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "lidarr" ]] && sed -i 's|APPNAME|'"$appname"'|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "jackett"  ]] && sed -i 's|APPNAME|'"$appname"'|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "emby" ]] && sed -i 's|APPNAME|'"$appname"'|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
     #
-    [[ "$appname" = "sonarr" ]] && sed -i 's|PATH|~/.sonarr/NzbDrone.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
-    [[ "$appname" = "radarr" ]] && sed -i 's|PATH|~/.radarr/Radarr.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
-    [[ "$appname" = "lidarr" ]] && sed -i 's|PATH|~/.lidarr/Lidarr.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
-    [[ "$appname" = "jackett"  ]] && sed -i 's|PATH|~/.jackett/JackettConsole.exe|g' ~/.userdocs/cronjobs/$appname.cronjob
-    [[ "$appname" = "emby" ]] && sed -i 's|PATH|~/.emby/bin/./emby-server|g' ~/.userdocs/cronjobs/$appname.cronjob
+    [[ "$appname" = "sonarr" ]] && sed -i 's|PATH|~/.sonarr/NzbDrone.exe|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "radarr" ]] && sed -i 's|PATH|~/.radarr/Radarr.exe|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "lidarr" ]] && sed -i 's|PATH|~/.lidarr/Lidarr.exe|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "jackett"  ]] && sed -i 's|PATH|~/.jackett/JackettConsole.exe|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "emby" ]] && sed -i 's|PATH|~/.emby/bin/./emby-server|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
     #
 }
 #
@@ -281,9 +285,9 @@ sqlite3setup () {
     #
     prerequisites
     #
-    if [[ ! -z $(which sqlite3 2> /dev/null) ]]
+    if [[ ! -z $(which sqlite3 2> /dev/null) && "$(cat ~/.userdocs/versions/sqlite3.version 2> /dev/null)" = "$sqlite3v" ]]
     then
-        echo "Libtool is already installed and the latest version."; echo
+        echo "sqlite is already installed and the latest version."; echo
     else
         [[ -f ~/bin/sqlite3 ]] && sqlite3check1="ON" || sqlite3check1="NO"
         [[ -f ~/.userdocs/versions/sqlite3.version ]] && sqlite3check2="ON" || sqlite3check2="NO"
