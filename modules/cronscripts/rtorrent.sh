@@ -27,7 +27,7 @@ if [[ "$(ps -xU $(whoami) | grep -Ecw "rtorrent$")" -eq '0' ]]; then
     kill -9 $(ps -xU $(whoami) | grep -Ew "rtorrent$" | awk '{print $1}') $(screen -ls | grep -Ew "rtorrent\s" | awk '{print $1}' | cut -d \. -f 1) > /dev/null 2>&1
     screen -wipe > /dev/null 2>&1
     [[ -f "$HOME/private/rtorrent/work/rtorrent.lock" ]] && rm -f "$HOME/private/rtorrent/work/rtorrent.lock"
-    rm -f "$HOME/.userdocs/tmp/rtorrent-$suffix"
+    rm -f "$HOME/.userdocs/tmp/rtorrent"
 fi
 #
 # The below if section is the restart job for your default rtorrent installation. This will only manage the default installation.
@@ -73,7 +73,7 @@ if [[ "$(ps -xU $(whoami) | grep -Ecw 'irssi$')" -eq '0' ]]; then
 fi
 #
 # This is our check to see if the 3 required processes ares running. This match is very specific and will only match the default installation processes and not other instances. Otherwise do nothing.
-if [[ "$(ps -xU $(whoami) | grep -Ecw 'irssi$')" -ne '1' && -d "$HOME/.autodl" && -d "$HOME/.irssi" && ! -f "$HOME/.userdocs/tmp/autodl.lock" ]]; then
+if [[ "$(ps -xU $(whoami) | grep -Ecw 'irssi$')" -ne '1' && "$(screen -ls | grep -Ecw "autodl\s")" -ne '1' && -d "$HOME/.autodl" && -d "$HOME/.irssi" && ! -f "$HOME/.userdocs/tmp/autodl.lock" ]]; then
     #
     # Create this file so that the cronjob will skipped if it is restarting the processes and attempts to run again.
     touch "$HOME/.userdocs/tmp/autodl.lock"
@@ -85,8 +85,14 @@ if [[ "$(ps -xU $(whoami) | grep -Ecw 'irssi$')" -ne '1' && -d "$HOME/.autodl" &
     screen -wipe > /dev/null 2>&1
     #
     # Create the new screen process and log this screen to a file. Then start it in the background and then send it a command.
-    screen -L "$HOME/.userdocs/logs/autodlscreen.log" -dmS "autodl" && screen -S "autodl" -p 0 -X stuff "irssi^M"
+    screen -dmS "autodl" && screen -S "autodl" -p 0 -X stuff "irssi^M"
     #
+	# Starts a log to check for errors such as a port conflict.
+	screen -S "autodl" -p 0 -X stuff "/LOG OPEN -window ~/.userdocs/logs/autodlscreen.log^M"
+	#
+	# Reloads autodl to log the output.
+	screen -S "autodl" -p 0 -X stuff '/script load autorun/autodl-irssi.pl^M'
+	#
     # Tell Autodl to update itself by sending a command to the matching screen process.
     screen -S "autodl" -p 0 -X stuff '/autodl update^M'
     #
@@ -136,7 +142,7 @@ fi
 #
 # The Autodl screen is logged to a file which we can search for issues: ~/.userdocs/logs/autodlscreen.log
 # For example, if the port is in use and cannot be used Autodl will give this error below we are grepping for and if the result is 1 then it triggers this section.
-if [[ -f "$HOME/.userdocs/logs/autodlscreen-$suffix.log" ]]; then
+if [[ -f "$HOME/.userdocs/logs/autodlscreen.log" ]]; then
     if [[ $(grep -c 'GUI server disabled. Got error: Could not bind to port' $HOME/.userdocs/logs/autodlscreen.log) -ge '1' ]]; then
         # This will generate a 20 character random password.
         apppass="$(< /dev/urandom tr -dc '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' | head -c20; echo;)"
@@ -170,9 +176,13 @@ if [[ -f "$HOME/.userdocs/logs/autodlscreen-$suffix.log" ]]; then
         # Uses echo to make the config file for the rutorrent plugun to work with autodl using the variables port and pass
         echo -ne '<?php\n$autodlPort = '"$appport"';\n$autodlPassword = "'"$apppass"'";\n?>' > "$HOME/www/$(whoami).$(hostname -f)/public_html/rutorrent/plugins/autodl-irssi/conf.php"
         #
+		# Clear the window text buffer and scrollback for the new log.
+        screen -S "autodl" -p 0 -X stuff '/SCROLLBACK CLEAR^M'
+		screen -S "autodl" -p 0 -X stuff '/CLEAR^M'
+		#
+		# Wipe the log wipe to avoid conflicts.
+        echo -n '' > "$HOME/.userdocs/logs/autodlscreen.log"
         # Reload Autodl.
-        screen -S "autodl" -p 0 -X stuff '/clear^M'
-        rm -f > "$HOME/.userdocs/logs/autodlscreen.log"
         screen -S "autodl" -p 0 -X stuff '/script load autorun/autodl-irssi.pl^M'
         #
         # Echo the time and date this cronjob was run to the ~/.userdocs/cronjobs/logs/rtorrent.log

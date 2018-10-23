@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-#
 # Part 1: A cron based restarter for a custom instance of rtorrent and autodl.
 #
 # Part 2: A cron based auto-patcher for an installation of autodl to a custom instance using the userdocs script.
+#
 #
 # The suffix is set here to be used throughout this cronscript.
 suffix="SUFFIX"
@@ -73,7 +73,7 @@ if [[ "$(ps -xU $(whoami) | grep -Ecw 'irssi-$suffix$')" -eq '0' ]]; then
 fi
 #
 # This is our check to see if the 3 required processes ares running. This match is very specific and will only match your custom installation processes and not other instances. Otherwise do nothing.
-if [[ "$(ps -xU $(whoami) | grep -Ecw "irssi-$suffix/$")" -ne '1' && -d "$HOME/.autodl-$suffix" && -d "$HOME/.irssi-$suffix" && ! -f "$HOME/.userdocs/tmp/autodl-$suffix.lock" ]]; then
+if [[ "$(ps -xU $(whoami) | grep -Ecw "irssi-$suffix/$")" -ne '1' && "$(screen -ls | grep -Ecw "autodl-$suffix\s")" -ne '1' && -d "$HOME/.autodl-$suffix" && -d "$HOME/.irssi-$suffix" && ! -f "$HOME/.userdocs/tmp/autodl-$suffix.lock" ]]; then
     #
     # Create this file so that the cronjob will skipped if it is restarting the processes and attempts to run again.
     touch "$HOME/.userdocs/tmp/autodl-$suffix.lock"
@@ -85,8 +85,14 @@ if [[ "$(ps -xU $(whoami) | grep -Ecw "irssi-$suffix/$")" -ne '1' && -d "$HOME/.
     screen -wipe > /dev/null 2>&1
     #
     # Create the new screen process and log this screen to a file. Then start it in the background and then send it a command.
-    screen -L "$HOME/.userdocs/logs/autodlscreen-$suffix.log" -dmS "autodl-$suffix" && screen -S "autodl-$suffix" -p 0 -X stuff "irssi --home=$HOME/.irssi-$suffix/^M"
+    screen -dmS "autodl-$suffix" && screen -S "autodl-$suffix" -p 0 -X stuff "irssi --home=$HOME/.irssi-$suffix/^M"
     #
+	# Starts a log to check for errors such as a port conflict.
+	screen -S "autodl-$suffix" -p 0 -X stuff "/LOG OPEN -window ~/.userdocs/logs/autodlscreen-$suffix.log^M"
+	#
+	# Reloads autodl to log the output.
+	screen -S "autodl-$suffix" -p 0 -X stuff '/script load autorun/autodl-irssi.pl^M'
+	#
     # Tell Autodl to update itself by sending a command to the matching screen process.
     screen -S "autodl-$suffix" -p 0 -X stuff '/autodl update^M'
     #
@@ -170,9 +176,13 @@ if [[ -f "$HOME/.userdocs/logs/autodlscreen-$suffix.log" ]]; then
         # Uses echo to make the config file for the rutorrent plugun to work with autodl using the variables port and pass
         echo -ne '<?php\n$autodlPort = '"$appport"';\n$autodlPassword = "'"$apppass"'";\n?>' > "$HOME/www/$(whoami).$(hostname -f)/public_html/rutorrent/plugins/autodl-irssi/conf.php"
         #
+		# Clear the window text buffer and scrollback for the new log.
+        screen -S "autodl-$suffix" -p 0 -X stuff '/SCROLLBACK CLEAR^M'
+		screen -S "autodl-$suffix" -p 0 -X stuff '/CLEAR^M'
+		#
+		# Wipe the log wipe to avoid conflicts.
+        echo -n '' > "$HOME/.userdocs/logs/autodlscreen-$suffix.log"
         # Reload Autodl.
-        screen -S "autodl-$suffix" -p 0 -X stuff '/clear^M'
-        rm -f > "$HOME/.userdocs/logs/autodlscreen-$suffix.log"
         screen -S "autodl-$suffix" -p 0 -X stuff '/script load autorun/autodl-irssi.pl^M'
         #
         # Echo the time and date this cronjob was run to the ~/.userdocs/cronjobs/logs/rtorrent.log
