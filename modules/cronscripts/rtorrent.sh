@@ -86,12 +86,12 @@ if [[ "$(ps -xU $(whoami) | grep -Ecw 'irssi$')" -ne '1' && "$(screen -ls | grep
     #
     # Create the new screen process and log this screen to a file. Then start it in the background and then send it a command.
     screen -dmS "autodl" && screen -S "autodl" -p 0 -X stuff "irssi^M"
-    #
-	# Starts a log to check for errors such as a port conflict.
-	screen -S "autodl" -p 0 -X stuff "/LOG OPEN -window ~/.userdocs/logs/autodlscreen.log^M"
 	#
-	# Reloads autodl to log the output.
-	screen -S "autodl" -p 0 -X stuff '/script load autorun/autodl-irssi.pl^M'
+	# Tells irssi to log scrollback to a file so we can see what was in the window before this command was executed.
+	screen -S "autodl" -p 0 -X stuff "/LASTLOG -file ~/.userdocs/logs/autodlscreen.log^M"
+	#
+	# Tells irssi to start logging new output in the window to the same file.
+    screen -S "autodl" -p 0 -X stuff "/LOG OPEN -window -autoopen ~/.userdocs/logs/autodlscreen.log^M"
 	#
     # Tell Autodl to update itself by sending a command to the matching screen process.
     screen -S "autodl" -p 0 -X stuff '/autodl update^M'
