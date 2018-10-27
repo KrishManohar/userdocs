@@ -1,10 +1,10 @@
 Step 1:
 
 ~~~
-wget -qO ~/protobuf.tar.gz https://github.com/google/protobuf/archive/v3.5.1.tar.gz
-tar xf ~/protobuf.tar.gz && cd ~/protobuf-3.5.1 && bash autogen.sh
+wget -qO ~/protobuf.tar.gz https://github.com/google/protobuf/archive/v3.6.1.tar.gz
+tar xf ~/protobuf.tar.gz && cd ~/protobuf-3.6.1 && bash autogen.sh
 ./configure --prefix=$HOME && make && make install
-cd && rm -rf protobuf{.tar.gz,-3.5.1}
+cd && rm -rf protobuf{.tar.gz,-3.6.1}
 ~~~
 
 Step 2:
