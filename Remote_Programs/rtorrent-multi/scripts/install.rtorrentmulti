@@ -399,7 +399,7 @@ then
                         #
                         echo -e "\033[33m""Autodl fix has been applied""\e[0m"
                         # Fix the relevent rutorrent plugin file by changing 127.0.0.1 to 10.0.0.1 using sed
-                        sed -i 's|if (!socket_connect($socket, "127.0.0.1", $autodlPort))|if (!socket_connect($socket, "10.0.0.1", $autodlPort))|g' ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/plugins/autodl-irssi/getConf.php
+                        sed -i 's|if (!@socket_connect($socket, "127.0.0.1", $autodlPort))|if (!@socket_connect($socket, "10.0.0.1", $autodlPort))|g' ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/plugins/autodl-irssi/getConf.php
                         sed -i "s|'/.autodl/autodl.cfg'|'/.autodl-$suffix/autodl.cfg'|g" ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/plugins/autodl-irssi/getConf.php
                         echo -e "\033[33m""Autodl-rutorrent fix has been applied""\e[0m"
                         echo
@@ -595,14 +595,14 @@ then
                     if [[ -d "$HOME/www/$(whoami).$(hostname -f)/public_html/rutorrent-$suffix/plugins/autodl-irssi" ]]
                     then
                         echo -e "\033[33m""Autodl-rutorrent Before""\e[0m"
-                        echo -e "\033[32m""/rutorrent-$suffix/plugins/autodl-irssi/getConf.php =" "\033[31m""$(sed -n 's/\(.*\)if (\!socket_connect($socket, "\(.*\)", $autodlPort))/\2/p' $HOME/www/$(whoami).$(hostname -f)/public_html/rutorrent/plugins/autodl-irssi/getConf.php 2> /dev/null)""\e[0m"
+                        echo -e "\033[32m""/rutorrent-$suffix/plugins/autodl-irssi/getConf.php =" "\033[31m""$(sed -n 's/\(.*\)if (\!@socket_connect($socket, "\(.*\)", $autodlPort))/\2/p' $HOME/www/$(whoami).$(hostname -f)/public_html/rutorrent/plugins/autodl-irssi/getConf.php 2> /dev/null)""\e[0m"
                         echo
                         #
                         echo -e "\033[31m""Applying some fixes to autodl rutorrent plugin if needed.""\e[0m"
                         echo
-                        sed -i 's/if (!socket_connect($socket, "127.0.0.1", $autodlPort))/if (!socket_connect($socket, "10.0.0.1", $autodlPort))/g' "$HOME/www/$(whoami).$(hostname -f)/public_html/rutorrent-$suffix/plugins/autodl-irssi/getConf.php"
+                        sed -i 's/if (!@socket_connect($socket, "127.0.0.1", $autodlPort))/if (!@socket_connect($socket, "10.0.0.1", $autodlPort))/g' "$HOME/www/$(whoami).$(hostname -f)/public_html/rutorrent-$suffix/plugins/autodl-irssi/getConf.php"
                         echo -e "\033[33m""Autodl-rutorrent After""\e[0m"
-                        echo -e "\033[32m""/rutorrent/plugins/autodl-irssi/getConf.php =" "\033[31m""$(sed -n 's/\(.*\)if (\!socket_connect($socket, "\(.*\)", $autodlPort))/\2/p' $HOME/www/$(whoami).$(hostname -f)/public_html/rutorrent-$suffix/plugins/autodl-irssi/getConf.php 2> /dev/null)""\e[0m"
+                        echo -e "\033[32m""/rutorrent/plugins/autodl-irssi/getConf.php =" "\033[31m""$(sed -n 's/\(.*\)if (\!@socket_connect($socket, "\(.*\)", $autodlPort))/\2/p' $HOME/www/$(whoami).$(hostname -f)/public_html/rutorrent-$suffix/plugins/autodl-irssi/getConf.php 2> /dev/null)""\e[0m"
                         echo
                         # Uses echo to make the config file for the rutorrent plugun to work with autodl using the variables port and pass
                         echo -ne '<?php\n$autodlPort = '"$appport"';\n$autodlPassword = "'"$apppass"'";\n?>' > ~/www/$(whoami).$(hostname -f)/public_html/rutorrent-"$suffix"/plugins/autodl-irssi/conf.php
