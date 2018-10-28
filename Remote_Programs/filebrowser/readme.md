@@ -1,4 +1,4 @@
-# Filebrowser - Feralhosting
+# Filebrowser
 
 [https://github.com/filebrowser/filebrowser](https://github.com/filebrowser/filebrowser)
 
@@ -18,7 +18,7 @@ We point the binary to configuration file in `~/.config/filebrowser` using `-c` 
 
 We proxypass it using nginx to be available by https only.
 
-The below commands can be copy and pasted and will download, install and configure filebrowser with nginx on Feralhosting. The commands canbe tweaked to work with other providers.
+The below commands can be copy and pasted and will download, install and configure filebrowser with nginx on Feralhosting. The commands can be tweaked to work with other providers.
 
 ~~~bash
 mkdir -p ~/.config/filebrowser
