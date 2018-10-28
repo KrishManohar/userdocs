@@ -1,0 +1,20 @@
+{
+  "port": PORT,
+  "noAuth": false,
+  "baseURL": "BASEURL",
+  "address": "10.0.0.1",
+  "alternativeReCaptcha": false,
+  "reCaptchaKey": "",
+  "reCaptchaSecret": "",
+  "database": "CONFIG/database.db",
+  "log": "stdout",
+  "plugin": "",
+  "scope": "SCOPE",
+  "allowCommands": true,
+  "allowEdit": true,
+  "allowNew": true,
+  "commands": [
+    "git",
+    "svn"
+  ]
+}
