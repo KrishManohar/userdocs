@@ -6,17 +6,19 @@ This program is not like h5ai. h5ai is a "modern file indexer for HTTP web serve
 
 What this does is allow you to manage your slot files directly from the web browser since it runs via ssh and is proxypassed using nginx in this example.
 
-You can create separate configured instances that limit to a specific folder using SCOPE. Then you can create users with limited permissions to access the data in that folder.
+You can create separate configured instances that limit to a specific folder using SCOPE. Then you can create users with limited permissions to access the data in that folder via a browser.
 
 [https://filebrowser.github.io/configuration/](https://filebrowser.github.io/configuration/)
 
 The setup is this:
 
 Binary run from the ~/bin directory in a screen.
+
 We point the binary to configuration file in `~/.config/filebrowser` using `-c` ( but this is optional as you can do all this via the command switches directly )
+
 We proxypass it using nginx to be available by https only.
 
-The below commands can be copy and pasted and will download, install and configure filebrowser with nginx on Feralhosting. They be tweaked to work with other providers.
+The below commands can be copy and pasted and will download, install and configure filebrowser with nginx on Feralhosting. The commands canbe tweaked to work with other providers.
 
 ~~~bash
 mkdir -p ~/.config/filebrowser
