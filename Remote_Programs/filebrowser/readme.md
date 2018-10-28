@@ -18,7 +18,7 @@ We proxypass it using nginx to be available by https only.
 
 The below commands can be copy and pasted and will download, install and configure filebrowser with nginx on Feralhosting. They be tweaked to work with other providers.
 
-~~~
+~~~bash
 mkdir -p ~/.config/filebrowser
 wget -qO ~/.config/filebrowser/filebrowser.json https://git.io/fxQGc
 wget -qO ~/filebrowser.tar.gz $(curl -sNL https://git.io/fxQ38 | grep -P 'browser(.*)linux-amd64-filebrowser.tar.gz' | cut -d\" -f4)
