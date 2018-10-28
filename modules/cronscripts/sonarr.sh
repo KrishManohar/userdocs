@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-apppath="NzbDrone.exe"
 appname="sonarr"
+apppath="NzbDrone.exe"
 screencommand="export TMPDIR=$HOME/.userdocs/tmp; $HOME/bin/mono --debug ~/.$appname/$apppath^M"
 #
 # Lets make some required directories. This solution works best alongside these folders for tmp files, logs and more.
