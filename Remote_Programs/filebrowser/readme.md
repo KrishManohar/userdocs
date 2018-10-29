@@ -20,7 +20,7 @@ We proxypass it using nginx to be available by https only.
 
 We start filebrowser in a screen called `filebrowser` using the custom configuration file.
 
-You will have will be able to access the progam via http://servername.feralhosting/username/filebrowser to login as admin
+You will have will be able to access the progam via http://servername.feralhosting.com/username/filebrowser to login as admin
 
 The default username is `admin` and the default password is `admin` ( you should change this in the settings/profile section )
 
