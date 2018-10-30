@@ -220,24 +220,27 @@ cronjobremove () {
 #
 cronscript () {
     wget -qO ~/.userdocs/cronjobs/"$appname".cronjob "https://raw.githubusercontent.com/userdocs/userdocs/master/0_templates/Bash_Scripts/cronscript.sh"
-	#
-	if [[ "$appname" =~ (emby|ombi) ]]; then
-		sed -i 's|# screen command|screen -dmS APPNAME \&\& screen -S APPNAME -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; PATH^M"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
-	else
-		sed -i 's|# screen command|screen -dmS APPNAME \&\& screen -S APPNAME -p 0 -X stuff "export TMPDIR=$HOME/.userdocs/tmp; $HOME/bin/mono --debug PATH^M"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
-	fi
     #
-    [[ "$appname" = "sonarr" ]] && sed -i 's|APPNAME|'"$appname"'|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
-    [[ "$appname" = "radarr" ]] && sed -i 's|APPNAME|'"$appname"'|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
-    [[ "$appname" = "lidarr" ]] && sed -i 's|APPNAME|'"$appname"'|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
-    [[ "$appname" = "jackett"  ]] && sed -i 's|APPNAME|'"$appname"'|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
-    [[ "$appname" = "emby" ]] && sed -i 's|APPNAME|'"$appname"'|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    # Set the appname in the cronscript.
+    [[ "$appname" = "sonarr" ]] && sed -i 's|appname=""|appname="'"$appname"'"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "radarr" ]] && sed -i 's|appname=""|appname="'"$appname"'"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "lidarr" ]] && sed -i 's|appname=""|appname="'"$appname"'"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "jackett"  ]] && sed -i 's|appname=""|appname="'"$appname"'"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "emby" ]] && sed -i 's|appname=""|appname="'"$appname"'"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
     #
-    [[ "$appname" = "sonarr" ]] && sed -i 's|PATH|~/.sonarr/NzbDrone.exe|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
-    [[ "$appname" = "radarr" ]] && sed -i 's|PATH|~/.radarr/Radarr.exe|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
-    [[ "$appname" = "lidarr" ]] && sed -i 's|PATH|~/.lidarr/Lidarr.exe|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
-    [[ "$appname" = "jackett"  ]] && sed -i 's|PATH|~/.jackett/JackettConsole.exe|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
-    [[ "$appname" = "emby" ]] && sed -i 's|PATH|~/.emby/bin/./emby-server|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    # Set the apppath in the cronscript.
+    [[ "$appname" = "sonarr" ]] && sed -i 's|apppath=""|apppath="NzbDrone.exe"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "radarr" ]] && sed -i 's|apppath=""|apppath="Radarr.exe"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "lidarr" ]] && sed -i 's|apppath=""|apppath="Lidarr.exe"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "jackett"  ]] && sed -i 's|apppath=""|apppath="JackettConsole.exe"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "emby" ]] && sed -i 's|apppath=""|apppath="$HOME/.emby/system/EmbyServer(.*).deb$"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    #
+    # Set the screen command in the cronscript.
+    [[ "$appname" = "sonarr" ]] && sed -i 's|screencommand=""|screencommand="$HOME/bin/mono --debug ~/.$appname/$apppath"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "radarr" ]] && sed -i 's|screencommand=""|screencommand="$HOME/bin/mono --debug ~/.$appname/$apppath"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "lidarr" ]] && sed -i 's|screencommand=""|screencommand="$HOME/bin/mono --debug ~/.$appname/$apppath"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "jackett"  ]] && sed -i 's|screencommand=""|screencommand="$HOME/bin/mono --debug ~/.$appname/$apppath"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "emby" ]] && sed -i 's|screencommand=""|$HOME/.emby/bin/./emby-server|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
     #
 }
 #
@@ -481,9 +484,9 @@ genericremove () {
             rm -rf ~/.userdocs/pids/"$appname".pids
             rm -rf ~/.userdocs/logs/"$appname".log
             #
-            sed -i '/^export PATH=~\/bin:$PATH$/d' ~/.bashrc
-            sed -i '/^export LD_LIBRARY_PATH=~\/lib:$LD_LIBRARY_PATH$/d' ~/.bashrc
-            sed -i '/^export PKG_CONFIG_PATH=~\/lib\/pkgconfig:$PKG_CONFIG_PATH$/d' ~/.bashrc
+            sed -i '#^export PATH=$HOME/bin:$PATH$#d' ~/.bashrc
+            sed -i '#^export LD_LIBRARY_PATH=$HOME/lib:$LD_LIBRARY_PATH$#d' ~/.bashrc
+            sed -i '#^export PKG_CONFIG_PATH=$HOME/lib/pkgconfig:$PKG_CONFIG_PATH$#d' ~/.bashrc
             #
             rm -rf ~/.apache2/conf.d/"$appname".conf
             rm -rf ~/.nginx/conf.d/000-default-server.d/"$appname".conf
@@ -499,13 +502,13 @@ genericremove () {
 # These environment variables are required by emby to run.
 embyexportenv () {
     #
-    [[ $(echo "$PATH" | grep -oc ~/bin) -eq "0" ]] && export PATH=~/bin:"$PATH"
-    [[ $(echo "$LD_LIBRARY_PATH" | grep -oc ~/lib) -eq "0" ]] && export LD_LIBRARY_PATH=~/lib:"$LD_LIBRARY_PATH"
-    [[ $(echo "$PKG_CONFIG_PATH" | grep -oc ~/lib/pkgconfig) -eq "0" ]] && export PKG_CONFIG_PATH=~/lib/pkgconfig:"$PKG_CONFIG_PATH"
+    [[ $(echo "$PATH" | grep -oc "$HOME/bin") -eq "0" ]] && export PATH="$HOME/bin:$PATH"
+    [[ $(echo "$LD_LIBRARY_PATH" | grep -oc "$HOME/lib") -eq "0" ]] && export LD_LIBRARY_PATH="$HOME/lib:$LD_LIBRARY_PATH"
+    [[ $(echo "$PKG_CONFIG_PATH" | grep -oc "$HOME/lib/pkgconfig") -eq "0" ]] && export PKG_CONFIG_PATH="$HOME/lib/pkgconfig:$PKG_CONFIG_PATH"
     #
-    [[ $(cat ~/.bashrc | grep -oc 'export PATH=~/bin:$PATH') -eq "0" ]] && echo 'export PATH=~/bin:$PATH' >> ~/.bashrc
-    [[ $(cat ~/.bashrc | grep -oc 'export LD_LIBRARY_PATH=~/lib:$LD_LIBRARY_PATH') -eq "0" ]] && echo 'export LD_LIBRARY_PATH=~/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
-    [[ $(cat ~/.bashrc | grep -oc 'export PKG_CONFIG_PATH=~/lib/pkgconfig:$PKG_CONFIG_PATH') -eq "0" ]] && echo 'export PKG_CONFIG_PATH=~/lib/pkgconfig:$PKG_CONFIG_PATH' >> ~/.bashrc
+    [[ $(cat ~/.bashrc | grep -oc 'export PATH=$HOME/bin:$PATH') -eq "0" ]] && echo 'export PATH=$HOME/bin:$PATH' >> ~/.bashrc
+    [[ $(cat ~/.bashrc | grep -oc 'export LD_LIBRARY_PATH=$HOME/lib:$LD_LIBRARY_PATH') -eq "0" ]] && echo 'export LD_LIBRARY_PATH=$HOME/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
+    [[ $(cat ~/.bashrc | grep -oc 'export PKG_CONFIG_PATH=$HOME/lib/pkgconfig:$PKG_CONFIG_PATH') -eq "0" ]] && echo 'export PKG_CONFIG_PATH=$HOME/lib/pkgconfig:$PKG_CONFIG_PATH' >> ~/.bashrc
 }
 #
 ############################
@@ -1056,8 +1059,6 @@ do
                 #
                 cronscript
                 #
-                # embyexportenv
-                #
                 genericproxypass
                 #
                 genericrestart
@@ -1074,8 +1075,6 @@ do
                 cronjobadd
                 #
                 cronscript
-                #
-                # embyexportenv
                 #
                 genericproxypass
                 #
