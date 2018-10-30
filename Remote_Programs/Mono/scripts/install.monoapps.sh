@@ -76,7 +76,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.1.16"
+scriptversion="1.1.17"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
