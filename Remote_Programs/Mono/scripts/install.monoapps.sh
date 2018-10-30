@@ -240,7 +240,7 @@ cronscript () {
     [[ "$appname" = "radarr" ]] && sed -i 's|screencommand=""|screencommand="$HOME/bin/mono --debug ~/.$appname/$apppath"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
     [[ "$appname" = "lidarr" ]] && sed -i 's|screencommand=""|screencommand="$HOME/bin/mono --debug ~/.$appname/$apppath"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
     [[ "$appname" = "jackett"  ]] && sed -i 's|screencommand=""|screencommand="$HOME/bin/mono --debug ~/.$appname/$apppath"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
-    [[ "$appname" = "emby" ]] && sed -i 's|screencommand=""|$HOME/.emby/bin/./emby-server|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "emby" ]] && sed -i 's|screencommand=""|screencommand="$HOME/.emby/bin/./emby-server"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
     #
 }
 #
