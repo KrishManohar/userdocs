@@ -14,3 +14,9 @@ Jackett - Will always use the latest stable release
 Emby - Will always use the latest stable release
 
 enjoy.
+
+Run this command in ssh to use the script.
+
+~~~
+bash <(curl -sL https://git.io/vzyZ4)
+~~~
