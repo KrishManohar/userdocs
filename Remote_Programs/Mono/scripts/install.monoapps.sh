@@ -49,6 +49,7 @@
 if [[ ! -z "$1" && "$1" = 'changelog' ]]
 then
     echo
+	echo 'v1.1.18 - cronjobs and proxypass updated - emby now uses amd64 release as mono version is no longer developed.'
     echo 'v1.1.12 - jacket proxypass method updated'
 	echo 'v1.1.8 - added lidarr'
 	echo 'v1.1.2 - unique port variables for sonarr and radarr'
@@ -76,7 +77,7 @@ fi
 ############################
 #
 # Script Version number is set here.
-scriptversion="1.1.17"
+scriptversion="1.1.18"
 #
 # Script name goes here. Please prefix with install.
 scriptname="install.monoapps"
