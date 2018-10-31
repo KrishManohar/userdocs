@@ -19,7 +19,7 @@ mkdir -p ~/.userdocs/{versions,cronjobs/logs,logins,logs,pids,tmp}
 #
 ##
 ###
-#### Part 1.1: A cron based restarter for custom instance of rtorrent installed via the manager and or Autodl installed via this script.
+#### Part 1.1: A cron based restarter for a custom instance of rtorrent installed via the manager and or Autodl installed via this script.
 ###
 ##
 #
@@ -34,7 +34,7 @@ fi
 # The below if section is the restart job for your custom rtorrent installation. This will only manage your custom installation.
 #
 # This is our check to see if the 2 required processes ares running. This match is very specific and will only match the default installation processes and not other instances. Otherwise do nothing.
-if [[ "$(ps -xU $(whoami) | grep -Ecw "rtorrent-$suffix(\.rc)?$" | awk '{print $1}')" -ne '2' && -d "$HOME/private/rtorrent-$suffix" && ! -f "$HOME/.userdocs/tmp/rtorrent-$suffix.lock" ]]; then
+if [[ "$(ps -xU $(whoami) | grep -Ecw "rtorrent-$suffix(\.rc)?$")" -ne '2' && -d "$HOME/private/rtorrent-$suffix" && ! -f "$HOME/.userdocs/tmp/rtorrent-$suffix.lock" ]]; then
     #
     # Create this file so that the cronjob will skipped if it is restarting the processes and attempts to run again.
     touch "$HOME/.userdocs/tmp/rtorrent-$suffix.lock"
@@ -98,7 +98,7 @@ if [[ "$(ps -xU $(whoami) | grep -Ecw "irssi-$suffix/$")" -ne '1' && "$(screen -
     screen -S "autodl-$suffix" -p 0 -X stuff '/autodl update^M'
     #
     # Echo the 2 pids of the running processes to a file ~/.userdocs/pids/autodl-SUFFIX.pid
-    echo $(screen -ls | grep -Ew "autodl-$suffix" | awk '{print $1}' | cut -d \. -f 1) $(ps -xU $(whoami) | grep -Ew "irssi-$suffix/$" | awk '{print $1}') > "$HOME/.userdocs/pids/autodl-$suffix.pid"
+    echo $(ps -xU $(whoami) | grep -Ew "irssi-$suffix/$" | awk '{print $1}') $(screen -ls | grep -Ew "autodl-$suffix" | awk '{print $1}' | cut -d \. -f 1) > "$HOME/.userdocs/pids/autodl-$suffix.pid"
     #
     # Echo the time and date this cronjob was run to the ~/.userdocs/cronjobs/logs/autodl-SUFFIX.log
     echo "Restarted at: $(date +"%H:%M on the %d.%m.%y")" >> "$HOME/.userdocs/cronjobs/logs/autodl-$suffix.log" 2>&1
