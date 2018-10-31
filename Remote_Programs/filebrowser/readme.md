@@ -58,5 +58,5 @@ sed -i "s|SCOPE|$HOME|g" ~/.config/filebrowser/filebrowser.json
 # Start the program in a screen called filebrowser
 screen -dmS "filebrowser" && screen -S "filebrowser" -p 0 -X stuff "filebrowser -c $HOME/.config/filebrowser/filebrowser.json^M"
 #
-echo "Just and echo to return our prompt if you copied and pasted all these commands"
+echo "Just an echo to return our prompt if you copied and pasted all these commands"
 ~~~
