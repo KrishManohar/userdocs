@@ -72,6 +72,10 @@ wwwurl="$HOME/www/$(whoami).$(hostname -f)/public_html"
 # If you use this script for a single app installation you can set this here. Otherwise leave blank and you will need to set this per installation in a function or before a function is used.
 appname=""
 #
+greppath=""
+#
+screencommand=""
+#
 # Please link to the cronscript module for this installer.
 cronscripturl="https://raw.githubusercontent.com/userdocs/userdocs/master/modules/cronscripts/$appname.sh"
 #
