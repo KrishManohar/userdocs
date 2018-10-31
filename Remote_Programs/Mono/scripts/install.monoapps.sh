@@ -234,18 +234,18 @@ cronscript () {
     [[ "$appname" = "jackett" ]] && sed -i 's|appname=""|appname="'"$appname"'"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
     [[ "$appname" = "emby" ]] && sed -i 's|appname=""|appname="'"$appname"'"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
     #
-    # Set the apppath in the cronscript.
-    [[ "$appname" = "sonarr" ]] && sed -i 's|apppath=""|apppath="NzbDrone.exe"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
-    [[ "$appname" = "radarr" ]] && sed -i 's|apppath=""|apppath="Radarr.exe"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
-    [[ "$appname" = "lidarr" ]] && sed -i 's|apppath=""|apppath="Lidarr.exe"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
-    [[ "$appname" = "jackett" ]] && sed -i 's|apppath=""|apppath="JackettConsole.exe"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
-    [[ "$appname" = "emby" ]] && sed -i 's|apppath=""|apppath="$HOME/.emby/system/EmbyServer(.*).deb$"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    # Set the greppath in the cronscript.
+    [[ "$appname" = "sonarr" ]] && sed -i 's|greppath=""|greppath="NzbDrone.exe"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "radarr" ]] && sed -i 's|greppath=""|greppath="Radarr.exe"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "lidarr" ]] && sed -i 's|greppath=""|greppath="Lidarr.exe"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "jackett" ]] && sed -i 's|greppath=""|greppath="JackettConsole.exe"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "emby" ]] && sed -i 's|greppath=""|greppath="$HOME/.emby/system/EmbyServer(.*).deb$"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
     #
     # Set the screen command in the cronscript.
-    [[ "$appname" = "sonarr" ]] && sed -i 's|screencommand=""|screencommand="$HOME/bin/mono --debug ~/.$appname/$apppath"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
-    [[ "$appname" = "radarr" ]] && sed -i 's|screencommand=""|screencommand="$HOME/bin/mono --debug ~/.$appname/$apppath"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
-    [[ "$appname" = "lidarr" ]] && sed -i 's|screencommand=""|screencommand="$HOME/bin/mono --debug ~/.$appname/$apppath"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
-    [[ "$appname" = "jackett" ]] && sed -i 's|screencommand=""|screencommand="$HOME/bin/mono --debug ~/.$appname/$apppath"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "sonarr" ]] && sed -i 's|screencommand=""|screencommand="$HOME/bin/mono --debug ~/.$appname/$greppath"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "radarr" ]] && sed -i 's|screencommand=""|screencommand="$HOME/bin/mono --debug ~/.$appname/$greppath"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "lidarr" ]] && sed -i 's|screencommand=""|screencommand="$HOME/bin/mono --debug ~/.$appname/$greppath"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
+    [[ "$appname" = "jackett" ]] && sed -i 's|screencommand=""|screencommand="$HOME/bin/mono --debug ~/.$appname/$greppath"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
     [[ "$appname" = "emby" ]] && sed -i 's|screencommand=""|screencommand="$HOME/.emby/bin/./emby-server"|g' "$HOME/.userdocs/cronjobs/$appname.cronjob"
     #
 }
@@ -327,11 +327,11 @@ sqlite3setup () {
 }
 #
 programpaths () {
-    [[ "$appname" = "sonarr" ]] && apppaths="$HOME/.config/NzbDrone/config.xml"
-    [[ "$appname" = "radarr" ]] && apppaths="$HOME/.config/Radarr/config.xml"
-    [[ "$appname" = "lidarr" ]] && apppaths="$HOME/.config/Lidarr/config.xml"
-    [[ "$appname" = "jackett" ]] && apppaths="$HOME/.config/Jackett/ServerConfig.json"
-    [[ "$appname" = "emby" ]] && apppaths="$HOME/.config/emby-server/config/system.xml"
+    [[ "$appname" = "sonarr" ]] && configpath="$HOME/.config/NzbDrone/config.xml"
+    [[ "$appname" = "radarr" ]] && configpath="$HOME/.config/Radarr/config.xml"
+    [[ "$appname" = "lidarr" ]] && configpath="$HOME/.config/Lidarr/config.xml"
+    [[ "$appname" = "jackett" ]] && configpath="$HOME/.config/Jackett/ServerConfig.json"
+    [[ "$appname" = "emby" ]] && configpath="$HOME/.config/emby-server/config/system.xml"
     #
     [[ "$appname" = "sonarr" ]] && greppath="NzbDrone.exe"
     [[ "$appname" = "radarr" ]] && greppath="Radarr.exe"
@@ -347,17 +347,17 @@ genericproxypass () {
         sed -i "s|generic|$appname|g" "$HOME/.apache2/conf.d/$appname.conf"
         sed -i 's|HOME|'"$HOME"'|g' "$HOME/.apache2/conf.d/$appname.conf"
         #
-        [[ "$appname" = "sonarr" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $apppaths)"'|g' "$HOME/.apache2/conf.d/$appname.conf"
-        [[ "$appname" = "radarr" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $apppaths)"'|g' "$HOME/.apache2/conf.d/$appname.conf"
-        [[ "$appname" = "lidarr" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $apppaths)"'|g' "$HOME/.apache2/conf.d/$appname.conf"
-        [[ "$appname" = "jackett" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)"Port": (.*),|\2|p' $apppaths)"'|g' "$HOME/.apache2/conf.d/$appname.conf"
-        [[ "$appname" = "emby" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<PublicPort>(.*)</PublicPort>|\2|p' $apppaths)"'|g' "$HOME/.apache2/conf.d/$appname.conf"
+        [[ "$appname" = "sonarr" && -f "$configpath" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $configpath)"'|g' "$HOME/.apache2/conf.d/$appname.conf"
+        [[ "$appname" = "radarr" && -f "$configpath" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $configpath)"'|g' "$HOME/.apache2/conf.d/$appname.conf"
+        [[ "$appname" = "lidarr" && -f "$configpath" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $configpath)"'|g' "$HOME/.apache2/conf.d/$appname.conf"
+        [[ "$appname" = "jackett" && -f "$configpath" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)"Port": (.*),|\2|p' $configpath)"'|g' "$HOME/.apache2/conf.d/$appname.conf"
+        [[ "$appname" = "emby" && -f "$configpath" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<PublicPort>(.*)</PublicPort>|\2|p' $configpath)"'|g' "$HOME/.apache2/conf.d/$appname.conf"
         #
-        [[ "$appname" = "sonarr" && ! -f "$apppaths" ]] && proxyport="$sonarrappport"; sed -i 's|PORT|'"$proxyport"'|g' "$HOME/.apache2/conf.d/$appname.conf"
-        [[ "$appname" = "radarr" && ! -f "$apppaths" ]] && proxyport="$radarrappport"; sed -i 's|PORT|'"$proxyport"'|g' "$HOME/.apache2/conf.d/$appname.conf"
-        [[ "$appname" = "liddarr" && ! -f "$apppaths" ]] && proxyport="$lidarrappport"; sed -i 's|PORT|'"$proxyport"'|g' "$HOME/.apache2/conf.d/$appname.conf"
-        [[ "$appname" = "jackett" && ! -f "$apppaths" ]] && proxyport="$jackettappport"; sed -i 's|PORT|'"$proxyport"'|g' "$HOME/.apache2/conf.d/$appname.conf"
-        [[ "$appname" = "emby" && ! -f "$apppaths" ]] && proxyport="$embyappporthttp"; sed -i 's|PORT|'"$proxyport"'|g' "$HOME/.apache2/conf.d/$appname.conf"
+        [[ "$appname" = "sonarr" && ! -f "$configpath" ]] && proxyport="$sonarrappport"; sed -i 's|PORT|'"$proxyport"'|g' "$HOME/.apache2/conf.d/$appname.conf"
+        [[ "$appname" = "radarr" && ! -f "$configpath" ]] && proxyport="$radarrappport"; sed -i 's|PORT|'"$proxyport"'|g' "$HOME/.apache2/conf.d/$appname.conf"
+        [[ "$appname" = "liddarr" && ! -f "$configpath" ]] && proxyport="$lidarrappport"; sed -i 's|PORT|'"$proxyport"'|g' "$HOME/.apache2/conf.d/$appname.conf"
+        [[ "$appname" = "jackett" && ! -f "$configpath" ]] && proxyport="$jackettappport"; sed -i 's|PORT|'"$proxyport"'|g' "$HOME/.apache2/conf.d/$appname.conf"
+        [[ "$appname" = "emby" && ! -f "$configpath" ]] && proxyport="$embyappporthttp"; sed -i 's|PORT|'"$proxyport"'|g' "$HOME/.apache2/conf.d/$appname.conf"
         #
         /usr/sbin/apache2ctl -k graceful > /dev/null 2>&1
         echo "The Apache proxypass was installed"; echo
@@ -378,17 +378,17 @@ genericproxypass () {
             sed -i 's|generic|'"$appname"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
             sed -i 's|username|'"$(whoami)"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
             #
-            [[ "$appname" = "sonarr" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $apppaths)"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
-            [[ "$appname" = "radarr" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $apppaths)"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
-            [[ "$appname" = "lidarr" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $apppaths)"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
-            [[ "$appname" = "jackett" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)"Port": (.*),|\2|p' $apppaths)"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
-            [[ "$appname" = "emby" && -f "$apppaths" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<PublicPort>(.*)</PublicPort>|\2|p' $apppaths)"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
+            [[ "$appname" = "sonarr" && -f "$configpath" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $configpath)"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
+            [[ "$appname" = "radarr" && -f "$configpath" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $configpath)"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
+            [[ "$appname" = "lidarr" && -f "$configpath" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $configpath)"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
+            [[ "$appname" = "jackett" && -f "$configpath" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)"Port": (.*),|\2|p' $configpath)"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
+            [[ "$appname" = "emby" && -f "$configpath" ]] && sed -i 's|PORT|'"$(sed -rn 's|(.*)<PublicPort>(.*)</PublicPort>|\2|p' $configpath)"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
             #
-            [[ "$appname" = "sonarr" && ! -f "$apppaths" ]] && proxyport="$sonarrappport"; sed -i 's|PORT|'"$proxyport"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
-            [[ "$appname" = "radarr" && ! -f "$apppaths" ]] && proxyport="$radarrappport"; sed -i 's|PORT|'"$proxyport"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
-            [[ "$appname" = "lidarr" && ! -f "$apppaths" ]] && proxyport="$lidarrappport"; sed -i 's|PORT|'"$proxyport"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
-            [[ "$appname" = "jackett" && ! -f "$apppaths" ]] && proxyport="$jackettappport"; sed -i 's|PORT|'"$proxyport"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
-            [[ "$appname" = "emby" && ! -f "$apppaths" ]] && proxyport="$embyappporthttp"; sed -i 's|PORT|'"$proxyport"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
+            [[ "$appname" = "sonarr" && ! -f "$configpath" ]] && proxyport="$sonarrappport"; sed -i 's|PORT|'"$proxyport"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
+            [[ "$appname" = "radarr" && ! -f "$configpath" ]] && proxyport="$radarrappport"; sed -i 's|PORT|'"$proxyport"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
+            [[ "$appname" = "lidarr" && ! -f "$configpath" ]] && proxyport="$lidarrappport"; sed -i 's|PORT|'"$proxyport"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
+            [[ "$appname" = "jackett" && ! -f "$configpath" ]] && proxyport="$jackettappport"; sed -i 's|PORT|'"$proxyport"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
+            [[ "$appname" = "emby" && ! -f "$configpath" ]] && proxyport="$embyappporthttp"; sed -i 's|PORT|'"$proxyport"'|g' "$HOME/.nginx/conf.d/000-default-server.d/$appname.conf"
             #
             /usr/sbin/nginx -s reload -c ~/.nginx/nginx.conf > /dev/null 2>&1
             echo "The nginx proxypass was installed"; echo
@@ -399,17 +399,17 @@ genericproxypass () {
 generichosturl () {
     if [[ $(hostname -f | egrep -co ^.*\.feralhosting\.com) -eq "1" ]]
     then
-        [[ "$appname" = "sonarr" && -f "$apppaths" ]] && echo -e "\033[32m""https://$(hostname -f)/$(whoami)/$appname/settings/general""\e[0m"
-        [[ "$appname" = "radarr" && -f "$apppaths" ]] && echo -e "\033[32m""https://$(hostname -f)/$(whoami)/$appname/settings/general""\e[0m"
-        [[ "$appname" = "lidarr" && -f "$apppaths" ]] && echo -e "\033[32m""https://$(hostname -f)/$(whoami)/$appname/settings/general""\e[0m"
-        [[ "$appname" = "jackett" && -f "$apppaths" ]] && echo -e "\033[32m""https://$(hostname -f)/$(whoami)/$appname/UI/Dashboard""\e[0m"
-        [[ "$appname" = "emby" && -f "$apppaths" ]] && echo -e "\033[32m""https://$(hostname -f)/$(whoami)/$appname""\e[0m"
+        [[ "$appname" = "sonarr" && -f "$configpath" ]] && echo -e "\033[32m""https://$(hostname -f)/$(whoami)/$appname/settings/general""\e[0m"
+        [[ "$appname" = "radarr" && -f "$configpath" ]] && echo -e "\033[32m""https://$(hostname -f)/$(whoami)/$appname/settings/general""\e[0m"
+        [[ "$appname" = "lidarr" && -f "$configpath" ]] && echo -e "\033[32m""https://$(hostname -f)/$(whoami)/$appname/settings/general""\e[0m"
+        [[ "$appname" = "jackett" && -f "$configpath" ]] && echo -e "\033[32m""https://$(hostname -f)/$(whoami)/$appname/UI/Dashboard""\e[0m"
+        [[ "$appname" = "emby" && -f "$configpath" ]] && echo -e "\033[32m""https://$(hostname -f)/$(whoami)/$appname""\e[0m"
     else
-        [[ "$appname" = "sonarr" && -f "$apppaths" ]] && echo -e "\033[32m""http://$(hostname -f):$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $apppaths)/$(whoami)/$appname/settings/general""\e[0m"
-        [[ "$appname" = "radarr" && -f "$apppaths" ]] && echo -e "\033[32m""http://$(hostname -f):$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $apppaths)/$(whoami)/$appname/settings/general""\e[0m"
-        [[ "$appname" = "lidarr" && -f "$apppaths" ]] && echo -e "\033[32m""http://$(hostname -f):$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $apppaths)/$(whoami)/$appname/settings/general""\e[0m"
-        [[ "$appname" = "jackett" && -f "$apppaths" ]] && echo -e "\033[32m""http://$(hostname -f):$(sed -rn 's|(.*)"Port": (.*),|\2|p' $apppaths)/$(whoami)/$appname/UI/Dashboard""\e[0m"
-        [[ "$appname" = "emby" && -f "$apppaths" ]] && echo -e "\033[32m""http://$(hostname -f):$(sed -rn 's|(.*)<PublicPort>(.*)</PublicPort>|\2|p' $apppaths)/""\e[0m"
+        [[ "$appname" = "sonarr" && -f "$configpath" ]] && echo -e "\033[32m""http://$(hostname -f):$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $configpath)/$(whoami)/$appname/settings/general""\e[0m"
+        [[ "$appname" = "radarr" && -f "$configpath" ]] && echo -e "\033[32m""http://$(hostname -f):$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $configpath)/$(whoami)/$appname/settings/general""\e[0m"
+        [[ "$appname" = "lidarr" && -f "$configpath" ]] && echo -e "\033[32m""http://$(hostname -f):$(sed -rn 's|(.*)<Port>(.*)</Port>|\2|p' $configpath)/$(whoami)/$appname/settings/general""\e[0m"
+        [[ "$appname" = "jackett" && -f "$configpath" ]] && echo -e "\033[32m""http://$(hostname -f):$(sed -rn 's|(.*)"Port": (.*),|\2|p' $configpath)/$(whoami)/$appname/UI/Dashboard""\e[0m"
+        [[ "$appname" = "emby" && -f "$configpath" ]] && echo -e "\033[32m""http://$(hostname -f):$(sed -rn 's|(.*)<PublicPort>(.*)</PublicPort>|\2|p' $configpath)/""\e[0m"
     fi    
 }
 #
@@ -783,12 +783,12 @@ do
                 cp -rf ~/.userdocs/tmp/NzbDrone/. ~/.$appname
                 rm -rf ~/.userdocs/tmp/NzbDrone{,.tar.gz}
                 #
-                if [[ ! -f "$apppaths" ]]
+                if [[ ! -f "$configpath" ]]
                 then
                     mkdir -p ~/.config/NzbDrone >> ~/.userdocs/logs/$appname.log 2>&1
-                    wget -qO "$apppaths" "$sonarrconfig"
-                    sed -i 's|<Port>8989</Port>|<Port>'"$sonarrappport"'</Port>|g' "$apppaths"
-                    sed -i 's|<UrlBase></UrlBase>|<UrlBase>/'"$(whoami)"'/'"$appname"'</UrlBase>|g' "$apppaths"
+                    wget -qO "$configpath" "$sonarrconfig"
+                    sed -i 's|<Port>8989</Port>|<Port>'"$sonarrappport"'</Port>|g' "$configpath"
+                    sed -i 's|<UrlBase></UrlBase>|<UrlBase>/'"$(whoami)"'/'"$appname"'</UrlBase>|g' "$configpath"
                 fi
                 #
                 cronjobadd
@@ -848,12 +848,12 @@ do
                 cp -rf ~/.userdocs/tmp/${appname^}/. ~/.$appname
                 rm -rf ~/.userdocs/tmp/${appname^}{,.tar.gz}
                 #
-                if [[ ! -f "$apppaths" ]]
+                if [[ ! -f "$configpath" ]]
                 then
                     mkdir -p ~/.config/${appname^} >> ~/.userdocs/logs/$appname.log 2>&1
-                    wget -qO "$apppaths" "$radarrconfig"
-                    sed -i 's|<Port>7878</Port>|<Port>'"$radarrappport"'</Port>|g' "$apppaths"
-                    sed -i 's|<UrlBase></UrlBase>|<UrlBase>/'"$(whoami)"'/'"$appname"'</UrlBase>|g' "$apppaths"
+                    wget -qO "$configpath" "$radarrconfig"
+                    sed -i 's|<Port>7878</Port>|<Port>'"$radarrappport"'</Port>|g' "$configpath"
+                    sed -i 's|<UrlBase></UrlBase>|<UrlBase>/'"$(whoami)"'/'"$appname"'</UrlBase>|g' "$configpath"
                 fi
                 #
                 cronjobadd
@@ -913,12 +913,12 @@ do
                 cp -rf ~/.userdocs/tmp/${appname^}/. ~/.$appname
                 rm -rf ~/.userdocs/tmp/${appname^}{,.tar.gz}
                 #
-                if [[ ! -f "$apppaths" ]]
+                if [[ ! -f "$configpath" ]]
                 then
                     mkdir -p ~/.config/${appname^} >> ~/.userdocs/logs/$appname.log 2>&1
-                    wget -qO "$apppaths" "$lidarrconfig"
-                    sed -i 's|<Port>8686</Port>|<Port>'"$lidarrappport"'</Port>|g' "$apppaths"
-                    sed -i 's|<UrlBase></UrlBase>|<UrlBase>/'"$(whoami)"'/'"$appname"'</UrlBase>|g' "$apppaths"
+                    wget -qO "$configpath" "$lidarrconfig"
+                    sed -i 's|<Port>8686</Port>|<Port>'"$lidarrappport"'</Port>|g' "$configpath"
+                    sed -i 's|<UrlBase></UrlBase>|<UrlBase>/'"$(whoami)"'/'"$appname"'</UrlBase>|g' "$configpath"
                 fi
                 #
                 cronjobadd
