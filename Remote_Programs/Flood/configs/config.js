@@ -12,7 +12,7 @@ const CONFIG = {
   // the root of Flood's web server.
   // Recompiling assets with `npm run build` is needed after each `baseURI` change.
   // See https://github.com/jfurrow/flood/wiki/Using-Flood-behind-a-reverse-proxy
-  baseURI: '/',
+  baseURI: '/username/flood',
   // Flood uses a local nedb database to keep track of users, torrents,
   // and activity. The database is regularly purged to remove outdated data.
   // This value dictates how old data is, in milliseconds, before being purged.
