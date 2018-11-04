@@ -24,7 +24,7 @@ mkdir -p ~/.userdocs/{versions,cronjobs/logs,logins,logs,pids,tmp}
 ##
 #
 # This check will see if rtorrent is running. If not then it will remove the cronjob lock file and kill and wipe all related screens.
-if [[ "$(ps -xU $(whoami) | grep -Ecw "rtorrent-$suffix(\.rc)?$")" -eq '0' ]]; then
+if [[ "$(ps -xU $(whoami) | grep -Ecw "rtorrent-$suffix(\.rc)?$")" -eq '0' || "$(screen -ls | grep -Ecw "rtorrent-$suffix")" -eq '0' ]]; then
     kill -9 $(ps -xU $(whoami) | grep -Ew "rtorrent-$suffix(\.rc)?$" | awk '{print $1}') $(screen -ls | grep -Ew "rtorrent-$suffix" | awk '{print $1}' | cut -d \. -f 1) > /dev/null 2>&1
     screen -wipe > /dev/null 2>&1
     [[ -f "$HOME/private/rtorrent-$suffix/work/rtorrent.lock" ]] && rm -f "$HOME/private/rtorrent-$suffix/work/rtorrent.lock"

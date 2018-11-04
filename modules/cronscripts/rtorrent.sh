@@ -8,7 +8,6 @@
 #
 #
 #
-#
 # Please set the path to your www root here.
 wwwurl="$HOME/www/$(whoami).$(hostname -f)/public_html"
 #
@@ -25,7 +24,7 @@ mkdir -p ~/.userdocs/{versions,cronjobs/logs,logins,logs,pids,tmp}
 ##
 #
 # This check will see if rtorrent is running. If not then it will remove the cronjob lock file and kill and wipe all related screens.
-if [[ "$(ps -xU $(whoami) | grep -Ecw "rtorrent$")" -eq '0' ]]; then
+if [[ "$(ps -xU $(whoami) | grep -Ecw "rtorrent$")" -eq '0' || "$(screen -ls | grep -Ecw "rtorrent\s")" -eq '0' ]]; then
     kill -9 $(ps -xU $(whoami) | grep -Ew "rtorrent$" | awk '{print $1}') $(screen -ls | grep -Ew "rtorrent\s" | awk '{print $1}' | cut -d \. -f 1) > /dev/null 2>&1
     screen -wipe > /dev/null 2>&1
     [[ -f "$HOME/private/rtorrent/work/rtorrent.lock" ]] && rm -f "$HOME/private/rtorrent/work/rtorrent.lock"
