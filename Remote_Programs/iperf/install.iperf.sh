@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 #
+# bash <(curl -sL https://git.io/fpcor)
+#
 mkdir -p ~/{bin,lib} && source ~/.bashrc
 #
 if [[ $(echo "$PATH" | grep -oc "$HOME/bin") -eq "0" && $(cat ~/.bashrc | grep -oc 'export PATH="$HOME/bin${PATH:+:${PATH}}"') -eq "0" ]]; then
