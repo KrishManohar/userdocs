@@ -17,6 +17,7 @@ wget -qO ~/bin/iperf3 https://iperf.fr/download/ubuntu/iperf3_3.1.3 && chmod +x 
 wget -qO ~/lib/libiperf.so.0 https://iperf.fr/download/ubuntu/libiperf.so.0_3.1.3
 #
 while [[ "$(ss -ln | grep -co ''"$port"'')" -ge "1" ]]; do port="$(shuf -i 10001-32001 -n 1)"; done
+echo -n "$port" > ~/.iperf3port
 #
 echo
 echo 'Connect with your client using these commands:'
