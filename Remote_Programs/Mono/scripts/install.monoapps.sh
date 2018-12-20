@@ -137,7 +137,7 @@ sonarrconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_
 while [[ "$(ss -ln | grep -co ''"$sonarrappport"'')" -ge "1" ]]; do sonarrappport="$(shuf -i 10001-32001 -n 1)"; done
 #
 radarrv="$(curl -sN https://github.com/Radarr/Radarr/releases | grep -o '/Radarr/Radarr/archive/.*\.zip' | sort -V | tail -1 | sed -rn 's|/Radarr/Radarr/archive/v(.*).zip|\1|p')"
-radarrurl="https://github.com/Radarr/Radarr/releases/download/v$radarrv/Radarr.develop.$radarrv.linux.tar.gz"
+radarrurl="https://github.com/Radarr/Radarr/releases/download/v$radarrv/Radarr.v$radarrv.linux.tar.gz"
 radarrconfig="https://raw.githubusercontent.com/userdocs/userdocs/master/Remote_Programs/Radarr/configs/config.xml"
 while [[ "$(ss -ln | grep -co ''"$radarrappport"'')" -ge "1" ]]; do radarrappport="$(shuf -i 10001-32001 -n 1)"; done
 #
